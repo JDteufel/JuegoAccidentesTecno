@@ -1,11 +1,5 @@
 import * as BABYLON from '@babylonjs/core'
 import * as GUI from '@babylonjs/gui'
-import { VistaTutorial } from './VistaTutorial.js'
-import { VistaRegistro } from './VistaRegistro.js'
-import { VistaLogin } from './VistaLogin.js'
-import { VistaJugar } from './VistaJugar.js'
-import { VistaReglas } from './VistaReglas.js'
-import { VistaCrearJuego } from './VistaCrearJuego.js'
 
 export class VistaInicio {
   constructor(canvas) {
@@ -14,15 +8,9 @@ export class VistaInicio {
     this.scene = null
     this.gui = null
     this.overlay = null
-    this.vistaTutorial = null
-    this.vistaRegistro = null
-    this.vistaLogin = null
-    this.vistaJugar = null
-    this.vistaReglas = null
-    this.vistaCrearJuego = null
     this.onTutorial = null
     this.onRegistro = null
-    this.onLogin = null
+    this.onInicioSesion = null
     this.onJugar = null
     this.onReglas = null
     this.onCrearJuego = null
@@ -32,18 +20,16 @@ export class VistaInicio {
     const scene = new BABYLON.Scene(this.engine)
     scene.clearColor = new BABYLON.Color4(0.07, 0.05, 0.05, 1)
 
+    const objetivoCamara = new BABYLON.Vector3(0, 1.2, 0)
     const camera = new BABYLON.ArcRotateCamera(
       'camera',
       Math.PI / 2,
       Math.PI / 2.25,
       13,
-      BABYLON.Vector3.Zero(),
+      objetivoCamara,
       scene
     )
-    camera.attachControl(this.canvas, true)
-    camera.lowerRadiusLimit = 11
-    camera.upperRadiusLimit = 15
-    camera.wheelDeltaPercentage = 0.01
+    camera.inputs.clear()
 
     const light = new BABYLON.HemisphericLight(
       'light',
@@ -60,16 +46,23 @@ export class VistaInicio {
     pointLight.diffuse = new BABYLON.Color3(1, 0.55, 0.2)
     pointLight.intensity = 18
 
+    scene.onBeforeRenderObservable.add(() => {
+      const tiempoSolar = performance.now() * 0.000144
+      const radioSolar = 24
+      pointLight.position.x = Math.cos(tiempoSolar) * radioSolar
+      pointLight.position.z = Math.sin(tiempoSolar) * radioSolar
+      pointLight.position.y = 11 + Math.sin(tiempoSolar * 0.7) * 2.8
+    })
+
     this.gui = GUI.AdvancedDynamicTexture.CreateFullscreenUI('UI', true, scene)
 
-    this.crearDecoracion(scene)
+    this.crearDecoracion(scene, camera)
     this.crearMenu()
-    this.crearSubvistas()
 
     this.scene = scene
   }
 
-  crearDecoracion(scene) {
+  crearDecoracion(scene, camera) {
     const materialPrincipal = new BABYLON.StandardMaterial('matPrincipal', scene)
     materialPrincipal.diffuseColor = new BABYLON.Color3(0.92, 0.4, 0.1)
     materialPrincipal.emissiveColor = new BABYLON.Color3(0.33, 0.12, 0.04)
@@ -79,47 +72,69 @@ export class VistaInicio {
     materialSecundario.diffuseColor = new BABYLON.Color3(0.96, 0.65, 0.24)
     materialSecundario.emissiveColor = new BABYLON.Color3(0.18, 0.08, 0.03)
 
-    const materialOscuro = new BABYLON.StandardMaterial('matOscuro', scene)
-    materialOscuro.diffuseColor = new BABYLON.Color3(0.16, 0.12, 0.12)
-    materialOscuro.emissiveColor = new BABYLON.Color3(0.05, 0.03, 0.03)
-
-    const suelo = BABYLON.MeshBuilder.CreateGround(
-      'suelo',
-      { width: 18, height: 18 },
-      scene
-    )
-    suelo.position.y = -2.2
-    suelo.material = materialOscuro
-
-    const figuras = []
+    const centroOrbita = new BABYLON.Vector3(0, 0.8, 0)
+    const anguloDiagonalPantalla = BABYLON.Tools.ToRadians(35)
+    const direccionCamara = centroOrbita.subtract(camera.position).normalize()
+    const ejeProfundidad = camera.position.subtract(centroOrbita).normalize()
+    const derechaPantalla = BABYLON.Vector3.Cross(
+      direccionCamara,
+      BABYLON.Vector3.Up()
+    ).normalize()
+    const arribaPantalla = BABYLON.Vector3.Cross(
+      derechaPantalla,
+      direccionCamara
+    ).normalize()
+    const ejeDiagonal = derechaPantalla
+      .scale(Math.cos(anguloDiagonalPantalla))
+      .add(arribaPantalla.scale(-Math.sin(anguloDiagonalPantalla)))
+      .normalize()
+    const ejeDiagonalPerpendicular = derechaPantalla
+      .scale(Math.sin(anguloDiagonalPantalla))
+      .add(arribaPantalla.scale(Math.cos(anguloDiagonalPantalla)))
+      .normalize()
+    const radioAnillo = 3.25
+    const velocidadRotacionAnillos = 1
+    const velocidadOrbitaAnillo = velocidadRotacionAnillos
+    const velocidadRotacionOctaedro = 0.014
+    const separacionAngular = (Math.PI * 2) / 4
+    const figurasEnAnillo = []
 
     const octaedro = BABYLON.MeshBuilder.CreatePolyhedron(
       'octaedro',
       { type: 1, size: 1.55 },
       scene
     )
-    octaedro.position = new BABYLON.Vector3(0, 0.8, 0)
+    octaedro.position = centroOrbita.clone()
     octaedro.material = materialPrincipal
-    figuras.push({
-      mesh: octaedro,
-      velocidad: new BABYLON.Vector3(0.004, 0.01, 0),
-      offset: 0
-    })
 
-    const toro = BABYLON.MeshBuilder.CreateTorus(
-      'toroCentral',
-      { diameter: 4.6, thickness: 0.22, tessellation: 96 },
+    const materialAnilloBorde = new BABYLON.StandardMaterial(
+      'matAnilloBorde',
       scene
     )
-    toro.rotation.x = Math.PI / 3
-    toro.rotation.z = Math.PI / 5
-    toro.position.y = 0.8
-    toro.material = materialSecundario
-    figuras.push({
-      mesh: toro,
-      velocidad: new BABYLON.Vector3(0.002, -0.004, 0.003),
-      offset: 0.8
-    })
+    materialAnilloBorde.diffuseColor = new BABYLON.Color3(0.98, 0.74, 0.3)
+    materialAnilloBorde.emissiveColor = new BABYLON.Color3(0.2, 0.11, 0.04)
+
+    const puntosAnilloBorde = []
+    const ladosAnilloBorde = 8
+    for (let i = 0; i <= ladosAnilloBorde; i += 1) {
+      const t = (i / ladosAnilloBorde) * Math.PI * 2
+      const punto = centroOrbita
+        .add(ejeDiagonalPerpendicular.scale(radioAnillo * Math.cos(t)))
+        .add(ejeProfundidad.scale(radioAnillo * Math.sin(t)))
+      puntosAnilloBorde.push(punto)
+    }
+    let anilloBorde = BABYLON.MeshBuilder.CreateTube(
+      'anilloBorde',
+      {
+        path: puntosAnilloBorde,
+        radius: 0.07,
+        tessellation: 32,
+        sideOrientation: BABYLON.Mesh.DOUBLESIDE,
+        updatable: true
+      },
+      scene
+    )
+    anilloBorde.material = materialAnilloBorde
 
     const cajaA = BABYLON.MeshBuilder.CreateBox(
       'cajaA',
@@ -128,23 +143,27 @@ export class VistaInicio {
     )
     cajaA.position = new BABYLON.Vector3(-2.4, 1.75, 1.1)
     cajaA.material = materialSecundario
-    figuras.push({
+    figurasEnAnillo.push({
       mesh: cajaA,
-      velocidad: new BABYLON.Vector3(0.008, 0.006, 0),
-      offset: 1.4
+      radio: radioAnillo,
+      velocidadOrbita: velocidadOrbitaAnillo,
+      fase: 0 * separacionAngular,
+      velocidadRotacion: new BABYLON.Vector3(0.008, 0.006, 0)
     })
 
-    const cajaB = BABYLON.MeshBuilder.CreateBox(
-      'cajaB',
-      { size: 0.95 },
+    const tetraedroB = BABYLON.MeshBuilder.CreatePolyhedron(
+      'tetraedroB',
+      { type: 4, size: 1.0 },
       scene
     )
-    cajaB.position = new BABYLON.Vector3(2.65, 0.1, -0.7)
-    cajaB.material = materialPrincipal
-    figuras.push({
-      mesh: cajaB,
-      velocidad: new BABYLON.Vector3(-0.006, 0.009, 0),
-      offset: 2.2
+    tetraedroB.position = new BABYLON.Vector3(2.65, 0.1, -0.7)
+    tetraedroB.material = materialPrincipal
+    figurasEnAnillo.push({
+      mesh: tetraedroB,
+      radio: radioAnillo,
+      velocidadOrbita: velocidadOrbitaAnillo,
+      fase: 1 * separacionAngular,
+      velocidadRotacion: new BABYLON.Vector3(-0.006, 0.009, 0)
     })
 
     const dodecaedro = BABYLON.MeshBuilder.CreatePolyhedron(
@@ -154,10 +173,12 @@ export class VistaInicio {
     )
     dodecaedro.position = new BABYLON.Vector3(2.15, 2.2, 1.8)
     dodecaedro.material = materialSecundario
-    figuras.push({
+    figurasEnAnillo.push({
       mesh: dodecaedro,
-      velocidad: new BABYLON.Vector3(0.005, 0.007, 0),
-      offset: 0.35
+      radio: radioAnillo,
+      velocidadOrbita: velocidadOrbitaAnillo,
+      fase: 2 * separacionAngular,
+      velocidadRotacion: new BABYLON.Vector3(0.005, 0.007, 0)
     })
 
     const icosaedro = BABYLON.MeshBuilder.CreatePolyhedron(
@@ -167,21 +188,78 @@ export class VistaInicio {
     )
     icosaedro.position = new BABYLON.Vector3(-2.9, -0.15, -1.4)
     icosaedro.material = materialPrincipal
-    figuras.push({
+    figurasEnAnillo.push({
       mesh: icosaedro,
-      velocidad: new BABYLON.Vector3(-0.007, 0.005, 0),
-      offset: 2.8
+      radio: radioAnillo,
+      velocidadOrbita: velocidadOrbitaAnillo,
+      fase: 3 * separacionAngular,
+      velocidadRotacion: new BABYLON.Vector3(-0.007, 0.005, 0)
     })
 
     scene.onBeforeRenderObservable.add(() => {
       const tiempo = performance.now() * 0.001
+      const anguloRotacionAnillos = -tiempo * velocidadRotacionAnillos
+      const rotacionAnillosY = BABYLON.Quaternion.FromEulerAngles(
+        0,
+        anguloRotacionAnillos,
+        0
+      )
+      const ejeDiagonalOrbital = ejeDiagonal.rotateByQuaternionToRef(
+        rotacionAnillosY,
+        new BABYLON.Vector3()
+      )
+      const ejeProfundidadOrbital = ejeProfundidad.rotateByQuaternionToRef(
+        rotacionAnillosY,
+        new BABYLON.Vector3()
+      )
+      const ejeDiagonalPerpendicularOrbital =
+        ejeDiagonalPerpendicular.rotateByQuaternionToRef(
+          rotacionAnillosY,
+          new BABYLON.Vector3()
+        )
 
-      figuras.forEach(({ mesh, velocidad, offset }, index) => {
-        mesh.rotation.x += velocidad.x
-        mesh.rotation.y += velocidad.y
-        mesh.rotation.z += velocidad.z
-        mesh.position.y += Math.sin(tiempo * 1.2 + offset + index * 0.4) * 0.0035
-      })
+      octaedro.rotation.y += velocidadRotacionOctaedro
+      octaedro.rotation.x = 0
+      octaedro.rotation.z = 0
+
+      figurasEnAnillo.forEach(
+        ({
+          mesh,
+          radio,
+          velocidadOrbita,
+          fase,
+          velocidadRotacion
+        }) => {
+          const angulo = tiempo * velocidadOrbita + fase
+          const puntoAnillo = ejeDiagonalOrbital
+            .scale(radio * Math.cos(angulo))
+            .add(ejeProfundidadOrbital.scale(radio * Math.sin(angulo)))
+          mesh.position.copyFrom(centroOrbita.add(puntoAnillo))
+          mesh.rotation.x += velocidadRotacion.x
+          mesh.rotation.y += velocidadRotacion.y
+          mesh.rotation.z += velocidadRotacion.z
+        }
+      )
+
+      const pathAnilloActualizado = []
+      for (let i = 0; i <= ladosAnilloBorde; i += 1) {
+        const t = (i / ladosAnilloBorde) * Math.PI * 2
+        const punto = centroOrbita
+          .add(ejeDiagonalPerpendicularOrbital.scale(radioAnillo * Math.cos(t)))
+          .add(ejeProfundidadOrbital.scale(radioAnillo * Math.sin(t)))
+        pathAnilloActualizado.push(punto)
+      }
+      anilloBorde = BABYLON.MeshBuilder.CreateTube(
+        'anilloBorde',
+        {
+          path: pathAnilloActualizado,
+          radius: 0.07,
+          tessellation: 32,
+          sideOrientation: BABYLON.Mesh.DOUBLESIDE,
+          instance: anilloBorde
+        },
+        scene
+      )
     })
   }
 
@@ -219,12 +297,12 @@ export class VistaInicio {
         nombre: 'botonInicioSesionSuperior',
         texto: 'Iniciar sesión',
         top: '-44%',
-        left: '28%',
+        left: '38%',
         width: '220px',
         height: '44px',
         fondo: '#a84f16',
         color: '#fff1e3',
-        callback: () => this.onLogin && this.onLogin()
+        callback: () => this.onInicioSesion && this.onInicioSesion()
       })
     )
 
@@ -233,7 +311,7 @@ export class VistaInicio {
         nombre: 'botonRegistroSuperior',
         texto: 'Registrarse',
         top: '-44%',
-        left: '12%',
+        left: '24%',
         width: '200px',
         height: '44px',
         fondo: '#2f2623',
@@ -245,7 +323,7 @@ export class VistaInicio {
     const panelAcciones = new GUI.Rectangle('panelAccionesMenu')
     panelAcciones.width = '420px'
     panelAcciones.height = '470px'
-    panelAcciones.left = '-23%'
+    panelAcciones.left = '-34%'
     panelAcciones.top = '8%'
     panelAcciones.cornerRadius = 30
     panelAcciones.thickness = 2
@@ -263,7 +341,7 @@ export class VistaInicio {
         texto: 'Menú Principal',
         tamano: 28,
         alto: '60px',
-        top: '-145px',
+        top: '-166px',
         color: '#ffd9bd'
       })
     )
@@ -315,21 +393,6 @@ export class VistaInicio {
         callback: () => this.onReglas && this.onReglas()
       })
     )
-  }
-
-  crearSubvistas() {
-    this.vistaTutorial = new VistaTutorial(this.gui)
-    this.vistaTutorial.crear()
-    this.vistaRegistro = new VistaRegistro(this.gui)
-    this.vistaRegistro.crear()
-    this.vistaLogin = new VistaLogin(this.gui)
-    this.vistaLogin.crear()
-    this.vistaJugar = new VistaJugar(this.gui)
-    this.vistaJugar.crear()
-    this.vistaReglas = new VistaReglas(this.gui)
-    this.vistaReglas.crear()
-    this.vistaCrearJuego = new VistaCrearJuego(this.gui)
-    this.vistaCrearJuego.crear()
   }
 
   crearTexto({
@@ -397,8 +460,8 @@ export class VistaInicio {
     this.onRegistro = callback
   }
 
-  setOnLogin(callback) {
-    this.onLogin = callback
+  setOnInicioSesion(callback) {
+    this.onInicioSesion = callback
   }
 
   setOnJugar(callback) {
@@ -413,10 +476,16 @@ export class VistaInicio {
     this.onCrearJuego = callback
   }
 
-  render() {
+  render(targetFps = 60) {
     this.crearEscena()
     if (!this.scene) return
+    const frameInterval = 1000 / targetFps
+    let ultimoFrame = 0
     this.engine.runRenderLoop(() => {
+      const ahora = performance.now()
+      const delta = ahora - ultimoFrame
+      if (delta < frameInterval) return
+      ultimoFrame = ahora - (delta % frameInterval)
       this.scene.render()
     })
     window.addEventListener('resize', () => {
@@ -424,3 +493,5 @@ export class VistaInicio {
     })
   }
 }
+
+

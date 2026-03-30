@@ -1,8 +1,14 @@
 import { VistaInicio } from './view/VistaInicio.js'
+import { VistaTutorial } from './view/VistaTutorial.js'
+import { VistaRegistro } from './view/VistaRegistro.js'
+import { VistaInicioSesion } from './view/VistaInicioSesion.js'
+import { VistaJugar } from './view/VistaJugar.js'
+import { VistaReglas } from './view/VistaReglas.js'
+import { VistaCrearJuego } from './view/VistaCrearJuego.js'
 import { ControladorVistaInicio } from './controller/ControladorVistaInicio.js'
 import { ControladorVistaTutorial } from './controller/ControladorVistaTutorial.js'
 import { ControladorVistaRegistro } from './controller/ControladorVistaRegistro.js'
-import { ControladorVistaLogin } from './controller/ControladorVistaLogin.js'
+import { ControladorVistaInicioSesion } from './controller/ControladorVistaInicioSesion.js'
 import { ControladorVistaJugar } from './controller/ControladorVistaJugar.js'
 import { ControladorVistaReglas } from './controller/ControladorVistaReglas.js'
 import { ControladorVistaCrearJuego } from './controller/ControladorVistaCrearJuego.js'
@@ -14,41 +20,64 @@ if (!canvas) {
 }
 
 const vistaInicio = new VistaInicio(canvas)
-vistaInicio.render()
+const TARGET_FPS = 60
+vistaInicio.render(TARGET_FPS)
 
-const controladorVistaInicio = new ControladorVistaInicio(vistaInicio)
-const controladorTutorial = new ControladorVistaTutorial(
-  vistaInicio.vistaTutorial,
-  vistaInicio
+const vistaTutorial = new VistaTutorial(vistaInicio.gui)
+vistaTutorial.crear()
+const vistaRegistro = new VistaRegistro(vistaInicio.gui)
+vistaRegistro.crear()
+const vistaInicioSesion = new VistaInicioSesion(vistaInicio.gui)
+vistaInicioSesion.crear()
+const vistaJugar = new VistaJugar(vistaInicio.gui)
+vistaJugar.crear()
+const vistaReglas = new VistaReglas(vistaInicio.gui)
+vistaReglas.crear()
+const vistaCrearJuego = new VistaCrearJuego(vistaInicio.gui)
+vistaCrearJuego.crear()
+
+const controladorVistaInicio = new ControladorVistaInicio(
+  vistaInicio,
+  vistaTutorial,
+  vistaRegistro,
+  vistaInicioSesion,
+  vistaJugar,
+  vistaReglas,
+  vistaCrearJuego
 )
+
+const controladorTutorial = new ControladorVistaTutorial(vistaTutorial)
+
 const controladorRegistro = new ControladorVistaRegistro(
-  vistaInicio.vistaRegistro,
+  vistaRegistro,
   vistaInicio,
-  vistaInicio.vistaCrearJuego
+  vistaCrearJuego
 )
-const controladorLogin = new ControladorVistaLogin(
-  vistaInicio.vistaLogin,
+
+const controladorInicioSesion = new ControladorVistaInicioSesion(
+  vistaInicioSesion,
   vistaInicio,
-  vistaInicio.vistaCrearJuego
+  vistaCrearJuego
 )
+
 const controladorJugar = new ControladorVistaJugar(
-  vistaInicio.vistaJugar,
+  vistaJugar,
   vistaInicio,
-  vistaInicio.vistaCrearJuego
+  vistaCrearJuego
 )
-const controladorReglas = new ControladorVistaReglas(
-  vistaInicio.vistaReglas,
-  vistaInicio
-)
+
+const controladorReglas = new ControladorVistaReglas(vistaReglas, vistaInicio)
+
 const controladorCrearJuego = new ControladorVistaCrearJuego(
-  vistaInicio.vistaCrearJuego,
+  vistaCrearJuego,
   vistaInicio
 )
 
 controladorVistaInicio.init()
 controladorTutorial.init()
 controladorRegistro.init()
-controladorLogin.init()
+controladorInicioSesion.init()
 controladorJugar.init()
 controladorReglas.init()
 controladorCrearJuego.init()
+

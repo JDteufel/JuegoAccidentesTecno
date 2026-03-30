@@ -16,7 +16,7 @@ export class VistaTutorial {
     fondo.width = 1
     fondo.height = 1
     fondo.thickness = 0
-    fondo.background = 'rgba(0, 0, 0, 0.65)'
+    fondo.background = 'rgba(12, 9, 8, 0.64)'
     fondo.isVisible = false
     this.gui.addControl(fondo)
     this.fondo = fondo
@@ -35,48 +35,88 @@ export class VistaTutorial {
     panel.style.position = 'absolute'
     panel.style.top = '50%'
     panel.style.left = '50%'
-    panel.style.width = 'min(80vw, 80vh * 1.7778)'
-    panel.style.maxWidth = '80vw'
-    panel.style.maxHeight = '80vh'
+    panel.style.width = 'auto'
+    panel.style.height = 'auto'
+    panel.style.maxWidth = 'none'
+    panel.style.maxHeight = 'none'
     panel.style.transform = 'translate(-50%, -50%)'
-    panel.style.border = '3px solid #e5e7eb'
-    panel.style.borderRadius = '14px'
+    panel.style.border = 'none'
+    panel.style.borderRadius = '0'
     panel.style.boxSizing = 'border-box'
-    panel.style.backgroundColor = '#000000'
+    panel.style.backgroundColor = 'transparent'
+    panel.style.boxShadow = 'none'
     panel.style.zIndex = '20'
     panel.style.display = 'none'
-    panel.style.overflow = 'hidden'
+    panel.style.overflow = 'visible'
+    panel.style.padding = '0'
+    panel.style.flexDirection = 'column'
+    panel.style.alignItems = 'center'
+    panel.style.justifyContent = 'center'
+    panel.style.gap = '14px'
 
-    const btnCerrar = document.createElement('button')
-    btnCerrar.type = 'button'
-    btnCerrar.textContent = 'X'
-    btnCerrar.style.position = 'absolute'
-    btnCerrar.style.top = '10px'
-    btnCerrar.style.right = '10px'
-    btnCerrar.style.width = '36px'
-    btnCerrar.style.height = '36px'
-    btnCerrar.style.border = '1px solid rgba(229, 231, 235, 0.65)'
-    btnCerrar.style.borderRadius = '999px'
-    btnCerrar.style.background = 'rgba(15, 23, 42, 0.8)'
-    btnCerrar.style.color = '#ffffff'
-    btnCerrar.style.fontSize = '18px'
-    btnCerrar.style.cursor = 'pointer'
-    btnCerrar.style.zIndex = '1'
-
-    panel.appendChild(btnCerrar)
-    this.botonCerrar = btnCerrar
-    this.panel = panel
+    const contenedorVideo = document.createElement('div')
+    contenedorVideo.style.width = 'auto'
+    contenedorVideo.style.flex = '0 0 auto'
+    contenedorVideo.style.position = 'relative'
+    contenedorVideo.style.display = 'flex'
+    contenedorVideo.style.alignItems = 'center'
+    contenedorVideo.style.justifyContent = 'center'
+    contenedorVideo.style.background = 'transparent'
+    contenedorVideo.style.padding = '0'
 
     const video = document.createElement('video')
     video.src = videoTutorial
     video.controls = true
     video.style.display = 'block'
-    video.style.width = '100%'
+    video.style.width = 'auto'
     video.style.height = 'auto'
-    video.style.maxHeight = '80vh'
-    video.style.backgroundColor = '#000000'
+    video.style.boxSizing = 'border-box'
+    video.style.backgroundColor = 'transparent'
+    video.style.border = '2px solid #8e4d22'
+    video.style.borderRadius = '10px'
 
-    panel.appendChild(video)
+    const ajustarTamanoVideo = () => {
+      const anchoMax = window.innerWidth * 0.8
+      const altoMax = window.innerHeight * 0.8
+      const relacion = video.videoWidth && video.videoHeight
+        ? video.videoWidth / video.videoHeight
+        : 16 / 9
+
+      const ancho = Math.min(anchoMax, altoMax * relacion)
+      const alto = ancho / relacion
+
+      video.style.width = `${ancho}px`
+      video.style.height = `${alto}px`
+    }
+
+    video.addEventListener('loadedmetadata', ajustarTamanoVideo)
+    window.addEventListener('resize', ajustarTamanoVideo)
+    ajustarTamanoVideo()
+
+    const btnCerrar = document.createElement('button')
+    btnCerrar.type = 'button'
+    btnCerrar.textContent = 'X'
+    btnCerrar.style.position = 'absolute'
+    btnCerrar.style.top = '-20px'
+    btnCerrar.style.right = '-20px'
+    btnCerrar.style.width = '40px'
+    btnCerrar.style.height = '40px'
+    btnCerrar.style.border = '2px solid rgba(255, 216, 188, 0.85)'
+    btnCerrar.style.borderRadius = '50%'
+    btnCerrar.style.background = 'rgba(54, 41, 36, 0.9)'
+    btnCerrar.style.color = '#ffd8bc'
+    btnCerrar.style.fontSize = '20px'
+    btnCerrar.style.fontWeight = '700'
+    btnCerrar.style.lineHeight = '1'
+    btnCerrar.style.fontFamily = "'Comic Sans MS', cursive"
+    btnCerrar.style.cursor = 'pointer'
+
+    contenedorVideo.appendChild(video)
+    contenedorVideo.appendChild(btnCerrar)
+    panel.appendChild(contenedorVideo)
+
+    this.botonCerrar = btnCerrar
+    this.panel = panel
     document.body.appendChild(panel)
     this.video = video
   }
@@ -86,7 +126,7 @@ export class VistaTutorial {
 
     this.fondo.isVisible = true
     this.container.isVisible = true
-    this.panel.style.display = 'block'
+    this.panel.style.display = 'flex'
     this.video.play()
   }
 
@@ -99,9 +139,10 @@ export class VistaTutorial {
     this.panel.style.display = 'none'
   }
 
-  onCerrar(callback) {
+  alCerrar(callback) {
     if (!this.botonCerrar) return
 
     this.botonCerrar.addEventListener('click', callback)
   }
 }
+

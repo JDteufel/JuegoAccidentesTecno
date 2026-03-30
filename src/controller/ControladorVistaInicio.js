@@ -1,36 +1,51 @@
 export class ControladorVistaInicio {
-  constructor(vistaInicio) {
+  constructor(
+    vistaInicio,
+    vistaTutorial,
+    vistaRegistro,
+    vistaInicioSesion,
+    vistaJugar,
+    vistaReglas,
+    vistaCrearJuego
+  ) {
     this.vistaInicio = vistaInicio
+    this.vistaTutorial = vistaTutorial
+    this.vistaRegistro = vistaRegistro
+    this.vistaInicioSesion = vistaInicioSesion
+    this.vistaJugar = vistaJugar
+    this.vistaReglas = vistaReglas
+    this.vistaCrearJuego = vistaCrearJuego
   }
 
   init() {
     this.vistaInicio.setOnTutorial(() => {
-      this.vistaInicio.vistaTutorial.mostrar()
+      this.vistaTutorial.mostrar()
     })
 
     this.vistaInicio.setOnRegistro(() => {
       this.vistaInicio.ocultar()
-      this.vistaInicio.vistaRegistro.mostrar()
+      this.vistaRegistro.mostrar()
     })
 
-    this.vistaInicio.setOnLogin(() => {
+    this.vistaInicio.setOnInicioSesion(() => {
       this.vistaInicio.ocultar()
-      this.vistaInicio.vistaLogin.mostrar()
+      this.vistaInicioSesion.mostrar()
     })
 
     this.vistaInicio.setOnJugar(() => {
       this.vistaInicio.ocultar()
-      this.vistaInicio.vistaJugar.mostrar()
+      this.vistaJugar.mostrar()
     })
 
     this.vistaInicio.setOnReglas(() => {
       this.vistaInicio.ocultar()
-      this.vistaInicio.vistaReglas.mostrar()
+      this.vistaReglas.mostrar()
     })
 
     this.vistaInicio.setOnCrearJuego(() => {
       this.vistaInicio.ocultar()
-      this.vistaInicio.vistaCrearJuego.mostrar()
+      this.vistaCrearJuego.mostrar()
     })
   }
 }
+

@@ -169,3 +169,4 @@ export class VistaJugar {
     this.onAccionCallback = callback
   }
 }
+

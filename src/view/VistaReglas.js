@@ -162,3 +162,4 @@ export class VistaReglas {
     this.onVolverCallback = callback
   }
 }
+

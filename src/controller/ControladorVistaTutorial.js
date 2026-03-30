@@ -1,12 +1,12 @@
 export class ControladorVistaTutorial {
-  constructor(vistaTutorial, vistaInicio) {
+  constructor(vistaTutorial) {
     this.vistaTutorial = vistaTutorial
-    this.vistaInicio = vistaInicio
   }
 
   init() {
-    this.vistaTutorial.onCerrar(() => {
+    this.vistaTutorial.alCerrar(() => {
       this.vistaTutorial.ocultar()
     })
   }
 }
+

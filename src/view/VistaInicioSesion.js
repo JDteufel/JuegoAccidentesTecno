@@ -1,21 +1,21 @@
 import * as GUI from '@babylonjs/gui'
 
-export class VistaLogin {
+export class VistaInicioSesion {
   constructor(gui) {
     this.gui = gui
     this.overlay = null
-    this.onVolverCallback = null
-    this.onAccionCallback = null
+    this.alVolverCallback = null
+    this.alAccionCallback = null
   }
 
   crear() {
-    const overlay = this.crearOverlay('pantallaLogin')
-    const tarjeta = this.crearTarjetaBase('tarjetaLogin')
+    const overlay = this.crearOverlay('pantallaInicioSesion')
+    const tarjeta = this.crearTarjetaBase('tarjetaInicioSesion')
     overlay.addControl(tarjeta)
 
     tarjeta.addControl(
       this.crearTexto({
-        nombre: 'tituloLogin',
+        nombre: 'tituloInicioSesion',
         texto: 'Inicio de Sesión',
         tamano: 30,
         alto: '72px',
@@ -25,7 +25,7 @@ export class VistaLogin {
 
     tarjeta.addControl(
       this.crearCampoEntrada({
-        nombre: 'loginUsuario',
+        nombre: 'inicioSesionUsuario',
         placeholder: 'Nombre de usuario',
         top: '-70px'
       })
@@ -33,7 +33,7 @@ export class VistaLogin {
 
     tarjeta.addControl(
       this.crearCampoEntrada({
-        nombre: 'loginContrasena',
+        nombre: 'inicioSesionContrasena',
         placeholder: 'Contraseña',
         top: '8px'
       })
@@ -41,21 +41,21 @@ export class VistaLogin {
 
     tarjeta.addControl(
       this.crearBoton({
-        nombre: 'loginAccion',
+        nombre: 'inicioSesionAccion',
         texto: 'Ingresar',
         top: '115px',
-        callback: () => this.onAccionCallback && this.onAccionCallback()
+        callback: () => this.alAccionCallback && this.alAccionCallback()
       })
     )
 
     tarjeta.addControl(
       this.crearBoton({
-        nombre: 'loginVolver',
+        nombre: 'inicioSesionVolver',
         texto: 'Volver al menú',
         top: '185px',
         fondo: '#362924',
         color: '#ffd8bc',
-        callback: () => this.onVolverCallback && this.onVolverCallback()
+        callback: () => this.alVolverCallback && this.alVolverCallback()
       })
     )
 
@@ -161,11 +161,13 @@ export class VistaLogin {
     if (this.overlay) this.overlay.isVisible = false
   }
 
-  onVolver(callback) {
-    this.onVolverCallback = callback
+  alVolver(callback) {
+    this.alVolverCallback = callback
   }
 
-  onAccion(callback) {
-    this.onAccionCallback = callback
+  alAccion(callback) {
+    this.alAccionCallback = callback
   }
 }
+
+
