@@ -1,7 +1,7 @@
 import * as BABYLON from '@babylonjs/core'
 import * as GUI from '@babylonjs/gui'
 
-export class VistaInicio {
+export class VistaInicial {
   constructor(canvas) {
     this.canvas = canvas
     this.engine = new BABYLON.Engine(canvas, true)
@@ -13,7 +13,6 @@ export class VistaInicio {
     this.onInicioSesion = null
     this.onJugar = null
     this.onReglas = null
-    this.onCrearJuego = null
   }
 
   crearEscena() {
@@ -264,7 +263,7 @@ export class VistaInicio {
   }
 
   crearMenu() {
-    const overlay = new GUI.Rectangle('pantallaMenu')
+    const overlay = new GUI.Rectangle('pantallaMenuInicial')
     overlay.width = 1
     overlay.height = 1
     overlay.thickness = 0
@@ -273,7 +272,7 @@ export class VistaInicio {
     this.gui.addControl(overlay)
     this.overlay = overlay
 
-    const barraSuperior = new GUI.Rectangle('barraSuperiorMenu')
+    const barraSuperior = new GUI.Rectangle('barraSuperiorMenuInicial')
     barraSuperior.width = 1
     barraSuperior.height = '92px'
     barraSuperior.top = '-44%'
@@ -283,8 +282,8 @@ export class VistaInicio {
 
     overlay.addControl(
       this.crearTexto({
-        nombre: 'tituloMenu',
-        texto: 'Juego de Accidentes Tecnológicos',
+        nombre: 'tituloMenuInicial',
+        texto: 'Juego de Accidentes Tecnologicos',
         tamano: 42,
         alto: '120px',
         top: '-33%',
@@ -295,7 +294,7 @@ export class VistaInicio {
     overlay.addControl(
       this.crearBoton({
         nombre: 'botonInicioSesionSuperior',
-        texto: 'Iniciar sesión',
+        texto: 'Iniciar sesion',
         top: '-44%',
         left: '38%',
         width: '220px',
@@ -320,9 +319,9 @@ export class VistaInicio {
       })
     )
 
-    const panelAcciones = new GUI.Rectangle('panelAccionesMenu')
+    const panelAcciones = new GUI.Rectangle('panelAccionesMenuInicial')
     panelAcciones.width = '420px'
-    panelAcciones.height = '470px'
+    panelAcciones.height = '410px'
     panelAcciones.left = '-34%'
     panelAcciones.top = '8%'
     panelAcciones.cornerRadius = 30
@@ -337,11 +336,11 @@ export class VistaInicio {
 
     panelAcciones.addControl(
       this.crearTexto({
-        nombre: 'tituloPanelAcciones',
-        texto: 'Menú Principal',
+        nombre: 'tituloPanelAccionesInicial',
+        texto: 'Menu Principal',
         tamano: 28,
         alto: '60px',
-        top: '-166px',
+        top: '-135px',
         color: '#ffd9bd'
       })
     )
@@ -350,7 +349,7 @@ export class VistaInicio {
       this.crearBoton({
         nombre: 'botonJugar',
         texto: 'Jugar',
-        top: '-55px',
+        top: '-45px',
         width: '290px',
         fondo: '#d66a1f',
         color: '#fff7ef',
@@ -360,21 +359,9 @@ export class VistaInicio {
 
     panelAcciones.addControl(
       this.crearBoton({
-        nombre: 'botonCrearJuego',
-        texto: 'Crear juego',
-        top: '20px',
-        width: '290px',
-        fondo: '#ba5617',
-        color: '#fff1e6',
-        callback: () => this.onCrearJuego && this.onCrearJuego()
-      })
-    )
-
-    panelAcciones.addControl(
-      this.crearBoton({
         nombre: 'botonTutorial',
         texto: 'Tutorial',
-        top: '95px',
+        top: '30px',
         width: '290px',
         fondo: '#3c2d27',
         color: '#ffd6b7',
@@ -386,7 +373,7 @@ export class VistaInicio {
       this.crearBoton({
         nombre: 'botonReglas',
         texto: 'Ver reglas',
-        top: '170px',
+        top: '105px',
         width: '290px',
         fondo: '#3c2d27',
         color: '#ffd6b7',
@@ -472,10 +459,6 @@ export class VistaInicio {
     this.onReglas = callback
   }
 
-  setOnCrearJuego(callback) {
-    this.onCrearJuego = callback
-  }
-
   render(targetFps = 60) {
     this.crearEscena()
     if (!this.scene) return
@@ -493,5 +476,3 @@ export class VistaInicio {
     })
   }
 }
-
-

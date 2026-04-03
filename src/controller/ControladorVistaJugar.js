@@ -1,19 +1,20 @@
+import { PANTALLAS, TIPOS_JUGADOR } from '../model/EstadoApp.js'
+
 export class ControladorVistaJugar {
-  constructor(vistaJugar, vistaInicio, vistaCrearJuego) {
+  constructor(vistaJugar, estadoApp, controladorEstadoApp) {
     this.vistaJugar = vistaJugar
-    this.vistaInicio = vistaInicio
-    this.vistaCrearJuego = vistaCrearJuego
+    this.estadoApp = estadoApp
+    this.controladorEstadoApp = controladorEstadoApp
   }
 
   init() {
     this.vistaJugar.onVolver(() => {
-      this.vistaJugar.ocultar()
-      this.vistaInicio.mostrar()
+      this.controladorEstadoApp.irAPantalla(PANTALLAS.INICIAL_PUBLICA)
     })
 
     this.vistaJugar.onAccion(() => {
-      this.vistaJugar.ocultar()
-      this.vistaCrearJuego.mostrar()
+      this.estadoApp.setTipoJugador(TIPOS_JUGADOR.INVITADO)
+      this.controladorEstadoApp.irAPantalla(PANTALLAS.GESTION_LOBBY)
     })
   }
 }

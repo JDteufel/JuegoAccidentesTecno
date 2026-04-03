@@ -1,19 +1,20 @@
+import { PANTALLAS, TIPOS_JUGADOR } from '../model/EstadoApp.js'
+
 export class ControladorVistaInicioSesion {
-  constructor(vistaInicioSesion, vistaInicio, vistaCrearJuego) {
+  constructor(vistaInicioSesion, estadoApp, controladorEstadoApp) {
     this.vistaInicioSesion = vistaInicioSesion
-    this.vistaInicio = vistaInicio
-    this.vistaCrearJuego = vistaCrearJuego
+    this.estadoApp = estadoApp
+    this.controladorEstadoApp = controladorEstadoApp
   }
 
   init() {
-    this.vistaInicioSesion.alVolver(() => {
-      this.vistaInicioSesion.ocultar()
-      this.vistaInicio.mostrar()
+    this.vistaInicioSesion.onVolver(() => {
+      this.controladorEstadoApp.irAPantalla(PANTALLAS.INICIAL_PUBLICA)
     })
 
-    this.vistaInicioSesion.alAccion(() => {
-      this.vistaInicioSesion.ocultar()
-      this.vistaCrearJuego.mostrar()
+    this.vistaInicioSesion.onAccion(() => {
+      this.estadoApp.setTipoJugador(TIPOS_JUGADOR.REGISTRADO)
+      this.controladorEstadoApp.irAPantalla(PANTALLAS.INICIAL_REGISTRADO)
     })
   }
 }

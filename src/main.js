@@ -1,11 +1,15 @@
-import { VistaInicio } from './view/VistaInicio.js'
+import { VistaInicial } from './view/VistaInicial.js'
+import { VistaInicialR } from './view/VistaInicialR.js'
 import { VistaTutorial } from './view/VistaTutorial.js'
 import { VistaRegistro } from './view/VistaRegistro.js'
 import { VistaInicioSesion } from './view/VistaInicioSesion.js'
 import { VistaJugar } from './view/VistaJugar.js'
 import { VistaReglas } from './view/VistaReglas.js'
 import { VistaCrearJuego } from './view/VistaCrearJuego.js'
-import { ControladorVistaInicio } from './controller/ControladorVistaInicio.js'
+import { EstadoApp } from './model/EstadoApp.js'
+import { ControladorVistaInicial } from './controller/ControladorVistaInicial.js'
+import { ControladorVistaInicialR } from './controller/ControladorVistaInicialR.js'
+import { ControladorEstadoApp } from './controller/ControladorEstadoApp.js'
 import { ControladorVistaTutorial } from './controller/ControladorVistaTutorial.js'
 import { ControladorVistaRegistro } from './controller/ControladorVistaRegistro.js'
 import { ControladorVistaInicioSesion } from './controller/ControladorVistaInicioSesion.js'
@@ -19,65 +23,75 @@ if (!canvas) {
   throw new Error('No se encontró el canvas')
 }
 
-const vistaInicio = new VistaInicio(canvas)
+const vistaInicial = new VistaInicial(canvas)
 const TARGET_FPS = 60
-vistaInicio.render(TARGET_FPS)
+vistaInicial.render(TARGET_FPS)
 
-const vistaTutorial = new VistaTutorial(vistaInicio.gui)
+const vistaInicialR = new VistaInicialR(vistaInicial.gui)
+vistaInicialR.crear()
+const vistaTutorial = new VistaTutorial(vistaInicial.gui)
 vistaTutorial.crear()
-const vistaRegistro = new VistaRegistro(vistaInicio.gui)
+const vistaRegistro = new VistaRegistro(vistaInicial.gui)
 vistaRegistro.crear()
-const vistaInicioSesion = new VistaInicioSesion(vistaInicio.gui)
+const vistaInicioSesion = new VistaInicioSesion(vistaInicial.gui)
 vistaInicioSesion.crear()
-const vistaJugar = new VistaJugar(vistaInicio.gui)
+const vistaJugar = new VistaJugar(vistaInicial.gui)
 vistaJugar.crear()
-const vistaReglas = new VistaReglas(vistaInicio.gui)
+const vistaReglas = new VistaReglas(vistaInicial.gui)
 vistaReglas.crear()
-const vistaCrearJuego = new VistaCrearJuego(vistaInicio.gui)
+const vistaCrearJuego = new VistaCrearJuego(vistaInicial.gui)
 vistaCrearJuego.crear()
 
-const controladorVistaInicio = new ControladorVistaInicio(
-  vistaInicio,
-  vistaTutorial,
+const estadoApp = new EstadoApp()
+const controladorEstadoApp = new ControladorEstadoApp(estadoApp, {
+  vistaInicial,
+  vistaInicialR,
   vistaRegistro,
   vistaInicioSesion,
   vistaJugar,
   vistaReglas,
   vistaCrearJuego
+})
+
+const controladorVistaInicial = new ControladorVistaInicial(
+  vistaInicial,
+  vistaTutorial,
+  controladorEstadoApp
+)
+
+const controladorVistaInicialR = new ControladorVistaInicialR(
+  vistaInicialR,
+  vistaTutorial,
+  controladorEstadoApp
 )
 
 const controladorTutorial = new ControladorVistaTutorial(vistaTutorial)
 
-const controladorRegistro = new ControladorVistaRegistro(
-  vistaRegistro,
-  vistaInicio,
-  vistaCrearJuego
-)
+const controladorRegistro = new ControladorVistaRegistro(vistaRegistro, estadoApp, controladorEstadoApp)
 
 const controladorInicioSesion = new ControladorVistaInicioSesion(
   vistaInicioSesion,
-  vistaInicio,
-  vistaCrearJuego
+  estadoApp,
+  controladorEstadoApp
 )
 
-const controladorJugar = new ControladorVistaJugar(
-  vistaJugar,
-  vistaInicio,
-  vistaCrearJuego
-)
+const controladorJugar = new ControladorVistaJugar(vistaJugar, estadoApp, controladorEstadoApp)
 
-const controladorReglas = new ControladorVistaReglas(vistaReglas, vistaInicio)
+const controladorReglas = new ControladorVistaReglas(vistaReglas, controladorEstadoApp)
 
 const controladorCrearJuego = new ControladorVistaCrearJuego(
   vistaCrearJuego,
-  vistaInicio
+  estadoApp,
+  controladorEstadoApp
 )
 
-controladorVistaInicio.init()
+controladorVistaInicial.init()
+controladorVistaInicialR.init()
 controladorTutorial.init()
 controladorRegistro.init()
 controladorInicioSesion.init()
 controladorJugar.init()
 controladorReglas.init()
 controladorCrearJuego.init()
+controladorEstadoApp.actualizarVista()
 

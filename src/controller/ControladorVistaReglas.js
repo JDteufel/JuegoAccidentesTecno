@@ -1,13 +1,12 @@
 export class ControladorVistaReglas {
-  constructor(vistaReglas, vistaInicio) {
+  constructor(vistaReglas, controladorEstadoApp) {
     this.vistaReglas = vistaReglas
-    this.vistaInicio = vistaInicio
+    this.controladorEstadoApp = controladorEstadoApp
   }
 
   init() {
     this.vistaReglas.onVolver(() => {
-      this.vistaReglas.ocultar()
-      this.vistaInicio.mostrar()
+      this.controladorEstadoApp.regresarPantallaAnterior()
     })
   }
 }
