@@ -16,6 +16,7 @@ import { ControladorVistaInicioSesion } from './controller/ControladorVistaInici
 import { ControladorVistaJugar } from './controller/ControladorVistaJugar.js'
 import { ControladorVistaReglas } from './controller/ControladorVistaReglas.js'
 import { ControladorVistaCrearJuego } from './controller/ControladorVistaCrearJuego.js'
+import { testSmartFoxPing } from './services/SmartFoxService.js'
 
 const canvas = document.getElementById('renderCanvas')
 
@@ -94,4 +95,12 @@ controladorJugar.init()
 controladorReglas.init()
 controladorCrearJuego.init()
 controladorEstadoApp.actualizarVista()
+
+testSmartFoxPing()
+  .then((response) => {
+    console.log('[SmartFox ping]', response)
+  })
+  .catch((error) => {
+    console.error('[SmartFox ping error]', error)
+  })
 
