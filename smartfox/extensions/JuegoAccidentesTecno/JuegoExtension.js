@@ -11,6 +11,14 @@ var MAX_PLAYERS_PER_LOBBY = 16
 var LOBBY_CODE_LENGTH = 6
 var LOBBY_CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
 
+// Sistema de logs en JSON por categoría
+var logs = {
+  USUARIO: [],
+  SESION: [],
+  ERROR: [],
+  SISTEMA: []
+}
+
 var zoneState = createInitialState()
 
 var commandHandlers = {
@@ -18,7 +26,10 @@ var commandHandlers = {
   createLobby: handleCreateLobby,
   joinLobby: handleJoinLobby,
   getLobbyState: handleGetLobbyState,
-  leaveLobby: handleLeaveLobby
+  leaveLobby: handleLeaveLobby,
+  getLogs: handleGetLogs,
+  clearLogs: handleClearLogs,
+  log: handleLog
 }
 
 function init() {
@@ -28,6 +39,7 @@ function init() {
     '[JuegoExtension] Zone extension inicializada en ' +
       zoneState.initializedAt
   )
+  logEvent('SYSTEM', 'extension_init', { zone: ZONE_NAME })
 }
 
 function destroy() {
@@ -105,6 +117,12 @@ function handleCreateLobby(params, sender) {
 
   zoneState.lobbyCodeBySender[senderName] = lobbyCode
 
+  logEvent('LOBBY', 'create_lobby', {
+    lobbyCode: lobbyCode,
+    hostName: hostName,
+    hostSenderName: senderName
+  })
+
   return sendResponse('lobbyCreated', buildLobbyResponse(lobbyCode), sender)
 }
 
@@ -148,6 +166,12 @@ function handleJoinLobby(params, sender) {
   )
   zoneState.lobbyCodeBySender[senderName] = lobby.code
 
+  logEvent('LOBBY', 'join_lobby', {
+    lobbyCode: lobby.code,
+    guestName: guestName,
+    playerCount: lobby.players.length
+  })
+
   return sendResponse('lobbyJoined', buildLobbyResponse(lobby.code), sender)
 }
 
@@ -190,6 +214,13 @@ function handleLeaveLobby(params, sender) {
 
   delete zoneState.lobbyCodeBySender[senderName]
 
+  logEvent('LOBBY', 'leave_lobby', {
+    lobbyCode: lobbyCode,
+    playerName: removedPlayer.name,
+    role: removedPlayer.role,
+    remainingPlayers: lobby.players.length
+  })
+
   if (lobby.players.length === 0 || removedPlayer.role === 'host') {
     dropLobby(lobby.code)
 
@@ -200,6 +231,35 @@ function handleLeaveLobby(params, sender) {
   }
 
   return sendResponse('lobbyLeft', buildLobbyResponse(lobby.code), sender)
+}
+
+function handleGetLogs(params, sender) {
+  var category = readString(params, 'category')
+  return sendResponse('logsData', {
+    ok: true,
+    category: category || 'ALL',
+    logs: getLogs(category)
+  }, sender)
+}
+
+function handleClearLogs(params, sender) {
+  var category = readString(params, 'category')
+  clearLogs(category)
+  return sendResponse('logsCleared', { ok: true, category: category || 'ALL' }, sender)
+}
+
+function handleLog(params, sender) {
+  var type = readString(params, 'type')
+  var action = readString(params, 'action')
+  var details = readParams(params, 'details')
+
+  if (!type || !action) {
+    return sendError(sender, 'type y action son obligatorios')
+  }
+
+  logEvent(type, action, details)
+
+  return sendResponse('logRecorded', { ok: true }, sender)
 }
 
 function createInitialState() {
@@ -395,10 +455,10 @@ function countKeys(objectValue) {
 /*
  * Adaptador local para desacoplar la logica del detalle de SmartFox.
  *
- * Sustituye el cuerpo de esta funcion por la API real de envio cuando
- * conectes la extension al runtime definitivo.
+ * Envia respuestas reales al cliente usando la API de SmartFoxServer.
  */
 function sendResponse(commandName, payload, recipient) {
+  // Log para debugging
   trace(
     '[JuegoExtension] response=' +
       commandName +
@@ -407,6 +467,18 @@ function sendResponse(commandName, payload, recipient) {
       ' payload=' +
       stringify(payload)
   )
+
+  // Enviar respuesta real al cliente
+  if (recipient && typeof recipient.send === 'function') {
+    try {
+      var params = new Packages.com.smartfoxserver.v2.util.SFSObject()
+      params.putUtfString('cmd', commandName)
+      params.putUtfString('data', stringify(payload))
+      recipient.send(Packages.com.smartfoxserver.v2.SFSEvent.EXTENSION_RESPONSE, params)
+    } catch (e) {
+      trace('[JuegoExtension] Error sending response: ' + e)
+    }
+  }
 }
 
 function sendError(recipient, message) {
@@ -430,4 +502,68 @@ function stringify(value) {
   } catch (_error) {
     return '[unserializable]'
   }
+}
+
+// ============================================
+// SISTEMA DE LOGS EN JSON
+// ============================================
+
+function logEvent(type, action, details) {
+  var logEntry = {
+    timestamp: new Date().toISOString(),
+    type: type,
+    action: action,
+    details: details || {}
+  }
+
+  // Guardar en la categoría correspondiente
+  if (!logs[type]) {
+    logs[type] = []
+  }
+  logs[type].push(logEntry)
+
+  trace('[LOG][' + type + '] ' + action + ' - ' + stringify(details))
+}
+
+function getLogs(category) {
+  if (category) {
+    return logs[category] || []
+  }
+  return logs
+}
+
+function getAllLogs() {
+  var allLogs = []
+  var category
+  for (category in logs) {
+    if (logs.hasOwnProperty(category)) {
+      allLogs = allLogs.concat(logs[category])
+    }
+  }
+  return allLogs
+}
+
+function clearLogs(category) {
+  if (category) {
+    logs[category] = []
+  } else {
+    // Limpiar todas las categorías
+    var cat
+    for (cat in logs) {
+      if (logs.hasOwnProperty(cat)) {
+        logs[cat] = []
+      }
+    }
+  }
+  trace('[LOG] Logs cleared' + (category ? ' (' + category + ')' : ''))
+}
+
+function exportLogs(category) {
+  var logData = category ? (logs[category] || []) : getAllLogs()
+  return stringify({
+    exportedAt: new Date().toISOString(),
+    category: category || 'ALL',
+    totalEvents: logData.length,
+    events: logData
+  })
 }

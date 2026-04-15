@@ -1,8 +1,17 @@
+/**
+ * SmartFoxService - Maneja la conexión con SmartFoxServer
+ *
+ * Provee una interfaz limpia para conectar, enviar comandos y recibir respuestas.
+ */
+
 const DEFAULT_CONFIG = {
   host: '127.0.0.1',
   port: 9933,
   zone: 'JuegoAccidentesTecno'
 }
+
+let smartFoxInstance = null
+let config = { ...DEFAULT_CONFIG }
 
 function getSfsNamespace() {
   return window.SFS2X || null
@@ -15,12 +24,38 @@ function createSmartFoxInstance() {
     throw new Error('La API de SmartFox no esta cargada en window.SFS2X')
   }
 
-  return new SFS2X.SmartFox({
+  smartFoxInstance = new SFS2X.SmartFox({
     debug: false
   })
+
+  return smartFoxInstance
 }
 
-export function testSmartFoxPing(config = {}) {
+/**
+ * Obtiene la instancia de SmartFox
+ * @returns {Object} Instancia de SmartFox o null
+ */
+export function getSmartFoxInstance() {
+  return smartFoxInstance
+}
+
+/**
+ * Obtiene la configuración actual
+ * @returns {Object} Configuración de conexión
+ */
+export function getConfig() {
+  return { ...config }
+}
+
+/**
+ * Actualiza la configuración
+ * @param {Object} newConfig - Nueva configuración
+ */
+export function updateConfig(newConfig) {
+  config = { ...DEFAULT_CONFIG, ...newConfig }
+}
+
+export function testSmartFoxPing() {
   const SFS2X = getSfsNamespace()
 
   if (!SFS2X) {

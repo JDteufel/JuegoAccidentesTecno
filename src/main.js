@@ -16,7 +16,8 @@ import { ControladorVistaInicioSesion } from './controller/ControladorVistaInici
 import { ControladorVistaJugar } from './controller/ControladorVistaJugar.js'
 import { ControladorVistaReglas } from './controller/ControladorVistaReglas.js'
 import { ControladorVistaCrearJuego } from './controller/ControladorVistaCrearJuego.js'
-import { testSmartFoxPing } from './services/SmartFoxService.js'
+import { testSmartFoxPing, getSmartFoxInstance } from './services/SmartFoxService.js'
+import { initLogsService } from './services/LogsService.js'
 
 const canvas = document.getElementById('renderCanvas')
 
@@ -99,6 +100,11 @@ controladorEstadoApp.actualizarVista()
 testSmartFoxPing()
   .then((response) => {
     console.log('[SmartFox ping]', response)
+    // Inicializar LoggingService con la instancia de SmartFox
+    const sfs = getSmartFoxInstance()
+    if (sfs) {
+      initLogsService(sfs)
+    }
   })
   .catch((error) => {
     console.error('[SmartFox ping error]', error)
