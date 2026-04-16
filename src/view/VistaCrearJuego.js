@@ -1,6 +1,11 @@
 import { VistaListaBase } from './base/VistaListaBase.js'
 
 export class VistaCrearJuego extends VistaListaBase {
+  constructor(gui) {
+    super(gui)
+    this.onEntrarCallback = null
+  }
+
   obtenerConfiguracionLista() {
     return {
       nombreOverlay: 'pantallaCrearJuego',
@@ -16,5 +21,24 @@ export class VistaCrearJuego extends VistaListaBase {
       ],
       nombreBotonVolver: 'crearJuegoVolver'
     }
+  }
+
+  crear() {
+    super.crear()
+
+    this.tarjeta.addControl(
+      this.crearBoton({
+        nombre: 'botonEntrar',
+        texto: 'Entrar',
+        top: '260px',
+        fondo: '#3c2d27',
+        color: '#ffd6b7',
+        callback: () => this.onEntrarCallback && this.onEntrarCallback()
+      })
+    )
+  }
+
+  onEntrar(callback) {
+    this.onEntrarCallback = callback
   }
 }

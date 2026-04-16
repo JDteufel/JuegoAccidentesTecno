@@ -20,6 +20,7 @@ var logs = {
 }
 
 var zoneState = createInitialState()
+var registeredUsers = {} // Almacena usuarios: { username: { password, createdAt } }
 
 var commandHandlers = {
   ping: handlePing,
@@ -29,7 +30,9 @@ var commandHandlers = {
   leaveLobby: handleLeaveLobby,
   getLogs: handleGetLogs,
   clearLogs: handleClearLogs,
-  log: handleLog
+  log: handleLog,
+  register: handleRegister,
+  login: handleLogin
 }
 
 function init() {
@@ -260,6 +263,78 @@ function handleLog(params, sender) {
   logEvent(type, action, details)
 
   return sendResponse('logRecorded', { ok: true }, sender)
+}
+
+function handleRegister(params, sender) {
+  var username = readString(params, 'username')
+  var password = readString(params, 'password')
+
+  // Validaciones
+  if (!username || username.length < 3) {
+    return sendError(sender, 'El usuario debe tener al menos 3 caracteres')
+  }
+
+  if (!password || password.length < 4) {
+    return sendError(sender, 'La contrasena debe tener al menos 4 caracteres')
+  }
+
+  // Normalizar username
+  var normalizedUsername = username.toLowerCase()
+
+  // Verificar si ya existe
+  if (registeredUsers[normalizedUsername]) {
+    return sendError(sender, 'El usuario ya existe')
+  }
+
+  // Registrar usuario
+  registeredUsers[normalizedUsername] = {
+    username: username,
+    password: password,
+    createdAt: new Date().toISOString()
+  }
+
+  logEvent('USUARIO', 'register', {
+    username: normalizedUsername,
+    createdAt: registeredUsers[normalizedUsername].createdAt
+  })
+
+  trace('[JuegoExtension] Usuario registrado: ' + normalizedUsername)
+
+  return sendResponse('registerSuccess', {
+    ok: true,
+    username: username
+  }, sender)
+}
+
+function handleLogin(params, sender) {
+  var username = readString(params, 'username')
+  var password = readString(params, 'password')
+
+  // Validaciones
+  if (!username || !password) {
+    return sendError(sender, 'Usuario y contrasena son obligatorios')
+  }
+
+  // Normalizar username
+  var normalizedUsername = username.toLowerCase()
+  var user = registeredUsers[normalizedUsername]
+
+  if (!user) {
+    logEvent('USUARIO', 'login_failed', { username: normalizedUsername, reason: 'user_not_found' })
+    return sendError(sender, 'Usuario no encontrado')
+  }
+
+  if (user.password !== password) {
+    logEvent('USUARIO', 'login_failed', { username: normalizedUsername, reason: 'wrong_password' })
+    return sendError(sender, 'Contrasena incorrecta')
+  }
+
+  logEvent('USUARIO', 'login_success', { username: normalizedUsername })
+
+  return sendResponse('loginSuccess', {
+    ok: true,
+    username: user.username
+  }, sender)
 }
 
 function createInitialState() {

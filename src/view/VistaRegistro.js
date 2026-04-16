@@ -15,12 +15,12 @@ export class VistaRegistro extends VistaFormularioBase {
         },
         {
           nombre: 'registroContrasena',
-          placeholder: 'Contrasena',
+          placeholder: 'Contraseña',
           top: '8px'
         }
       ],
       nombreBotonAccion: 'registroAccion',
-      textoBotonAccion: 'Crear cuenta',
+      textoBotonAccion: 'Crear Cuenta',
       nombreBotonVolver: 'registroVolver'
     }
   }

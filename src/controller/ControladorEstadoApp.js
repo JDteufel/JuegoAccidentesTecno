@@ -31,6 +31,15 @@ export class ControladorEstadoApp {
       case PANTALLAS.REGLAS:
         this.vistas.vistaReglas.mostrar()
         break
+      case PANTALLAS.CARTAS:
+        this.vistas.vistaCartas.mostrar()
+        break
+      case PANTALLAS.ACCIDENTES:
+        this.vistas.vistaAccidentes.mostrar()
+        break
+      case PANTALLAS.PARTIDA:
+        this.vistas.vistaPartida.mostrar()
+        break
       default:
         this.vistas.vistaInicial.mostrar()
         break
@@ -55,5 +64,8 @@ export class ControladorEstadoApp {
     this.vistas.vistaJugar.ocultar()
     this.vistas.vistaReglas.ocultar()
     this.vistas.vistaCrearJuego.ocultar()
+    this.vistas.vistaCartas.ocultar()
+    this.vistas.vistaAccidentes.ocultar()
+    this.vistas.vistaPartida.ocultar()
   }
 }

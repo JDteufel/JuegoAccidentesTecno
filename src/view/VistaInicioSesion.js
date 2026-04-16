@@ -6,7 +6,7 @@ export class VistaInicioSesion extends VistaFormularioBase {
       nombreOverlay: 'pantallaInicioSesion',
       nombreTarjeta: 'tarjetaInicioSesion',
       nombreTitulo: 'tituloInicioSesion',
-      titulo: 'Inicio de Sesion',
+      titulo: 'Inicio de Sesión',
       campos: [
         {
           nombre: 'inicioSesionUsuario',
@@ -15,12 +15,12 @@ export class VistaInicioSesion extends VistaFormularioBase {
         },
         {
           nombre: 'inicioSesionContrasena',
-          placeholder: 'Contrasena',
+          placeholder: 'Contraseña',
           top: '8px'
         }
       ],
       nombreBotonAccion: 'inicioSesionAccion',
-      textoBotonAccion: 'Ingresar',
+      textoBotonAccion: 'Iniciar Sesión',
       nombreBotonVolver: 'inicioSesionVolver'
     }
   }

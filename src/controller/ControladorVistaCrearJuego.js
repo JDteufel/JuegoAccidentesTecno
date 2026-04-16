@@ -16,5 +16,9 @@ export class ControladorVistaCrearJuego {
 
       this.controladorEstadoApp.irAPantalla(pantallaRetorno)
     })
+
+    this.vistaCrearJuego.onEntrar(() => {
+      this.controladorEstadoApp.irAPantalla(PANTALLAS.PARTIDA)
+    })
   }
 }

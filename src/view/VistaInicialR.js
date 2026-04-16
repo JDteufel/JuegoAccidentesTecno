@@ -28,7 +28,7 @@ export class VistaInicialR extends VistaPanelBase {
     panelAcciones.addControl(
       this.crearTexto({
         nombre: 'tituloPanelAccionesRegistrado',
-        texto: 'Menu de Usuario Registrado',
+        texto: 'Menú de Usuario Registrado',
         tamano: 28,
         alto: '72px',
         top: '-135px',

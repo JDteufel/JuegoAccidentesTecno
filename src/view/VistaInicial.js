@@ -59,6 +59,7 @@ export class VistaInicial {
     this.crearMenu()
 
     this.scene = scene
+    this.engine.activeScene = this.scene
   }
 
   crearDecoracion(scene, camera) {
@@ -283,7 +284,7 @@ export class VistaInicial {
     overlay.addControl(
       this.crearTexto({
         nombre: 'tituloMenuInicial',
-        texto: 'Juego de Accidentes Tecnologicos',
+        texto: 'Juego de Accidentes Tecnológicos',
         tamano: 42,
         alto: '120px',
         top: '-33%',
@@ -294,7 +295,7 @@ export class VistaInicial {
     overlay.addControl(
       this.crearBoton({
         nombre: 'botonInicioSesionSuperior',
-        texto: 'Iniciar sesion',
+        texto: 'Iniciar Sesión',
         top: '-44%',
         left: '38%',
         width: '220px',
@@ -337,7 +338,7 @@ export class VistaInicial {
     panelAcciones.addControl(
       this.crearTexto({
         nombre: 'tituloPanelAccionesInicial',
-        texto: 'Menu Principal',
+        texto: 'Menú Principal',
         tamano: 28,
         alto: '60px',
         top: '-135px',
@@ -469,7 +470,10 @@ export class VistaInicial {
       const delta = ahora - ultimoFrame
       if (delta < frameInterval) return
       ultimoFrame = ahora - (delta % frameInterval)
-      this.scene.render()
+      // Renderizar la escena activa del engine
+      if (this.engine.activeScene) {
+        this.engine.activeScene.render()
+      }
     })
     window.addEventListener('resize', () => {
       this.engine.resize()

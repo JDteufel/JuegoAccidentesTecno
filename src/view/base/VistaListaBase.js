@@ -4,6 +4,7 @@ export class VistaListaBase extends VistaPanelBase {
   constructor(gui) {
     super(gui)
     this.onVolverCallback = null
+    this.tarjeta = null
   }
 
   crear() {
@@ -36,7 +37,7 @@ export class VistaListaBase extends VistaPanelBase {
     tarjeta.addControl(
       this.crearBoton({
         nombre: configuracion.nombreBotonVolver,
-        texto: 'Volver al menu',
+        texto: 'Volver al Menú',
         top: '185px',
         fondo: '#362924',
         color: '#ffd8bc',
@@ -45,6 +46,7 @@ export class VistaListaBase extends VistaPanelBase {
     )
 
     this.overlay = overlay
+    this.tarjeta = tarjeta
   }
 
   obtenerConfiguracionLista() {

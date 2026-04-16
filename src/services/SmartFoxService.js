@@ -162,3 +162,98 @@ export function testSmartFoxPing() {
     }
   })
 }
+
+/**
+ * Registra un nuevo usuario en el servidor
+ * @param {string} username - Nombre de usuario
+ * @param {string} password - Contraseña
+ * @returns {Promise} Promesa con el resultado
+ */
+export function registerUser(username, password) {
+  return sendExtensionRequest('register', { username, password })
+}
+
+/**
+ * Inicia sesión con credenciales
+ * @param {string} username - Nombre de usuario
+ * @param {string} password - Contraseña
+ * @returns {Promise} Promesa con el resultado
+ */
+export function loginUser(username, password) {
+  return sendExtensionRequest('login', { username, password })
+}
+
+/**
+ * Envía una solicitud de extensión al servidor
+ * @param {string} command - Comando a ejecutar
+ * @param {Object} params - Parámetros
+ * @returns {Promise} Promesa con la respuesta
+ */
+function sendExtensionRequest(command, params) {
+  const SFS2X = getSfsNamespace()
+
+  if (!SFS2X) {
+    return Promise.reject(
+      new Error('No se encontro la API JavaScript de SmartFoxServer')
+    )
+  }
+
+  const smartFox = smartFoxInstance || createSmartFoxInstance()
+
+  return new Promise((resolve, reject) => {
+    const sfsParams = new SFS2X.SFSObject()
+
+    // Agregar parámetros
+    for (const key in params) {
+      if (params.hasOwnProperty(key)) {
+        sfsParams.putUtfString(key, params[key])
+      }
+    }
+
+    const onExtensionResponse = (event) => {
+      if (event.cmd !== command && event.cmd !== 'requestError' && event.cmd !== 'registerSuccess' && event.cmd !== 'loginSuccess') {
+        return
+      }
+
+      smartFox.removeEventListener(
+        SFS2X.SFSEvent.EXTENSION_RESPONSE,
+        onExtensionResponse
+      )
+
+      try {
+        const data = JSON.parse(event.params.getUtfString('data'))
+        if (data.ok === false) {
+          reject(new Error(data.message))
+        } else {
+          resolve(data)
+        }
+      } catch (error) {
+        // Si no es JSON, intentar obtener directamente
+        if (event.params.getUtfString('cmd') === command) {
+          resolve({ ok: true })
+        } else {
+          reject(error)
+        }
+      }
+    }
+
+    // Verificar si hay conexión
+    if (!smartFox.isConnected()) {
+      // Conectar primero
+      smartFox.addEventListener(SFS2X.SFSEvent.CONNECTION, () => {
+        smartFox.send(new SFS2X.ExtensionRequest(command, sfsParams))
+      })
+      smartFox.addEventListener(
+        SFS2X.SFSEvent.CONNECTION_LOST,
+        () => reject(new Error('Conexion perdida'))
+      )
+      smartFox.connect(config.host || DEFAULT_CONFIG.host, config.port || DEFAULT_CONFIG.port)
+    } else {
+      smartFox.addEventListener(
+        SFS2X.SFSEvent.EXTENSION_RESPONSE,
+        onExtensionResponse
+      )
+      smartFox.send(new SFS2X.ExtensionRequest(command, sfsParams))
+    }
+  })
+}
