@@ -1,9 +1,11 @@
 import { PANTALLAS } from '../model/EstadoApp.js'
 
 export class ControladorEstadoApp {
-  constructor(estadoApp, vistas) {
+  constructor(estadoApp, vistas, controladorPartida = null) {
     this.estadoApp = estadoApp
     this.vistas = vistas
+    this.controladorPartida = controladorPartida
+    this.perfilesAsignados = []
   }
 
   actualizarVista() {
@@ -38,6 +40,9 @@ export class ControladorEstadoApp {
         this.vistas.vistaAccidentes.mostrar()
         break
       case PANTALLAS.PARTIDA:
+        if (this.controladorPartida) {
+          this.controladorPartida.iniciarPartida()
+        }
         this.vistas.vistaPartida.mostrar()
         break
       default:
@@ -67,5 +72,17 @@ export class ControladorEstadoApp {
     this.vistas.vistaCartas.ocultar()
     this.vistas.vistaAccidentes.ocultar()
     this.vistas.vistaPartida.ocultar()
+  }
+
+  obtenerPerfilesAsignados() {
+    return this.perfilesAsignados
+  }
+
+  agregarPerfilAsignado(perfil) {
+    this.perfilesAsignados.push(perfil)
+  }
+
+  reiniciarPerfilesAsignados() {
+    this.perfilesAsignados = []
   }
 }

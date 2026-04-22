@@ -1,5 +1,6 @@
 import * as BABYLON from '@babylonjs/core'
 import * as GUI from '@babylonjs/gui'
+import { GestorAjusteRatio } from './base/GestorAjusteRatio.js'
 
 export class VistaInicial {
   constructor(canvas) {
@@ -54,6 +55,7 @@ export class VistaInicial {
     })
 
     this.gui = GUI.AdvancedDynamicTexture.CreateFullscreenUI('UI', true, scene)
+    GestorAjusteRatio.configurarGUI(this.gui)
 
     this.crearDecoracion(scene, camera)
     this.crearMenu()

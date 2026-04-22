@@ -1,5 +1,6 @@
 import * as GUI from '@babylonjs/gui'
 import videoTutorial from '../assets/VideoTutorial.mp4'
+import { GestorAjusteRatio } from './base/GestorAjusteRatio.js'
 
 export class VistaTutorial {
   constructor(gui) {
@@ -9,6 +10,7 @@ export class VistaTutorial {
     this.botonCerrar = null
     this.panel = null
     this.video = null
+    this.cleanupVideoResize = null
   }
 
   crear() {
@@ -76,21 +78,22 @@ export class VistaTutorial {
     video.style.borderRadius = '10px'
 
     const ajustarTamanoVideo = () => {
-      const anchoMax = window.innerWidth * 0.8
-      const altoMax = window.innerHeight * 0.8
-      const relacion = video.videoWidth && video.videoHeight
-        ? video.videoWidth / video.videoHeight
-        : 16 / 9
+      if (this.cleanupVideoResize) {
+        this.cleanupVideoResize()
+      }
 
-      const ancho = Math.min(anchoMax, altoMax * relacion)
-      const alto = ancho / relacion
-
-      video.style.width = `${ancho}px`
-      video.style.height = `${alto}px`
+      this.cleanupVideoResize = GestorAjusteRatio.crearAjustadorElemento(
+        video,
+        {
+          contentWidth: video.videoWidth || 16,
+          contentHeight: video.videoHeight || 9,
+          maxWidthRatio: 0.8,
+          maxHeightRatio: 0.8
+        }
+      )
     }
 
     video.addEventListener('loadedmetadata', ajustarTamanoVideo)
-    window.addEventListener('resize', ajustarTamanoVideo)
     ajustarTamanoVideo()
 
     const btnCerrar = document.createElement('button')

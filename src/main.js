@@ -57,6 +57,9 @@ const vistaPartida = new VistaPartida(canvas, vistaInicial.engine, vistaInicial.
 vistaPartida.crear()
 
 const estadoApp = new EstadoApp()
+
+const controladorPartida = new ControladorVistaPartida(vistaPartida, null)
+
 const controladorEstadoApp = new ControladorEstadoApp(estadoApp, {
   vistaInicial,
   vistaInicialR,
@@ -68,7 +71,9 @@ const controladorEstadoApp = new ControladorEstadoApp(estadoApp, {
   vistaCartas,
   vistaAccidentes,
   vistaPartida
-})
+}, controladorPartida)
+
+controladorPartida.controladorEstadoApp = controladorEstadoApp
 
 const controladorVistaInicial = new ControladorVistaInicial(
   vistaInicial,
@@ -105,8 +110,6 @@ const controladorCrearJuego = new ControladorVistaCrearJuego(
 const controladorCartas = new ControladorVistaCartas(vistaCartas, controladorEstadoApp)
 
 const controladorAccidentes = new ControladorVistaAccidentes(vistaAccidentes, controladorEstadoApp)
-
-const controladorPartida = new ControladorVistaPartida(vistaPartida, controladorEstadoApp)
 
 controladorVistaInicial.init()
 controladorVistaInicialR.init()
