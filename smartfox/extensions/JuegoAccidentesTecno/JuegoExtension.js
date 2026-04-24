@@ -11,6 +11,9 @@ var MAX_PLAYERS_PER_LOBBY = 16
 var LOBBY_CODE_LENGTH = 6
 var LOBBY_CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
 
+// REST Bridge configuration
+var REST_BRIDGE_URL = 'http://127.0.0.1:3000/api'
+
 // Sistema de logs en JSON por categoría
 var logs = {
   USUARIO: [],
@@ -43,6 +46,7 @@ function init() {
       zoneState.initializedAt
   )
   logEvent('SYSTEM', 'extension_init', { zone: ZONE_NAME })
+  logToMongoDB('SYSTEM', 'extension_init', { zone: ZONE_NAME })
 }
 
 function destroy() {
@@ -298,6 +302,12 @@ function handleRegister(params, sender) {
     createdAt: registeredUsers[normalizedUsername].createdAt
   })
 
+  // Enviar a MongoDB via REST Bridge
+  sendToRestBridge('/usuarios/register', {
+    username: username,
+    password: password
+  })
+
   trace('[JuegoExtension] Usuario registrado: ' + normalizedUsername)
 
   return sendResponse('registerSuccess', {
@@ -321,15 +331,18 @@ function handleLogin(params, sender) {
 
   if (!user) {
     logEvent('USUARIO', 'login_failed', { username: normalizedUsername, reason: 'user_not_found' })
+    logToMongoDB('USUARIO', 'login_failed', { username: normalizedUsername, reason: 'user_not_found' })
     return sendError(sender, 'Usuario no encontrado')
   }
 
   if (user.password !== password) {
     logEvent('USUARIO', 'login_failed', { username: normalizedUsername, reason: 'wrong_password' })
+    logToMongoDB('USUARIO', 'login_failed', { username: normalizedUsername, reason: 'wrong_password' })
     return sendError(sender, 'Contrasena incorrecta')
   }
 
   logEvent('USUARIO', 'login_success', { username: normalizedUsername })
+  logToMongoDB('USUARIO', 'login_success', { username: normalizedUsername })
 
   return sendResponse('loginSuccess', {
     ok: true,
@@ -640,5 +653,51 @@ function exportLogs(category) {
     category: category || 'ALL',
     totalEvents: logData.length,
     events: logData
+  })
+}
+
+// ============================================
+// REST BRIDGE - MongoDB Integration
+// ============================================
+
+function sendToRestBridge(endpoint, data, callback) {
+  var url = REST_BRIDGE_URL + endpoint
+  var params = {}
+  var key
+
+  for (key in data) {
+    if (data.hasOwnProperty(key)) {
+      params[key] = stringify(data[key])
+    }
+  }
+
+  var httpRequest = new SFSApi.HttpRequest(
+    url,
+    params,
+    SFSApi.HttpMode.POST,
+    function(response) {
+      if (response.error) {
+        trace('[REST Bridge] Error en ' + endpoint + ': ' + response.error)
+      } else if (response.statusCode >= 400) {
+        trace('[REST Bridge] Error HTTP ' + response.statusCode + ' en ' + endpoint)
+      }
+      if (callback) {
+        callback(response)
+      }
+    }
+  )
+
+  try {
+    httpRequest.execute()
+  } catch (e) {
+    trace('[REST Bridge] Exception al enviar a ' + endpoint + ': ' + e)
+  }
+}
+
+function logToMongoDB(type, action, details) {
+  sendToRestBridge('/logs', {
+    type: type,
+    action: action,
+    details: stringify(details)
   })
 }
