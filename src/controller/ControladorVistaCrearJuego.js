@@ -1,4 +1,5 @@
 import { PANTALLAS, TIPOS_JUGADOR } from '../model/EstadoApp.js'
+import { leaveCurrentRoom } from '../services/SmartFoxService.js'
 
 export class ControladorVistaCrearJuego {
   constructor(vistaCrearJuego, estadoApp, controladorEstadoApp) {
@@ -8,7 +9,12 @@ export class ControladorVistaCrearJuego {
   }
 
   init() {
-    this.vistaCrearJuego.onVolver(() => {
+    this.vistaCrearJuego.onVolver(async () => {
+      if (this.estadoApp.getLobbyActual()) {
+        await leaveCurrentRoom()
+        this.estadoApp.limpiarLobbyActual()
+      }
+
       const pantallaRetorno =
         this.estadoApp.tipoJugador === TIPOS_JUGADOR.REGISTRADO
           ? PANTALLAS.INICIAL_REGISTRADO
@@ -18,6 +24,13 @@ export class ControladorVistaCrearJuego {
     })
 
     this.vistaCrearJuego.onEntrar(() => {
+      const lobbyActual = this.estadoApp.getLobbyActual()
+
+      if (!lobbyActual) {
+        this.vistaCrearJuego.mostrarError('No hay una partida creada o un lobby unido')
+        return
+      }
+
       this.controladorEstadoApp.irAPantalla(PANTALLAS.PARTIDA)
     })
   }

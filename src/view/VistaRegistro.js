@@ -16,7 +16,9 @@ export class VistaRegistro extends VistaFormularioBase {
         {
           nombre: 'registroContrasena',
           placeholder: 'Contraseña',
-          top: '8px'
+          top: '8px',
+          isPassword: true,
+          showPasswordButton: true
         }
       ],
       nombreBotonAccion: 'registroAccion',

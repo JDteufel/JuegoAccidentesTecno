@@ -1,5 +1,5 @@
 import { PANTALLAS, TIPOS_JUGADOR } from '../model/EstadoApp.js'
-import { loginUser } from '../services/SmartFoxService.js'
+import usuariosService from '../services/UsuariosService.js'
 
 export class ControladorVistaInicioSesion {
   constructor(vistaInicioSesion, estadoApp, controladorEstadoApp) {
@@ -24,14 +24,18 @@ export class ControladorVistaInicioSesion {
 
       try {
         this.vistaInicioSesion.mostrarCargando(true)
-        const result = await loginUser(username, password)
+        const result = await usuariosService.login(username, password)
 
-        // Guardar usuario en estado local usando la clase Usuario
-        this.estadoApp.setUsuario(result.username)
-        this.estadoApp.setTipoJugador(TIPOS_JUGADOR.REGISTRADO)
-
-        this.controladorEstadoApp.irAPantalla(PANTALLAS.INICIAL_REGISTRADO)
+        if (result.ok) {
+          this.estadoApp.setUsuario(result.user.username)
+          this.estadoApp.setTipoJugador(TIPOS_JUGADOR.REGISTRADO)
+          this.controladorEstadoApp.irAPantalla(PANTALLAS.INICIAL_REGISTRADO)
+        } else {
+          this.vistaInicioSesion.limpiarCampos()
+          this.vistaInicioSesion.mostrarError(result.message)
+        }
       } catch (error) {
+        this.vistaInicioSesion.limpiarCampos()
         this.vistaInicioSesion.mostrarError(error.message)
       } finally {
         this.vistaInicioSesion.mostrarCargando(false)

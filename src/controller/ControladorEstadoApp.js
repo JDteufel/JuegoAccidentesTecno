@@ -1,4 +1,8 @@
-import { PANTALLAS } from '../model/EstadoApp.js'
+import { PANTALLAS, TIPOS_JUGADOR } from '../model/EstadoApp.js'
+import {
+  leaveCurrentRoom,
+  subscribeToLobbyUpdates
+} from '../services/SmartFoxService.js'
 
 export class ControladorEstadoApp {
   constructor(estadoApp, vistas, controladorPartida = null) {
@@ -6,6 +10,22 @@ export class ControladorEstadoApp {
     this.vistas = vistas
     this.controladorPartida = controladorPartida
     this.perfilesAsignados = []
+    this.unsubscribeLobbyUpdates = subscribeToLobbyUpdates((lobbyData) => {
+      if (!lobbyData) {
+        this.estadoApp.limpiarLobbyActual()
+        return
+      }
+
+      this.estadoApp.setLobbyActual(
+        lobbyData,
+        this.estadoApp.getLobbySenderName(),
+        this.estadoApp.getLobbyPlayerName()
+      )
+
+      if (this.estadoApp.pantallaActual === PANTALLAS.GESTION_LOBBY) {
+        this.vistas.vistaCrearJuego.actualizarLobby(lobbyData)
+      }
+    })
   }
 
   actualizarVista() {
@@ -28,6 +48,7 @@ export class ControladorEstadoApp {
         this.vistas.vistaJugar.mostrar()
         break
       case PANTALLAS.GESTION_LOBBY:
+        this.vistas.vistaCrearJuego.actualizarLobby(this.estadoApp.getLobbyActual())
         this.vistas.vistaCrearJuego.mostrar()
         break
       case PANTALLAS.REGLAS:
@@ -84,5 +105,16 @@ export class ControladorEstadoApp {
 
   reiniciarPerfilesAsignados() {
     this.perfilesAsignados = []
+  }
+
+  async cerrarSesion() {
+    if (this.estadoApp.getLobbyActual()) {
+      await leaveCurrentRoom()
+    }
+
+    this.estadoApp.setUsuario(null)
+    this.estadoApp.setTipoJugador(TIPOS_JUGADOR.VISITANTE)
+    this.estadoApp.limpiarLobbyActual()
+    this.irAPantalla(PANTALLAS.INICIAL_PUBLICA)
   }
 }

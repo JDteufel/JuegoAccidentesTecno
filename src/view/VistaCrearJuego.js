@@ -11,13 +11,13 @@ export class VistaCrearJuego extends VistaListaBase {
       nombreOverlay: 'pantallaCrearJuego',
       nombreTarjeta: 'tarjetaCrearJuego',
       nombreTitulo: 'tituloCrearJuego',
-      titulo: 'Crear Juego',
+      titulo: 'Lobby',
       prefijoItems: 'crearJuegoItem',
       items: [
-        'Codigo del lobby: ABC123',
-        'Jugadores conectados: Juan, Ana, Invitado 1',
-        'Partida 1: 2 jugadores',
-        'Partida 2: 1 jugador'
+        'Código del lobby: -',
+        'Anfitrión: -',
+        'Jugadores conectados: -',
+        'Estado: esperando'
       ],
       nombreBotonVolver: 'crearJuegoVolver'
     }
@@ -40,5 +40,31 @@ export class VistaCrearJuego extends VistaListaBase {
 
   onEntrar(callback) {
     this.onEntrarCallback = callback
+  }
+
+  actualizarLobby(lobbyData) {
+    if (!lobbyData) {
+      this.actualizarTitulo('Lobby')
+      this.actualizarItems([
+        'Código del lobby: -',
+        'Anfitrión: -',
+        'Jugadores conectados: -',
+        'Estado: esperando'
+      ])
+      return
+    }
+
+    const nombresJugadores = (lobbyData.players || [])
+      .map((player) => player.name)
+      .join(', ')
+
+    this.actualizarTitulo(`Lobby ${lobbyData.lobbyCode}`)
+    this.actualizarItems([
+      `Código del lobby: ${lobbyData.lobbyCode}`,
+      `Anfitrión: ${lobbyData.hostName}`,
+      `Jugadores conectados: ${nombresJugadores || 'sin jugadores'}`,
+      `Estado: ${lobbyData.status}`
+    ])
+    this.limpiarError()
   }
 }

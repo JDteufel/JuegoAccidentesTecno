@@ -71,6 +71,20 @@ export class VistaInicialR extends VistaPanelBase {
         callback: () => this.onReglas && this.onReglas()
       })
     )
+
+    overlay.addControl(
+      this.crearBoton({
+        nombre: 'botonCerrarSesion',
+        texto: 'Cerrar Sesión',
+        top: '-44%',
+        left: '38%',
+        width: '220px',
+        height: '44px',
+        fondo: '#a84f16',
+        color: '#fff1e3',
+        callback: () => this.onCerrarSesion && this.onCerrarSesion()
+      })
+    )
   }
 
   setOnCrearJuego(callback) {
@@ -83,5 +97,9 @@ export class VistaInicialR extends VistaPanelBase {
 
   setOnReglas(callback) {
     this.onReglas = callback
+  }
+
+  setOnCerrarSesion(callback) {
+    this.onCerrarSesion = callback
   }
 }

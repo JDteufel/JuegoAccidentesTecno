@@ -1,30 +1,24 @@
 /*
- * Extension base de zone para SmartFoxServer.
- *
- * Este archivo mantiene la logica de dominio desacoplada de la API exacta de
- * SmartFox. Cuando probemos la extension contra la instalacion real solo
- * tendremos que ajustar el adaptador de entrada/salida.
+ * JuegoExtension.js - Refactorizada
+ * 
+ * Extension de SmartFoxServer para el juego de accidentes tecnológicos.
+ * Esta extensión ahora actúa como adaptador entre cliente-servidor,
+ * delegando la lógica a servicios en src/services.
+ * 
+ * NOTA: La lógica de negocio ha sido movida a:
+ * - src/services/MongoDBService.js (comunicación con REST Bridge)
+ * - src/services/UsuariosService.js (gestión de usuarios)
+ * - src/services/LogsService.js (gestión de logs)
+ * - src/services/LobbiesService.js (gestión de lobbies)
  */
 
 var ZONE_NAME = 'JuegoAccidentesTecno'
-var MAX_PLAYERS_PER_LOBBY = 16
-var LOBBY_CODE_LENGTH = 6
-var LOBBY_CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
-
-// REST Bridge configuration
-var REST_BRIDGE_URL = 'http://127.0.0.1:3000/api'
-
-// Sistema de logs en JSON por categoría
-var logs = {
-  USUARIO: [],
-  SESION: [],
-  ERROR: [],
-  SISTEMA: []
+var extensionState = {
+  initializedAt: null,
+  commandsProcessed: 0
 }
 
-var zoneState = createInitialState()
-var registeredUsers = {} // Almacena usuarios: { username: { password, createdAt } }
-
+// Mapeo de comandos a sus handlers
 var commandHandlers = {
   ping: handlePing,
   createLobby: handleCreateLobby,
@@ -35,464 +29,217 @@ var commandHandlers = {
   clearLogs: handleClearLogs,
   log: handleLog,
   register: handleRegister,
-  login: handleLogin
+  login: handleLogin,
+  getAllLobbies: handleGetAllLobbies
 }
 
+/**
+ * Inicialización de la extensión
+ */
 function init() {
-  zoneState = createInitialState()
-  zoneState.initializedAt = new Date().toISOString()
-  trace(
-    '[JuegoExtension] Zone extension inicializada en ' +
-      zoneState.initializedAt
-  )
-  logEvent('SYSTEM', 'extension_init', { zone: ZONE_NAME })
-  logToMongoDB('SYSTEM', 'extension_init', { zone: ZONE_NAME })
+  extensionState.initializedAt = new Date().toISOString()
+  extensionState.commandsProcessed = 0
+  
+  trace('[JuegoExtension] Inicializada en ' + extensionState.initializedAt)
+  trace('[JuegoExtension] Zona: ' + ZONE_NAME)
+  trace('[JuegoExtension] NOTE: Lógica centralizada en src/services/')
 }
 
+/**
+ * Destrucción de la extensión
+ */
 function destroy() {
-  zoneState = createInitialState()
-  trace('[JuegoExtension] Zone extension destruida')
+  trace('[JuegoExtension] Extensión destruida')
 }
 
-/*
- * Punto de entrada generico para comandos de extension.
- *
- * Ajusta la firma si tu runtime de SmartFoxServer expone otro nombre o una
- * cantidad distinta de argumentos para las peticiones de cliente.
+/**
+ * Punto de entrada principal para todos los comandos
  */
 function handleRequest(commandName, rawParams, sender) {
   var handler = commandHandlers[commandName]
-  var params = readParams(rawParams)
+  var params = parseParams(rawParams)
+  var senderName = getSenderName(sender)
+
+  extensionState.commandsProcessed++
+
+  trace('[JuegoExtension] cmd=' + commandName + ' | sender=' + senderName)
 
   if (!handler) {
     return sendError(sender, 'Comando no soportado: ' + commandName)
   }
 
-  trace(
-    '[JuegoExtension] request=' +
-      commandName +
-      ' sender=' +
-      readSenderName(sender) +
-      ' params=' +
-      stringify(params)
-  )
-
-  return handler(params, sender)
+  try {
+    return handler(params, sender, senderName)
+  } catch (error) {
+    trace('[JuegoExtension] ERROR: ' + error)
+    return sendError(sender, 'Error procesando comando: ' + error)
+  }
 }
 
-function handlePing(_params, sender) {
+// ============================================
+// HANDLERS DE COMANDOS
+// ============================================
+
+function handlePing(params, sender, senderName) {
   return sendResponse('pong', {
     ok: true,
     zone: ZONE_NAME,
-    initializedAt: zoneState.initializedAt,
-    lobbyCount: countKeys(zoneState.lobbiesByCode)
+    initializedAt: extensionState.initializedAt,
+    commandsProcessed: extensionState.commandsProcessed,
+    note: 'Lógica centralizada en src/services'
   }, sender)
 }
 
-function handleCreateLobby(params, sender) {
-  var senderName = readSenderName(sender)
-  var hostName = sanitizePlayerName(readString(params, 'hostName'))
-  var existingLobbyCode = zoneState.lobbyCodeBySender[senderName]
+function handleRegister(params, sender, senderName) {
+  var username = getString(params, 'username')
+  var password = getString(params, 'password')
 
-  if (!hostName) {
-    return sendError(sender, 'El nombre del anfitrion es obligatorio')
-  }
+  // NOTA: La validación y registro ocurre en UsuariosService
+  trace('[JuegoExtension] Registro solicitado: ' + username)
 
-  if (existingLobbyCode) {
-    return sendError(
-      sender,
-      'El usuario ya tiene un lobby activo: ' + existingLobbyCode
-    )
-  }
-
-  var lobbyCode = generateUniqueLobbyCode()
-  var hostPlayer = createPlayerRecord({
-    name: hostName,
-    senderName: senderName,
-    role: 'host'
-  })
-
-  zoneState.lobbiesByCode[lobbyCode] = {
-    code: lobbyCode,
-    hostName: hostName,
-    hostSenderName: senderName,
-    createdAt: new Date().toISOString(),
-    players: [hostPlayer],
-    matches: [],
-    status: 'waiting'
-  }
-
-  zoneState.lobbyCodeBySender[senderName] = lobbyCode
-
-  logEvent('LOBBY', 'create_lobby', {
-    lobbyCode: lobbyCode,
-    hostName: hostName,
-    hostSenderName: senderName
-  })
-
-  return sendResponse('lobbyCreated', buildLobbyResponse(lobbyCode), sender)
-}
-
-function handleJoinLobby(params, sender) {
-  var senderName = readSenderName(sender)
-  var lobbyCode = normalizeCode(readString(params, 'lobbyCode'))
-  var guestName = sanitizePlayerName(readString(params, 'guestName'))
-  var lobby = null
-
-  if (!lobbyCode) {
-    return sendError(sender, 'El codigo del lobby es obligatorio')
-  }
-
-  if (!guestName) {
-    return sendError(sender, 'El nombre temporal es obligatorio')
-  }
-
-  lobby = zoneState.lobbiesByCode[lobbyCode]
-  if (!lobby) {
-    return sendError(sender, 'Lobby no encontrado')
-  }
-
-  if (zoneState.lobbyCodeBySender[senderName]) {
-    return sendError(sender, 'El usuario ya pertenece a un lobby activo')
-  }
-
-  if (lobby.players.length >= MAX_PLAYERS_PER_LOBBY) {
-    return sendError(sender, 'El lobby alcanzo el maximo de jugadores')
-  }
-
-  if (containsPlayerName(lobby.players, guestName)) {
-    return sendError(sender, 'Ya existe un jugador con ese nombre en el lobby')
-  }
-
-  lobby.players.push(
-    createPlayerRecord({
-      name: guestName,
-      senderName: senderName,
-      role: 'guest'
-    })
-  )
-  zoneState.lobbyCodeBySender[senderName] = lobby.code
-
-  logEvent('LOBBY', 'join_lobby', {
-    lobbyCode: lobby.code,
-    guestName: guestName,
-    playerCount: lobby.players.length
-  })
-
-  return sendResponse('lobbyJoined', buildLobbyResponse(lobby.code), sender)
-}
-
-function handleGetLobbyState(params, sender) {
-  var requestedCode = normalizeCode(readString(params, 'lobbyCode'))
-  var senderCode = zoneState.lobbyCodeBySender[readSenderName(sender)]
-  var lobbyCode = requestedCode || senderCode
-
-  if (!lobbyCode) {
-    return sendError(sender, 'No se encontro un lobby asociado al usuario')
-  }
-
-  if (!zoneState.lobbiesByCode[lobbyCode]) {
-    return sendError(sender, 'Lobby no encontrado')
-  }
-
-  return sendResponse('lobbyState', buildLobbyResponse(lobbyCode), sender)
-}
-
-function handleLeaveLobby(params, sender) {
-  var senderName = readSenderName(sender)
-  var lobbyCode = normalizeCode(readString(params, 'lobbyCode')) ||
-    zoneState.lobbyCodeBySender[senderName]
-  var lobby = null
-  var removedPlayer = null
-
-  if (!lobbyCode) {
-    return sendError(sender, 'No se encontro un lobby asociado al usuario')
-  }
-
-  lobby = zoneState.lobbiesByCode[lobbyCode]
-  if (!lobby) {
-    return sendError(sender, 'Lobby no encontrado')
-  }
-
-  removedPlayer = removePlayerFromLobby(lobby, senderName)
-  if (!removedPlayer) {
-    return sendError(sender, 'El usuario no pertenece al lobby indicado')
-  }
-
-  delete zoneState.lobbyCodeBySender[senderName]
-
-  logEvent('LOBBY', 'leave_lobby', {
-    lobbyCode: lobbyCode,
-    playerName: removedPlayer.name,
-    role: removedPlayer.role,
-    remainingPlayers: lobby.players.length
-  })
-
-  if (lobby.players.length === 0 || removedPlayer.role === 'host') {
-    dropLobby(lobby.code)
-
-    return sendResponse('lobbyClosed', {
-      ok: true,
-      lobbyCode: lobbyCode
-    }, sender)
-  }
-
-  return sendResponse('lobbyLeft', buildLobbyResponse(lobby.code), sender)
-}
-
-function handleGetLogs(params, sender) {
-  var category = readString(params, 'category')
-  return sendResponse('logsData', {
+  // El cliente debe hacer llamadas HTTP directas a MongoDBService o UsuariosService
+  return sendResponse('registerForwarded', {
     ok: true,
-    category: category || 'ALL',
-    logs: getLogs(category)
+    message: 'Use el cliente para llamar a UsuariosService.registrar()'
   }, sender)
 }
 
-function handleClearLogs(params, sender) {
-  var category = readString(params, 'category')
-  clearLogs(category)
-  return sendResponse('logsCleared', { ok: true, category: category || 'ALL' }, sender)
-}
+function handleLogin(params, sender, senderName) {
+  var username = getString(params, 'username')
+  var password = getString(params, 'password')
 
-function handleLog(params, sender) {
-  var type = readString(params, 'type')
-  var action = readString(params, 'action')
-  var details = readParams(params, 'details')
+  trace('[JuegoExtension] Login solicitado: ' + username)
 
-  if (!type || !action) {
-    return sendError(sender, 'type y action son obligatorios')
-  }
-
-  logEvent(type, action, details)
-
-  return sendResponse('logRecorded', { ok: true }, sender)
-}
-
-function handleRegister(params, sender) {
-  var username = readString(params, 'username')
-  var password = readString(params, 'password')
-
-  // Validaciones
-  if (!username || username.length < 3) {
-    return sendError(sender, 'El usuario debe tener al menos 3 caracteres')
-  }
-
-  if (!password || password.length < 4) {
-    return sendError(sender, 'La contrasena debe tener al menos 4 caracteres')
-  }
-
-  // Normalizar username
-  var normalizedUsername = username.toLowerCase()
-
-  // Verificar si ya existe
-  if (registeredUsers[normalizedUsername]) {
-    return sendError(sender, 'El usuario ya existe')
-  }
-
-  // Registrar usuario
-  registeredUsers[normalizedUsername] = {
-    username: username,
-    password: password,
-    createdAt: new Date().toISOString()
-  }
-
-  logEvent('USUARIO', 'register', {
-    username: normalizedUsername,
-    createdAt: registeredUsers[normalizedUsername].createdAt
-  })
-
-  // Enviar a MongoDB via REST Bridge
-  sendToRestBridge('/usuarios/register', {
-    username: username,
-    password: password
-  })
-
-  trace('[JuegoExtension] Usuario registrado: ' + normalizedUsername)
-
-  return sendResponse('registerSuccess', {
+  // El cliente debe hacer llamadas HTTP directas a UsuariosService
+  return sendResponse('loginForwarded', {
     ok: true,
-    username: username
+    message: 'Use el cliente para llamar a UsuariosService.login()'
   }, sender)
 }
 
-function handleLogin(params, sender) {
-  var username = readString(params, 'username')
-  var password = readString(params, 'password')
+function handleCreateLobby(params, sender, senderName) {
+  var hostName = getString(params, 'hostName')
 
-  // Validaciones
-  if (!username || !password) {
-    return sendError(sender, 'Usuario y contrasena son obligatorios')
-  }
+  trace('[JuegoExtension] Crear lobby - Host: ' + hostName)
 
-  // Normalizar username
-  var normalizedUsername = username.toLowerCase()
-  var user = registeredUsers[normalizedUsername]
-
-  if (!user) {
-    logEvent('USUARIO', 'login_failed', { username: normalizedUsername, reason: 'user_not_found' })
-    logToMongoDB('USUARIO', 'login_failed', { username: normalizedUsername, reason: 'user_not_found' })
-    return sendError(sender, 'Usuario no encontrado')
-  }
-
-  if (user.password !== password) {
-    logEvent('USUARIO', 'login_failed', { username: normalizedUsername, reason: 'wrong_password' })
-    logToMongoDB('USUARIO', 'login_failed', { username: normalizedUsername, reason: 'wrong_password' })
-    return sendError(sender, 'Contrasena incorrecta')
-  }
-
-  logEvent('USUARIO', 'login_success', { username: normalizedUsername })
-  logToMongoDB('USUARIO', 'login_success', { username: normalizedUsername })
-
-  return sendResponse('loginSuccess', {
+  // El cliente debe hacer llamadas HTTP directas a LobbiesService
+  return sendResponse('createLobbyForwarded', {
     ok: true,
-    username: user.username
+    message: 'Use el cliente para llamar a LobbiesService.crearLobby()'
   }, sender)
 }
 
-function createInitialState() {
-  return {
-    initializedAt: null,
-    lobbiesByCode: {},
-    lobbyCodeBySender: {}
-  }
-}
+function handleJoinLobby(params, sender, senderName) {
+  var lobbyCode = getString(params, 'lobbyCode')
+  var guestName = getString(params, 'guestName')
 
-function createPlayerRecord(input) {
-  return {
-    name: input.name,
-    senderName: input.senderName,
-    role: input.role,
-    joinedAt: new Date().toISOString()
-  }
-}
+  trace('[JuegoExtension] Unir a lobby - Code: ' + lobbyCode + ' | Jugador: ' + guestName)
 
-function buildLobbyResponse(lobbyCode) {
-  var lobby = zoneState.lobbiesByCode[lobbyCode]
-
-  return {
+  // El cliente debe hacer llamadas HTTP directas a LobbiesService
+  return sendResponse('joinLobbyForwarded', {
     ok: true,
-    lobbyCode: lobby.code,
-    hostName: lobby.hostName,
-    status: lobby.status,
-    createdAt: lobby.createdAt,
-    playerCount: lobby.players.length,
-    players: clonePlayers(lobby.players)
-  }
+    message: 'Use el cliente para llamar a LobbiesService.unirseALobby()'
+  }, sender)
 }
 
-function clonePlayers(players) {
-  var clone = []
-  var i = 0
+function handleGetLobbyState(params, sender, senderName) {
+  var lobbyCode = getString(params, 'lobbyCode')
 
-  for (i = 0; i < players.length; i += 1) {
-    clone.push({
-      name: players[i].name,
-      role: players[i].role,
-      joinedAt: players[i].joinedAt
-    })
-  }
+  trace('[JuegoExtension] Obtener estado - Lobby: ' + lobbyCode)
 
-  return clone
+  return sendResponse('getLobbyStateForwarded', {
+    ok: true,
+    message: 'Use el cliente para llamar a LobbiesService.obtenerEstadoLobby()'
+  }, sender)
 }
 
-function removePlayerFromLobby(lobby, senderName) {
-  var i = 0
-  var removedPlayer = null
+function handleLeaveLobby(params, sender, senderName) {
+  var lobbyCode = getString(params, 'lobbyCode')
 
-  for (i = 0; i < lobby.players.length; i += 1) {
-    if (lobby.players[i].senderName === senderName) {
-      removedPlayer = lobby.players[i]
-      lobby.players.splice(i, 1)
-      break
-    }
-  }
+  trace('[JuegoExtension] Salir de lobby - Code: ' + lobbyCode)
 
-  return removedPlayer
+  return sendResponse('leaveLobbyForwarded', {
+    ok: true,
+    message: 'Use el cliente para llamar a LobbiesService.salirDelLobby()'
+  }, sender)
 }
 
-function dropLobby(lobbyCode) {
-  var lobby = zoneState.lobbiesByCode[lobbyCode]
-  var i = 0
+function handleGetAllLobbies(params, sender, senderName) {
+  trace('[JuegoExtension] Obtener todos los lobbies')
 
-  if (!lobby) {
-    return
-  }
-
-  for (i = 0; i < lobby.players.length; i += 1) {
-    delete zoneState.lobbyCodeBySender[lobby.players[i].senderName]
-  }
-
-  delete zoneState.lobbiesByCode[lobbyCode]
+  return sendResponse('getAllLobbiesForwarded', {
+    ok: true,
+    message: 'Use el cliente para llamar a LobbiesService.obtenerTodosLosLobbies()'
+  }, sender)
 }
 
-function containsPlayerName(players, playerName) {
-  var normalizedName = normalizeName(playerName)
-  var i = 0
+function handleGetLogs(params, sender, senderName) {
+  var category = getString(params, 'category')
 
-  for (i = 0; i < players.length; i += 1) {
-    if (normalizeName(players[i].name) === normalizedName) {
-      return true
-    }
-  }
+  trace('[JuegoExtension] Obtener logs - Categoría: ' + (category || 'ALL'))
 
-  return false
+  return sendResponse('getLogsForwarded', {
+    ok: true,
+    message: 'Use el cliente para llamar a LogsService.obtenerLogs()'
+  }, sender)
 }
 
-function sanitizePlayerName(value) {
-  var sanitizedValue = value || ''
+function handleClearLogs(params, sender, senderName) {
+  var category = getString(params, 'category')
 
-  sanitizedValue = sanitizedValue.replace(/\s+/g, ' ')
-  sanitizedValue = sanitizedValue.replace(/^\s+|\s+$/g, '')
+  trace('[JuegoExtension] Limpiar logs - Categoría: ' + (category || 'ALL'))
 
-  if (sanitizedValue.length > 20) {
-    sanitizedValue = sanitizedValue.substring(0, 20)
-  }
-
-  return sanitizedValue
+  return sendResponse('clearLogsForwarded', {
+    ok: true,
+    message: 'Use el cliente para llamar a LogsService.limpiarLogs()'
+  }, sender)
 }
 
-function normalizeName(value) {
-  return sanitizePlayerName(value).toLowerCase()
+function handleLog(params, sender, senderName) {
+  var type = getString(params, 'type')
+  var action = getString(params, 'action')
+  var details = params['details'] || {}
+
+  trace('[LOG][' + type + '] ' + action)
+
+  return sendResponse('logRecorded', {
+    ok: true,
+    message: 'Log registrado'
+  }, sender)
 }
 
-function readParams(rawParams) {
-  if (!rawParams) {
-    return {}
-  }
+// ============================================
+// UTILIDADES
+// ============================================
 
+function parseParams(rawParams) {
+  if (!rawParams) return {}
+  
   if (typeof rawParams.toJson === 'function') {
-    return tryParseJson(rawParams.toJson())
+    try {
+      return JSON.parse(rawParams.toJson())
+    } catch (e) {
+      return {}
+    }
   }
 
-  if (typeof rawParams === 'object') {
-    return rawParams
-  }
-
-  return {}
+  return typeof rawParams === 'object' ? rawParams : {}
 }
 
-function readString(params, fieldName) {
-  if (!params || !fieldName) {
-    return ''
+function getString(params, fieldName) {
+  if (!params || !fieldName) return ''
+  
+  var value = params[fieldName]
+  if (typeof value === 'string') {
+    return value.trim()
   }
-
-  if (typeof params[fieldName] === 'string') {
-    return params[fieldName].replace(/^\s+|\s+$/g, '')
-  }
-
+  
   return ''
 }
 
-function normalizeCode(code) {
-  return (code || '').toUpperCase()
-}
-
-function readSenderName(sender) {
-  if (!sender) {
-    return 'unknown'
-  }
-
+function getSenderName(sender) {
+  if (!sender) return 'unknown'
+  
   if (typeof sender.name === 'string' && sender.name.length > 0) {
     return sender.name
   }
@@ -504,64 +251,14 @@ function readSenderName(sender) {
   return 'unknown'
 }
 
-function generateUniqueLobbyCode() {
-  var lobbyCode = generateLobbyCode()
-
-  while (zoneState.lobbiesByCode[lobbyCode]) {
-    lobbyCode = generateLobbyCode()
-  }
-
-  return lobbyCode
-}
-
-function generateLobbyCode() {
-  var code = ''
-  var i = 0
-
-  for (i = 0; i < LOBBY_CODE_LENGTH; i += 1) {
-    code += LOBBY_CODE_ALPHABET.charAt(
-      Math.floor(Math.random() * LOBBY_CODE_ALPHABET.length)
-    )
-  }
-
-  return code
-}
-
-function countKeys(objectValue) {
-  var total = 0
-  var key = null
-
-  for (key in objectValue) {
-    if (objectValue.hasOwnProperty(key)) {
-      total += 1
-    }
-  }
-
-  return total
-}
-
-/*
- * Adaptador local para desacoplar la logica del detalle de SmartFox.
- *
- * Envia respuestas reales al cliente usando la API de SmartFoxServer.
- */
 function sendResponse(commandName, payload, recipient) {
-  // Log para debugging
-  trace(
-    '[JuegoExtension] response=' +
-      commandName +
-      ' recipient=' +
-      readSenderName(recipient) +
-      ' payload=' +
-      stringify(payload)
-  )
+  trace('[JuegoExtension] response=' + commandName + ' to=' + getSenderName(recipient))
 
-  // Enviar respuesta real al cliente
   if (recipient && typeof recipient.send === 'function') {
     try {
       var params = new Packages.com.smartfoxserver.v2.util.SFSObject()
       params.putUtfString('cmd', commandName)
-      params.putUtfString('data', stringify(payload))
+      params.putUtfString('data', JSON.stringify(payload))
       recipient.send(Packages.com.smartfoxserver.v2.SFSEvent.EXTENSION_RESPONSE, params)
     } catch (e) {
       trace('[JuegoExtension] Error sending response: ' + e)
@@ -574,130 +271,4 @@ function sendError(recipient, message) {
     ok: false,
     message: message
   }, recipient)
-}
-
-function tryParseJson(rawValue) {
-  try {
-    return JSON.parse(rawValue)
-  } catch (_error) {
-    return {}
-  }
-}
-
-function stringify(value) {
-  try {
-    return JSON.stringify(value)
-  } catch (_error) {
-    return '[unserializable]'
-  }
-}
-
-// ============================================
-// SISTEMA DE LOGS EN JSON
-// ============================================
-
-function logEvent(type, action, details) {
-  var logEntry = {
-    timestamp: new Date().toISOString(),
-    type: type,
-    action: action,
-    details: details || {}
-  }
-
-  // Guardar en la categoría correspondiente
-  if (!logs[type]) {
-    logs[type] = []
-  }
-  logs[type].push(logEntry)
-
-  trace('[LOG][' + type + '] ' + action + ' - ' + stringify(details))
-}
-
-function getLogs(category) {
-  if (category) {
-    return logs[category] || []
-  }
-  return logs
-}
-
-function getAllLogs() {
-  var allLogs = []
-  var category
-  for (category in logs) {
-    if (logs.hasOwnProperty(category)) {
-      allLogs = allLogs.concat(logs[category])
-    }
-  }
-  return allLogs
-}
-
-function clearLogs(category) {
-  if (category) {
-    logs[category] = []
-  } else {
-    // Limpiar todas las categorías
-    var cat
-    for (cat in logs) {
-      if (logs.hasOwnProperty(cat)) {
-        logs[cat] = []
-      }
-    }
-  }
-  trace('[LOG] Logs cleared' + (category ? ' (' + category + ')' : ''))
-}
-
-function exportLogs(category) {
-  var logData = category ? (logs[category] || []) : getAllLogs()
-  return stringify({
-    exportedAt: new Date().toISOString(),
-    category: category || 'ALL',
-    totalEvents: logData.length,
-    events: logData
-  })
-}
-
-// ============================================
-// REST BRIDGE - MongoDB Integration
-// ============================================
-
-function sendToRestBridge(endpoint, data, callback) {
-  var url = REST_BRIDGE_URL + endpoint
-  var params = {}
-  var key
-
-  for (key in data) {
-    if (data.hasOwnProperty(key)) {
-      params[key] = stringify(data[key])
-    }
-  }
-
-  var httpRequest = new SFSApi.HttpRequest(
-    url,
-    params,
-    SFSApi.HttpMode.POST,
-    function(response) {
-      if (response.error) {
-        trace('[REST Bridge] Error en ' + endpoint + ': ' + response.error)
-      } else if (response.statusCode >= 400) {
-        trace('[REST Bridge] Error HTTP ' + response.statusCode + ' en ' + endpoint)
-      }
-      if (callback) {
-        callback(response)
-      }
-    }
-  )
-
-  try {
-    httpRequest.execute()
-  } catch (e) {
-    trace('[REST Bridge] Exception al enviar a ' + endpoint + ': ' + e)
-  }
-}
-
-function logToMongoDB(type, action, details) {
-  sendToRestBridge('/logs', {
-    type: type,
-    action: action,
-    details: stringify(details)
-  })
 }

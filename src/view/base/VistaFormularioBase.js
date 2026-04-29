@@ -27,10 +27,9 @@ export class VistaFormularioBase extends VistaPanelBase {
     configuracion.campos.forEach((campo) => {
       const campoInput = this.crearCampoEntrada(campo)
       this.campos[campo.nombre] = campoInput
-      tarjeta.addControl(campoInput)
+      tarjeta.addControl(campoInput.control)
     })
 
-    // Crear elemento para mostrar errores
     this.errorText = this.crearTexto({
       nombre: configuracion.nombreOverlay + 'Error',
       texto: '',
@@ -79,7 +78,7 @@ export class VistaFormularioBase extends VistaPanelBase {
 
   getValorCampo(nombre) {
     const campo = this.campos[nombre]
-    return campo ? campo.text : ''
+    return campo ? campo.getValue() : ''
   }
 
   mostrarError(mensaje) {
@@ -98,5 +97,12 @@ export class VistaFormularioBase extends VistaPanelBase {
 
   mostrarCargando(mostrar) {
     // Por defecto no hace nada, las subclases pueden sobrescribir
+  }
+
+  limpiarCampos() {
+    Object.keys(this.campos).forEach((nombre) => {
+      this.campos[nombre].clear()
+    })
+    this.limpiarError()
   }
 }

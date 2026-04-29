@@ -59,4 +59,14 @@ router.post('/login', async (req, res) => {
   }
 });
 
+router.get('/', async (req, res) => {
+  try {
+    const usuarios = await Usuario.find({}, { password: 0 }).sort({ createdAt: -1 });
+    res.json({ ok: true, usuarios });
+  } catch (error) {
+    console.error('[USUARIOS] Error:', error.message);
+    res.status(500).json({ ok: false, message: error.message });
+  }
+});
+
 module.exports = router;

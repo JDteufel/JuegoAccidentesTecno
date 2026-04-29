@@ -84,6 +84,7 @@ const controladorVistaInicial = new ControladorVistaInicial(
 const controladorVistaInicialR = new ControladorVistaInicialR(
   vistaInicialR,
   vistaTutorial,
+  estadoApp,
   controladorEstadoApp
 )
 
@@ -136,4 +137,3 @@ testSmartFoxPing()
   .catch((error) => {
     console.error('[SmartFox ping error]', error)
   })
-

@@ -16,7 +16,9 @@ export class VistaInicioSesion extends VistaFormularioBase {
         {
           nombre: 'inicioSesionContrasena',
           placeholder: 'Contraseña',
-          top: '8px'
+          top: '8px',
+          isPassword: true,
+          showPasswordButton: true
         }
       ],
       nombreBotonAccion: 'inicioSesionAccion',

@@ -25,6 +25,9 @@ export class EstadoApp {
     this.pantallaAnterior = null
     this.tipoJugador = TIPOS_JUGADOR.VISITANTE
     this.usuario = null
+    this.lobbyActual = null
+    this.lobbySenderName = null
+    this.lobbyPlayerName = null
   }
 
   setPantalla(pantalla) {
@@ -62,6 +65,31 @@ export class EstadoApp {
     this.tipoJugador = TIPOS_JUGADOR.VISITANTE
     this.pantallaActual = PANTALLAS.INICIAL_PUBLICA
     this.pantallaAnterior = null
+    this.limpiarLobbyActual()
+  }
+
+  setLobbyActual(lobbyData, senderName = null, playerName = null) {
+    this.lobbyActual = lobbyData
+    this.lobbySenderName = senderName
+    this.lobbyPlayerName = playerName
+  }
+
+  getLobbyActual() {
+    return this.lobbyActual
+  }
+
+  getLobbySenderName() {
+    return this.lobbySenderName
+  }
+
+  getLobbyPlayerName() {
+    return this.lobbyPlayerName
+  }
+
+  limpiarLobbyActual() {
+    this.lobbyActual = null
+    this.lobbySenderName = null
+    this.lobbyPlayerName = null
   }
 
   regresarPantallaAnterior() {
