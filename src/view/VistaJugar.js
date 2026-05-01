@@ -10,7 +10,7 @@ export class VistaJugar extends VistaFormularioBase {
       campos: [
         {
           nombre: 'jugarCodigo',
-          placeholder: 'Codigo del lobby',
+          placeholder: 'Codigo de la sala maestra',
           top: '-70px'
         },
         {

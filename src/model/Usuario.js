@@ -1,6 +1,3 @@
-/**
- * Usuario - Clase que representa un usuario registrado en el sistema
- */
 export class Usuario {
   constructor(username) {
     this.username = username

@@ -1,5 +1,4 @@
 import * as BABYLON from '@babylonjs/core'
-import * as GUI from '@babylonjs/gui'
 import { GestorAjusteRatio } from './base/GestorAjusteRatio.js'
 
 export class VistaInicial {
@@ -7,8 +6,7 @@ export class VistaInicial {
     this.canvas = canvas
     this.engine = new BABYLON.Engine(canvas, true)
     this.scene = null
-    this.gui = null
-    this.overlay = null
+    this.overlayEl = null
     this.onTutorial = null
     this.onRegistro = null
     this.onInicioSesion = null
@@ -54,11 +52,9 @@ export class VistaInicial {
       pointLight.position.y = 11 + Math.sin(tiempoSolar * 0.7) * 2.8
     })
 
-    this.gui = GUI.AdvancedDynamicTexture.CreateFullscreenUI('UI', true, scene)
-    GestorAjusteRatio.configurarGUI(this.gui)
-
     this.crearDecoracion(scene, camera)
-    this.crearMenu()
+
+    this.crearMenuDOM()
 
     this.scene = scene
     this.engine.activeScene = this.scene
@@ -265,181 +261,164 @@ export class VistaInicial {
     })
   }
 
-  crearMenu() {
-    const overlay = new GUI.Rectangle('pantallaMenuInicial')
-    overlay.width = 1
-    overlay.height = 1
-    overlay.thickness = 0
-    overlay.background = 'rgba(12, 9, 8, 0.48)'
-    overlay.isVisible = true
-    this.gui.addControl(overlay)
-    this.overlay = overlay
+  crearMenuDOM() {
+    const overlay = document.createElement('div')
+    overlay.id = 'pantallaMenuInicial'
+    overlay.style.cssText = `
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      display: none;
+      background: rgba(12, 9, 8, 0.48);
+      z-index: 100;
+      font-family: 'Comic Sans MS', cursive;
+    `
+    document.body.appendChild(overlay)
+    this.overlayEl = overlay
 
-    const barraSuperior = new GUI.Rectangle('barraSuperiorMenuInicial')
-    barraSuperior.width = 1
-    barraSuperior.height = '92px'
-    barraSuperior.top = '-44%'
-    barraSuperior.thickness = 0
-    barraSuperior.background = 'rgba(18, 14, 13, 0.72)'
-    overlay.addControl(barraSuperior)
+    const barraSuperior = document.createElement('div')
+    barraSuperior.style.cssText = `
+      position: absolute;
+      top: 6%;
+      right: 40px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      height: 92px;
+      background: rgba(18, 14, 13, 0.72);
+      padding: 0 20px;
+      border-radius: 18px;
+      box-sizing: border-box;
+    `
+    overlay.appendChild(barraSuperior)
 
-    overlay.addControl(
-      this.crearTexto({
-        nombre: 'tituloMenuInicial',
-        texto: 'Juego de Accidentes Tecnológicos',
-        tamano: 42,
-        alto: '120px',
-        top: '-33%',
-        color: '#ffe6d1'
-      })
+    const titulo = document.createElement('h1')
+    titulo.textContent = 'Juego de Accidentes Tecnológicos'
+    titulo.style.cssText = `
+      color: #ffe6d1;
+      font-size: 42px;
+      margin: 0;
+      position: absolute;
+      top: 15%;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+    `
+    overlay.appendChild(titulo)
+
+    const btnRegistro = this._crearBoton(
+      'Registrarse',
+      '#2f2623',
+      '#ffd6b5',
+      () => this.onRegistro && this.onRegistro()
     )
+    btnRegistro.style.cssText += `
+      width: 200px;
+      height: 44px;
+      font-size: 18px;
+    `
+    barraSuperior.appendChild(btnRegistro)
 
-    overlay.addControl(
-      this.crearBoton({
-        nombre: 'botonInicioSesionSuperior',
-        texto: 'Iniciar Sesión',
-        top: '-44%',
-        left: '38%',
-        width: '220px',
-        height: '44px',
-        fondo: '#a84f16',
-        color: '#fff1e3',
-        callback: () => this.onInicioSesion && this.onInicioSesion()
-      })
+    const btnInicioSesion = this._crearBoton(
+      'Iniciar Sesión',
+      '#a84f16',
+      '#fff1e3',
+      () => this.onInicioSesion && this.onInicioSesion()
     )
+    btnInicioSesion.style.cssText += `
+      width: 220px;
+      height: 44px;
+      font-size: 18px;
+    `
+    barraSuperior.appendChild(btnInicioSesion)
 
-    overlay.addControl(
-      this.crearBoton({
-        nombre: 'botonRegistroSuperior',
-        texto: 'Registrarse',
-        top: '-44%',
-        left: '24%',
-        width: '200px',
-        height: '44px',
-        fondo: '#2f2623',
-        color: '#ffd6b5',
-        callback: () => this.onRegistro && this.onRegistro()
-      })
+    const panelAcciones = document.createElement('div')
+    panelAcciones.style.cssText = `
+      position: absolute;
+      top: 35%;
+      left: 10%;
+      width: 320px;
+      height: 280px;
+      border-radius: 30px;
+      border: 2px solid #8a4a20;
+      background: rgba(28, 20, 18, 0.92);
+      box-shadow: 0 16px 28px rgba(0,0,0,0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 25px;
+    `
+    overlay.appendChild(panelAcciones)
+
+    const tituloPanel = document.createElement('h2')
+    tituloPanel.textContent = 'Menú Principal'
+    tituloPanel.style.cssText = `
+      color: #ffd9bd;
+      font-size: 26px;
+      margin: 0 0 20px 0;
+      text-align: center;
+    `
+    panelAcciones.appendChild(tituloPanel)
+
+    const btnJugar = this._crearBoton(
+      'Jugar',
+      '#d66a1f',
+      '#fff7ef',
+      () => this.onJugar && this.onJugar()
     )
+    btnJugar.style.marginBottom = '10px'
+    panelAcciones.appendChild(btnJugar)
 
-    const panelAcciones = new GUI.Rectangle('panelAccionesMenuInicial')
-    panelAcciones.width = '420px'
-    panelAcciones.height = '410px'
-    panelAcciones.left = '-34%'
-    panelAcciones.top = '8%'
-    panelAcciones.cornerRadius = 30
-    panelAcciones.thickness = 2
-    panelAcciones.color = '#8a4a20'
-    panelAcciones.background = 'rgba(28, 20, 18, 0.92)'
-    panelAcciones.shadowColor = '#00000066'
-    panelAcciones.shadowBlur = 28
-    panelAcciones.shadowOffsetX = 0
-    panelAcciones.shadowOffsetY = 16
-    overlay.addControl(panelAcciones)
-
-    panelAcciones.addControl(
-      this.crearTexto({
-        nombre: 'tituloPanelAccionesInicial',
-        texto: 'Menú Principal',
-        tamano: 28,
-        alto: '60px',
-        top: '-135px',
-        color: '#ffd9bd'
-      })
+    const btnTutorial = this._crearBoton(
+      'Tutorial',
+      '#3c2d27',
+      '#ffd6b7',
+      () => this.onTutorial && this.onTutorial()
     )
+    btnTutorial.style.marginBottom = '10px'
+    panelAcciones.appendChild(btnTutorial)
 
-    panelAcciones.addControl(
-      this.crearBoton({
-        nombre: 'botonJugar',
-        texto: 'Jugar',
-        top: '-45px',
-        width: '290px',
-        fondo: '#d66a1f',
-        color: '#fff7ef',
-        callback: () => this.onJugar && this.onJugar()
-      })
+    const btnReglas = this._crearBoton(
+      'Ver reglas',
+      '#3c2d27',
+      '#ffd6b7',
+      () => this.onReglas && this.onReglas()
     )
-
-    panelAcciones.addControl(
-      this.crearBoton({
-        nombre: 'botonTutorial',
-        texto: 'Tutorial',
-        top: '30px',
-        width: '290px',
-        fondo: '#3c2d27',
-        color: '#ffd6b7',
-        callback: () => this.onTutorial && this.onTutorial()
-      })
-    )
-
-    panelAcciones.addControl(
-      this.crearBoton({
-        nombre: 'botonReglas',
-        texto: 'Ver reglas',
-        top: '105px',
-        width: '290px',
-        fondo: '#3c2d27',
-        color: '#ffd6b7',
-        callback: () => this.onReglas && this.onReglas()
-      })
-    )
+    panelAcciones.appendChild(btnReglas)
   }
 
-  crearTexto({
-    nombre,
-    texto,
-    tamano,
-    alto,
-    top = '0px',
-    color = '#ffe5d2'
-  }) {
-    const bloque = new GUI.TextBlock(nombre, texto)
-    bloque.width = '82%'
-    bloque.height = alto
-    bloque.color = color
-    bloque.fontSize = tamano
-    bloque.fontFamily = 'Comic Sans MS'
-    bloque.textWrapping = true
-    bloque.resizeToFit = false
-    bloque.top = top
-    return bloque
-  }
-
-  crearBoton({
-    nombre,
-    texto,
-    top,
-    callback,
-    fondo = '#d66a1f',
-    color = '#fff7ef',
-    left = '0px',
-    width = '320px',
-    height = '52px'
-  }) {
-    const boton = GUI.Button.CreateSimpleButton(nombre, texto)
-    boton.width = width
-    boton.height = height
-    boton.top = top
-    boton.left = left
-    boton.color = color
-    boton.background = fondo
-    boton.cornerRadius = 18
-    boton.thickness = 0
-    boton.fontSize = 21
-    boton.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
-    if (boton.textBlock) {
-      boton.textBlock.fontFamily = 'Comic Sans MS'
-    }
-    boton.onPointerUpObservable.add(callback)
-    return boton
+  _crearBoton(texto, fondo, color, callback) {
+    const btn = document.createElement('button')
+    btn.textContent = texto
+    btn.style.cssText = `
+      width: 290px;
+      height: 52px;
+      border: none;
+      border-radius: 18px;
+      background: ${fondo};
+      color: ${color};
+      font-size: 21px;
+      font-family: 'Comic Sans MS', cursive;
+      cursor: pointer;
+      transition: transform 0.2s, opacity 0.2s;
+    `
+    btn.addEventListener('mouseenter', () => {
+      btn.style.opacity = '0.85'
+      btn.style.transform = 'scale(1.05)'
+    })
+    btn.addEventListener('mouseleave', () => {
+      btn.style.opacity = '1'
+      btn.style.transform = 'scale(1)'
+    })
+    btn.addEventListener('click', callback)
+    return btn
   }
 
   mostrar() {
-    if (this.overlay) this.overlay.isVisible = true
+    if (this.overlayEl) this.overlayEl.style.display = 'block'
   }
 
   ocultar() {
-    if (this.overlay) this.overlay.isVisible = false
+    if (this.overlayEl) this.overlayEl.style.display = 'none'
   }
 
   setOnTutorial(callback) {
@@ -472,7 +451,7 @@ export class VistaInicial {
       const delta = ahora - ultimoFrame
       if (delta < frameInterval) return
       ultimoFrame = ahora - (delta % frameInterval)
-      // Renderizar la escena activa del engine
+
       if (this.engine.activeScene) {
         this.engine.activeScene.render()
       }

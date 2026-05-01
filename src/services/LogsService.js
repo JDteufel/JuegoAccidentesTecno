@@ -1,18 +1,7 @@
-/**
- * LogsService (Mejorado)
- * 
- * Servicio centralizado para gestionar logs del juego.
- * Mantiene caché local, sincroniza con SmartFox y MongoDB.
- * 
- * Categorías: USUARIO, SESION, ERROR, SISTEMA, LOBBY, PARTIDA
- * Patrón: Singleton + Repository
- */
-
 import mongoDBService from './MongoDBService.js'
 
 let smartFoxInstance = null
 
-// Caché local de logs
 const logsLocales = {
   USUARIO: [],
   SESION: [],
@@ -22,21 +11,11 @@ const logsLocales = {
   PARTIDA: []
 }
 
-/**
- * Inicializa el servicio con la instancia de SmartFox
- * @param {Object} sfs - Instancia de SmartFoxServer
- */
 export function initLogsService(sfs) {
   smartFoxInstance = sfs
   console.log('[LogsService] Inicializado con SmartFox')
 }
 
-/**
- * Registra un evento en el servidor y MongoDB
- * @param {string} type - Tipo de evento (LOBBY, PARTIDA, JUGADOR, ACCIDENTE, etc.)
- * @param {string} action - Acción específica (create_lobby, play_card, etc.)
- * @param {Object} details - Detalles adicionales del evento
- */
 export function logEvent(type, action, details = {}) {
   const logEntry = {
     timestamp: new Date().toISOString(),
@@ -45,16 +24,13 @@ export function logEvent(type, action, details = {}) {
     details: details
   }
 
-  // Inicializar categoría si no existe
   if (!logsLocales[type]) {
     logsLocales[type] = []
   }
 
-  // Guardar en caché local
   logsLocales[type].push(logEntry)
   console.log(`[LOG][${type}] ${action}`, details)
 
-  // Enviar a SmartFox si está disponible
   if (smartFoxInstance) {
     try {
       const SFS2X = window.SFS2X
@@ -71,13 +47,9 @@ export function logEvent(type, action, details = {}) {
     }
   }
 
-  // Sincronizar con MongoDB
   syncToMongoDB(type, action, details)
 }
 
-/**
- * Sincroniza un evento con MongoDB
- */
 async function syncToMongoDB(type, action, details) {
   try {
     await mongoDBService.logEvent(type, action, details)
@@ -85,10 +57,6 @@ async function syncToMongoDB(type, action, details) {
     console.warn(`[LogsService] Error al sincronizar con MongoDB: ${error.message}`)
   }
 }
-
-// ============================================
-// API Pública del Servicio
-// ============================================
 
 export function obtenerLogs(category = null) {
   if (category) {
@@ -100,7 +68,7 @@ export function obtenerLogs(category = null) {
 export function obtenerTodosLogs() {
   const todosLogs = []
   const categories = Object.keys(logsLocales)
-  
+
   categories.forEach(category => {
     todosLogs.push(...logsLocales[category])
   })
@@ -118,7 +86,7 @@ export function limpiarLogs(category = null) {
   } else {
     const categories = Object.keys(logsLocales)
     let totalBorrados = 0
-    
+
     categories.forEach(cat => {
       totalBorrados += logsLocales[cat].length
       logsLocales[cat] = []
@@ -155,9 +123,6 @@ export function obtenerEstadisticas() {
     timestamp: new Date().toISOString()
   }
 }
-  // ============================================
-// Constantes para tipos y acciones de eventos
-// ============================================
 
 export const EVENT_TYPES = {
   LOBBY: 'LOBBY',
@@ -172,21 +137,18 @@ export const EVENT_TYPES = {
 }
 
 export const EVENT_ACTIONS = {
-  // Usuario
+
   USUARIO_REGISTRO: 'registro',
   USUARIO_LOGIN: 'login',
   USUARIO_LOGOUT: 'logout',
 
-  // Sesión
   SESION_CONEXION: 'conexion',
   SESION_DESCONEXION: 'desconexion',
 
-  // Lobby
   LOBBY_CREATE: 'create',
   LOBBY_JOIN: 'join',
   LOBBY_LEAVE: 'leave',
   LOBBY_CLOSE: 'close',
 
-  // Errores
   ERROR: 'error'
 }

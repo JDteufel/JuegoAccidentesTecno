@@ -1,7 +1,9 @@
 import { PANTALLAS, TIPOS_JUGADOR } from '../model/EstadoApp.js'
 import {
   leaveCurrentRoom,
-  subscribeToLobbyUpdates
+  subscribeToLobbyUpdates,
+  subscribeToRoomJoin,
+  subscribeToRoomEnter
 } from '../services/SmartFoxService.js'
 
 export class ControladorEstadoApp {
@@ -25,6 +27,25 @@ export class ControladorEstadoApp {
       if (this.estadoApp.pantallaActual === PANTALLAS.GESTION_LOBBY) {
         this.vistas.vistaCrearJuego.actualizarLobby(lobbyData)
       }
+
+      if (this.estadoApp.pantallaActual === PANTALLAS.GESTION) {
+        const jugadores = (lobbyData.players || [])
+          .filter(p => p.name !== this.estadoApp.getUsername())
+          .map(p => p.name)
+        this.estadoApp.jugadoresPool = jugadores
+        this.vistas.vistaGestion.actualizarSalaMaestra(lobbyData)
+        this.actualizarVistaGestion()
+      }
+    })
+
+    this.unsubscribeRoomJoin = subscribeToRoomJoin(({ roomName }) => {
+      console.log('[ControladorEstadoApp] ROOM_JOIN callback Disparado! roomName:', roomName)
+      console.log('[ControladorEstadoApp] Pantalla actual:', this.estadoApp.pantallaActual)
+    })
+
+    this.unsubscribeRoomEnter = subscribeToRoomEnter(({ roomName }) => {
+      console.log('[ControladorEstadoApp] USER_ENTER_ROOM callback Disparado! roomName:', roomName)
+      console.log('[ControladorEstadoApp] Pantalla actual:', this.estadoApp.pantallaActual)
     })
   }
 
@@ -51,6 +72,13 @@ export class ControladorEstadoApp {
         this.vistas.vistaCrearJuego.actualizarLobby(this.estadoApp.getLobbyActual())
         this.vistas.vistaCrearJuego.mostrar()
         break
+      case PANTALLAS.GESTION:
+        console.log('[ControladorEstadoApp] Cambiando a pantalla GESTION')
+        this.vistas.vistaGestion.actualizarSalaMaestra(this.estadoApp.getSalaMaestra())
+        this.actualizarVistaGestion()
+        this.vistas.vistaGestion.mostrar()
+        console.log('[ControladorEstadoApp] Pantalla GESTION mostrada')
+        break
       case PANTALLAS.REGLAS:
         this.vistas.vistaReglas.mostrar()
         break
@@ -72,6 +100,16 @@ export class ControladorEstadoApp {
     }
   }
 
+  actualizarVistaGestion() {
+    if (this.vistas.vistaGestion) {
+      const jugadoresPool = this.estadoApp.jugadoresPool || []
+      const subSalas = this.estadoApp.subSalas || []
+      const jugadoresAsignados = this.estadoApp.jugadoresAsignados || {}
+      this.vistas.vistaGestion.actualizarPool(jugadoresPool)
+      this.vistas.vistaGestion.actualizarSalas(subSalas, jugadoresAsignados)
+    }
+  }
+
   irAPantalla(pantalla) {
     this.estadoApp.setPantalla(pantalla)
     this.actualizarVista()
@@ -90,6 +128,7 @@ export class ControladorEstadoApp {
     this.vistas.vistaJugar.ocultar()
     this.vistas.vistaReglas.ocultar()
     this.vistas.vistaCrearJuego.ocultar()
+    this.vistas.vistaGestion.ocultar()
     this.vistas.vistaCartas.ocultar()
     this.vistas.vistaAccidentes.ocultar()
     this.vistas.vistaPartida.ocultar()

@@ -6,6 +6,7 @@ import { VistaInicioSesion } from './view/VistaInicioSesion.js'
 import { VistaJugar } from './view/VistaJugar.js'
 import { VistaReglas } from './view/VistaReglas.js'
 import { VistaCrearJuego } from './view/VistaCrearJuego.js'
+import { VistaGestion } from './view/VistaGestion.js'
 import { VistaCartas } from './view/VistaCartas.js'
 import { VistaAccidentes } from './view/VistaAccidentes.js'
 import { VistaPartida } from './view/VistaPartida.js'
@@ -19,6 +20,7 @@ import { ControladorVistaInicioSesion } from './controller/ControladorVistaInici
 import { ControladorVistaJugar } from './controller/ControladorVistaJugar.js'
 import { ControladorVistaReglas } from './controller/ControladorVistaReglas.js'
 import { ControladorVistaCrearJuego } from './controller/ControladorVistaCrearJuego.js'
+import { ControladorVistaGestion } from './controller/ControladorVistaGestion.js'
 import { ControladorVistaCartas } from './controller/ControladorVistaCartas.js'
 import { ControladorVistaAccidentes } from './controller/ControladorVistaAccidentes.js'
 import { ControladorVistaPartida } from './controller/ControladorVistaPartida.js'
@@ -35,23 +37,25 @@ const vistaInicial = new VistaInicial(canvas)
 const TARGET_FPS = 60
 vistaInicial.render(TARGET_FPS)
 
-const vistaInicialR = new VistaInicialR(vistaInicial.gui)
+const vistaInicialR = new VistaInicialR()
 vistaInicialR.crear()
-const vistaTutorial = new VistaTutorial(vistaInicial.gui)
+const vistaTutorial = new VistaTutorial()
 vistaTutorial.crear()
-const vistaRegistro = new VistaRegistro(vistaInicial.gui)
+const vistaRegistro = new VistaRegistro()
 vistaRegistro.crear()
-const vistaInicioSesion = new VistaInicioSesion(vistaInicial.gui)
+const vistaInicioSesion = new VistaInicioSesion()
 vistaInicioSesion.crear()
-const vistaJugar = new VistaJugar(vistaInicial.gui)
+const vistaJugar = new VistaJugar()
 vistaJugar.crear()
-const vistaReglas = new VistaReglas(vistaInicial.gui)
+const vistaReglas = new VistaReglas()
 vistaReglas.crear()
-const vistaCrearJuego = new VistaCrearJuego(vistaInicial.gui)
+const vistaCrearJuego = new VistaCrearJuego()
 vistaCrearJuego.crear()
-const vistaCartas = new VistaCartas(vistaInicial.gui)
+const vistaGestion = new VistaGestion()
+vistaGestion.crear()
+const vistaCartas = new VistaCartas()
 vistaCartas.crear()
-const vistaAccidentes = new VistaAccidentes(vistaInicial.gui)
+const vistaAccidentes = new VistaAccidentes()
 vistaAccidentes.crear()
 const vistaPartida = new VistaPartida(canvas, vistaInicial.engine, vistaInicial.scene)
 vistaPartida.crear()
@@ -68,6 +72,7 @@ const controladorEstadoApp = new ControladorEstadoApp(estadoApp, {
   vistaJugar,
   vistaReglas,
   vistaCrearJuego,
+  vistaGestion,
   vistaCartas,
   vistaAccidentes,
   vistaPartida
@@ -108,6 +113,12 @@ const controladorCrearJuego = new ControladorVistaCrearJuego(
   controladorEstadoApp
 )
 
+const controladorGestion = new ControladorVistaGestion(
+  vistaGestion,
+  estadoApp,
+  controladorEstadoApp
+)
+
 const controladorCartas = new ControladorVistaCartas(vistaCartas, controladorEstadoApp)
 
 const controladorAccidentes = new ControladorVistaAccidentes(vistaAccidentes, controladorEstadoApp)
@@ -120,6 +131,7 @@ controladorInicioSesion.init()
 controladorJugar.init()
 controladorReglas.init()
 controladorCrearJuego.init()
+controladorGestion.init()
 controladorCartas.init()
 controladorAccidentes.init()
 controladorPartida.init()
@@ -128,7 +140,7 @@ controladorEstadoApp.actualizarVista()
 testSmartFoxPing()
   .then((response) => {
     console.log('[SmartFox ping]', response)
-    // Inicializar LoggingService con la instancia de SmartFox
+
     const sfs = getSmartFoxInstance()
     if (sfs) {
       initLogsService(sfs)

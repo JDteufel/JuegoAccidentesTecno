@@ -1,6 +1,3 @@
-import * as BABYLON from '@babylonjs/core'
-import * as GUI from '@babylonjs/gui'
-
 import carta1 from '../assets/cartas/carta1.svg'
 import carta2 from '../assets/cartas/carta2.svg'
 import carta3 from '../assets/cartas/carta3.svg'
@@ -9,11 +6,10 @@ import carta5 from '../assets/cartas/carta5.svg'
 import carta6 from '../assets/cartas/carta6.svg'
 
 export class VistaAccidentes {
-  constructor(gui) {
-    this.gui = gui
-    this.overlay = null
+  constructor() {
     this.callbackVolver = null
     this.visible = false
+    this.containerEl = null
   }
 
   crear() {
@@ -21,64 +17,55 @@ export class VistaAccidentes {
   }
 
   crearUI() {
-    const overlay = new GUI.Rectangle()
-    overlay.width = 1
-    overlay.height = 1
-    overlay.thickness = 0
-    overlay.background = 'rgba(12, 9, 8, 0.75)'
-    overlay.isVisible = false
-    this.gui.addControl(overlay)
-    this.overlay = overlay
+    const container = document.createElement('div')
+    container.id = 'vistaAccidentes'
+    container.style.cssText = `
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      background: rgba(12, 9, 8, 0.75);
+      z-index: 100;
+      font-family: 'Comic Sans MS', cursive;
+      padding-top: 5%;
+    `
+    document.body.appendChild(container)
+    this.containerEl = container
 
-    // CONTENEDOR SUPERIOR CON TÍTULO Y BOTÓN
-    const containerTop = new GUI.StackPanel()
-    containerTop.width = 1
-    containerTop.height = '80px'
-    containerTop.top = '-45%'
-    containerTop.isVertical = false
-    containerTop.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
-    overlay.addControl(containerTop)
+    const header = document.createElement('div')
+    header.style.cssText = `
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 40px;
+      margin-bottom: 30px;
+    `
+    container.appendChild(header)
 
-    const titulo = new GUI.TextBlock('tituloAccidentes', 'Accidentes Tecnológicos')
-    titulo.fontSize = 42
-    titulo.color = '#ffe6d1'
-    titulo.fontFamily = 'Comic Sans MS'
-    containerTop.addControl(titulo)
+    const titulo = document.createElement('h1')
+    titulo.textContent = 'Accidentes Tecnológicos'
+    titulo.style.cssText = `
+      color: #ffe6d1;
+      font-size: 42px;
+      margin: 0;
+    `
+    header.appendChild(titulo)
 
-    // BOTÓN VOLVER
-    const botonVolver = GUI.Button.CreateSimpleButton('volverAccidentes', 'Volver a Reglas')
-    botonVolver.width = '320px'
-    botonVolver.height = '52px'
-    botonVolver.color = '#ffd8bc'
-    botonVolver.background = '#362924'
-    botonVolver.cornerRadius = 18
-    botonVolver.thickness = 0
-    botonVolver.fontSize = 21
-    botonVolver.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
-    if (botonVolver.textBlock) {
-      botonVolver.textBlock.fontFamily = 'Comic Sans MS'
-    }
-
-    botonVolver.onPointerUpObservable.add(() => {
+    const btnVolver = this._crearBoton('Volver a Reglas', '#362924', '#ffd8bc', () => {
       this.callbackVolver && this.callbackVolver()
     })
+    header.appendChild(btnVolver)
 
-    containerTop.addControl(botonVolver)
-
-    // GRID sin scroll
-    const grid = new GUI.Grid()
-    grid.width = '90%'
-    grid.height = '70%'
-    grid.top = '5%'
-    grid.addColumnDefinition(0.33)
-    grid.addColumnDefinition(0.33)
-    grid.addColumnDefinition(0.34)
-
-    for (let i = 0; i < 2; i++) {
-      grid.addRowDefinition(220)
-    }
-
-    overlay.addControl(grid)
+    const grid = document.createElement('div')
+    grid.style.cssText = `
+      display: grid;
+      grid-template-columns: repeat(3, 220px);
+      grid-template-rows: repeat(2, 220px);
+      gap: 20px;
+      justify-content: center;
+    `
+    container.appendChild(grid)
 
     const accidentes = [
       { nombre: 'Falla Eléctrica', desc: 'Sobrecarga en el sistema.', img: carta1 },
@@ -89,56 +76,92 @@ export class VistaAccidentes {
       { nombre: 'Incendio', desc: 'Combustión descontrolada.', img: carta6 }
     ]
 
-    accidentes.forEach((accidente, i) => {
-      const fila = Math.floor(i / 3)
-      const col = i % 3
-      grid.addControl(this.crearAccidente(accidente, i), fila, col)
+    accidentes.forEach((accidente) => {
+      grid.appendChild(this._crearAccidente(accidente))
     })
   }
 
-  crearAccidente({ nombre, desc, img }, index) {
-    const contenedor = new GUI.Rectangle()
-    contenedor.width = '200px'
-    contenedor.height = '220px'
-    contenedor.cornerRadius = 15
-    contenedor.thickness = 2
-    contenedor.borderColor = '#a85a2a'
-    contenedor.background = 'rgba(28,20,18,0.95)'
+  _crearBoton(texto, fondo, color, callback) {
+    const btn = document.createElement('button')
+    btn.textContent = texto
+    btn.style.cssText = `
+      padding: 10px 24px;
+      border: none;
+      border-radius: 18px;
+      background: ${fondo};
+      color: ${color};
+      font-size: 21px;
+      font-family: 'Comic Sans MS', cursive;
+      cursor: pointer;
+      transition: transform 0.2s, opacity 0.2s;
+    `
+    btn.addEventListener('mouseenter', () => {
+      btn.style.opacity = '0.85'
+      btn.style.transform = 'scale(1.05)'
+    })
+    btn.addEventListener('mouseleave', () => {
+      btn.style.opacity = '1'
+      btn.style.transform = 'scale(1)'
+    })
+    btn.addEventListener('click', callback)
+    return btn
+  }
 
-    // Stack vertical para organizar los elementos
-    const stack = new GUI.StackPanel()
-    stack.width = '95%'
-    stack.height = '95%'
-    stack.isVertical = true
-    stack.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
-    stack.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
-    stack.spacing = 3
-    contenedor.addControl(stack)
+  _crearAccidente({ nombre, desc, img }) {
+    const contenedor = document.createElement('div')
+    contenedor.style.cssText = `
+      width: 200px;
+      height: 220px;
+      border-radius: 15px;
+      border: 2px solid #a85a2a;
+      background: rgba(28,20,18,0.95);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      box-sizing: border-box;
+      gap: 3px;
+    `
 
-    const imagen = new GUI.Image(`imgAccidente_${index}`, img)
-    imagen.width = '100%'
-    imagen.height = '90px'
-    imagen.stretch = GUI.Image.STRETCH_UNIFORM_TO_FILL
-    stack.addControl(imagen)
+    const imagen = document.createElement('img')
+    imagen.src = img
+    imagen.alt = nombre
+    imagen.style.cssText = `
+      width: 100%;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 8px;
+    `
+    contenedor.appendChild(imagen)
 
-    const titulo = new GUI.TextBlock()
-    titulo.text = nombre
-    titulo.fontSize = 16
-    titulo.fontWeight = 'bold'
-    titulo.color = '#ffd6b5'
-    titulo.fontFamily = 'Comic Sans MS'
-    titulo.height = '30px'
-    titulo.textWrapping = true
-    stack.addControl(titulo)
+    const titulo = document.createElement('h3')
+    titulo.textContent = nombre
+    titulo.style.cssText = `
+      font-size: 16px;
+      font-weight: bold;
+      color: #ffd6b5;
+      font-family: 'Comic Sans MS', cursive;
+      margin: 5px 0;
+      text-align: center;
+      word-wrap: break-word;
+    `
+    contenedor.appendChild(titulo)
 
-    const descripcion = new GUI.TextBlock()
-    descripcion.text = desc
-    descripcion.fontSize = 12
-    descripcion.color = '#ffe9d6'
-    descripcion.textWrapping = true
-    descripcion.height = '60px'
-    descripcion.fontFamily = 'Comic Sans MS'
-    stack.addControl(descripcion)
+    const descripcion = document.createElement('p')
+    descripcion.textContent = desc
+    descripcion.style.cssText = `
+      font-size: 12px;
+      color: #ffe9d6;
+      font-family: 'Comic Sans MS', cursive;
+      text-align: center;
+      margin: 0;
+      word-wrap: break-word;
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    `
+    contenedor.appendChild(descripcion)
 
     return contenedor
   }
@@ -148,12 +171,12 @@ export class VistaAccidentes {
   }
 
   mostrar() {
-    if (this.overlay) this.overlay.isVisible = true
+    if (this.containerEl) this.containerEl.style.display = 'flex'
     this.visible = true
   }
 
   ocultar() {
-    if (this.overlay) this.overlay.isVisible = false
+    if (this.containerEl) this.containerEl.style.display = 'none'
     this.visible = false
   }
 }

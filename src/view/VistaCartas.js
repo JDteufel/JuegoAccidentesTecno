@@ -1,12 +1,8 @@
-import * as BABYLON from '@babylonjs/core'
-import * as GUI from '@babylonjs/gui'
-
 export class VistaCartas {
-  constructor(gui) {
-    this.gui = gui
-    this.overlay = null
+  constructor() {
     this.callbackVolver = null
     this.visible = false
+    this.containerEl = null
   }
 
   crear() {
@@ -14,64 +10,55 @@ export class VistaCartas {
   }
 
   crearUI() {
-    const overlay = new GUI.Rectangle()
-    overlay.width = 1
-    overlay.height = 1
-    overlay.thickness = 0
-    overlay.background = 'rgba(12, 9, 8, 0.75)'
-    overlay.isVisible = false
-    this.gui.addControl(overlay)
-    this.overlay = overlay
+    const container = document.createElement('div')
+    container.id = 'vistaCartas'
+    container.style.cssText = `
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      background: rgba(12, 9, 8, 0.75);
+      z-index: 100;
+      font-family: 'Comic Sans MS', cursive;
+      padding-top: 5%;
+    `
+    document.body.appendChild(container)
+    this.containerEl = container
 
-    // CONTENEDOR SUPERIOR CON TÍTULO Y BOTÓN
-    const containerTop = new GUI.StackPanel()
-    containerTop.width = 1
-    containerTop.height = '80px'
-    containerTop.top = '-45%'
-    containerTop.isVertical = false
-    containerTop.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
-    overlay.addControl(containerTop)
+    const header = document.createElement('div')
+    header.style.cssText = `
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 40px;
+      margin-bottom: 30px;
+    `
+    container.appendChild(header)
 
-    const titulo = new GUI.TextBlock('tituloCartas', 'Actividades y Aplicaciones')
-    titulo.fontSize = 42
-    titulo.color = '#ffe6d1'
-    titulo.fontFamily = 'Comic Sans MS'
-    containerTop.addControl(titulo)
+    const titulo = document.createElement('h1')
+    titulo.textContent = 'Actividades y Aplicaciones'
+    titulo.style.cssText = `
+      color: #ffe6d1;
+      font-size: 42px;
+      margin: 0;
+    `
+    header.appendChild(titulo)
 
-    // BOTÓN VOLVER
-    const botonVolver = GUI.Button.CreateSimpleButton('volverCartas', 'Volver a Reglas')
-    botonVolver.width = '320px'
-    botonVolver.height = '52px'
-    botonVolver.color = '#ffd8bc'
-    botonVolver.background = '#362924'
-    botonVolver.cornerRadius = 18
-    botonVolver.thickness = 0
-    botonVolver.fontSize = 21
-    botonVolver.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
-    if (botonVolver.textBlock) {
-      botonVolver.textBlock.fontFamily = 'Comic Sans MS'
-    }
-
-    botonVolver.onPointerUpObservable.add(() => {
+    const btnVolver = this._crearBoton('Volver a Reglas', '#362924', '#ffd8bc', () => {
       this.callbackVolver && this.callbackVolver()
     })
+    header.appendChild(btnVolver)
 
-    containerTop.addControl(botonVolver)
-
-    // GRID sin scroll
-    const grid = new GUI.Grid()
-    grid.width = '90%'
-    grid.height = '70%'
-    grid.top = '5%'
-    grid.addColumnDefinition(0.33)
-    grid.addColumnDefinition(0.33)
-    grid.addColumnDefinition(0.34)
-
-    for (let i = 0; i < 2; i++) {
-      grid.addRowDefinition(220)
-    }
-
-    overlay.addControl(grid)
+    const grid = document.createElement('div')
+    grid.style.cssText = `
+      display: grid;
+      grid-template-columns: repeat(3, 220px);
+      grid-template-rows: repeat(2, 220px);
+      gap: 20px;
+      justify-content: center;
+    `
+    container.appendChild(grid)
 
     const cartas = [
       { nombre: 'GitHub', desc: 'Plataforma de desarrollo colaborativo.', tipo: 'Trabajo' },
@@ -82,63 +69,93 @@ export class VistaCartas {
       { nombre: 'Twitch', desc: 'Streaming en vivo.', tipo: 'Entretenimiento' }
     ]
 
-    cartas.forEach((carta, i) => {
-      const fila = Math.floor(i / 3)
-      const col = i % 3
-      grid.addControl(this.crearCarta(carta, i), fila, col)
+    cartas.forEach((carta) => {
+      grid.appendChild(this._crearCarta(carta))
     })
   }
 
-  crearCarta({ nombre, desc, tipo }, index) {
-    const contenedor = new GUI.Rectangle()
-    contenedor.width = '200px'
-    contenedor.height = '220px'
-    contenedor.cornerRadius = 15
-    contenedor.thickness = 2
-    contenedor.borderColor = '#4a90e2'
-    contenedor.background = 'rgba(28,28,40,0.95)'
+  _crearBoton(texto, fondo, color, callback) {
+    const btn = document.createElement('button')
+    btn.textContent = texto
+    btn.style.cssText = `
+      padding: 10px 24px;
+      border: none;
+      border-radius: 18px;
+      background: ${fondo};
+      color: ${color};
+      font-size: 21px;
+      font-family: 'Comic Sans MS', cursive;
+      cursor: pointer;
+      transition: transform 0.2s, opacity 0.2s;
+    `
+    btn.addEventListener('mouseenter', () => {
+      btn.style.opacity = '0.85'
+      btn.style.transform = 'scale(1.05)'
+    })
+    btn.addEventListener('mouseleave', () => {
+      btn.style.opacity = '1'
+      btn.style.transform = 'scale(1)'
+    })
+    btn.addEventListener('click', callback)
+    return btn
+  }
 
-    // Stack vertical para organizar los elementos
-    const stack = new GUI.StackPanel()
-    stack.width = '95%'
-    stack.height = '95%'
-    stack.isVertical = true
-    stack.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
-    stack.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
-    stack.spacing = 3
-    contenedor.addControl(stack)
+  _crearCarta({ nombre, desc, tipo }) {
+    const contenedor = document.createElement('div')
+    contenedor.style.cssText = `
+      width: 200px;
+      height: 220px;
+      border-radius: 15px;
+      border: 2px solid #4a90e2;
+      background: rgba(28,28,40,0.95);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      box-sizing: border-box;
+      gap: 3px;
+    `
 
-    // Badge de tipo
-    const badge = new GUI.TextBlock()
-    badge.text = tipo
-    badge.fontSize = 11
-    badge.fontWeight = 'bold'
-    badge.color = tipo === 'Trabajo' ? '#90ee90' : '#ffa500'
-    badge.background = 'rgba(0,0,0,0.5)'
-    badge.paddingTop = '5px'
-    badge.paddingBottom = '5px'
-    badge.height = '25px'
-    badge.cornerRadius = 5
-    stack.addControl(badge)
+    const badge = document.createElement('span')
+    badge.textContent = tipo
+    badge.style.cssText = `
+      font-size: 11px;
+      font-weight: bold;
+      color: ${tipo === 'Trabajo' ? '#90ee90' : '#ffa500'};
+      background: rgba(0,0,0,0.5);
+      padding: 5px 10px;
+      border-radius: 5px;
+    `
+    contenedor.appendChild(badge)
 
-    const titulo = new GUI.TextBlock()
-    titulo.text = nombre
-    titulo.fontSize = 18
-    titulo.fontWeight = 'bold'
-    titulo.color = '#4a90e2'
-    titulo.fontFamily = 'Comic Sans MS'
-    titulo.height = '35px'
-    titulo.textWrapping = true
-    stack.addControl(titulo)
+    const titulo = document.createElement('h3')
+    titulo.textContent = nombre
+    titulo.style.cssText = `
+      font-size: 18px;
+      font-weight: bold;
+      color: #4a90e2;
+      font-family: 'Comic Sans MS', cursive;
+      margin: 5px 0;
+      text-align: center;
+      word-wrap: break-word;
+    `
+    contenedor.appendChild(titulo)
 
-    const descripcion = new GUI.TextBlock()
-    descripcion.text = desc
-    descripcion.fontSize = 12
-    descripcion.color = '#d0d0d0'
-    descripcion.textWrapping = true
-    descripcion.height = '60px'
-    descripcion.fontFamily = 'Comic Sans MS'
-    stack.addControl(descripcion)
+    const descripcion = document.createElement('p')
+    descripcion.textContent = desc
+    descripcion.style.cssText = `
+      font-size: 12px;
+      color: #d0d0d0;
+      font-family: 'Comic Sans MS', cursive;
+      text-align: center;
+      margin: 0;
+      word-wrap: break-word;
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    `
+    contenedor.appendChild(descripcion)
 
     return contenedor
   }
@@ -148,12 +165,12 @@ export class VistaCartas {
   }
 
   mostrar() {
-    if (this.overlay) this.overlay.isVisible = true
+    if (this.containerEl) this.containerEl.style.display = 'flex'
     this.visible = true
   }
 
   ocultar() {
-    if (this.overlay) this.overlay.isVisible = false
+    if (this.containerEl) this.containerEl.style.display = 'none'
     this.visible = false
   }
 }

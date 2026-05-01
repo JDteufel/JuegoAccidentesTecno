@@ -4,6 +4,7 @@ require('dotenv').config();
 
 const connectDB = require('./config/database');
 const usuariosRoutes = require('./routes/usuarios');
+const logsRoutes = require('./routes/logs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -12,6 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/usuarios', usuariosRoutes);
+app.use('/api/logs', logsRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });

@@ -7,6 +7,7 @@ export const PANTALLAS = {
   INICIO_SESION: 'inicio_sesion',
   UNIRSE_LOBBY: 'unirse_lobby',
   GESTION_LOBBY: 'gestion_lobby',
+  GESTION: 'gestion',
   REGLAS: 'reglas',
   CARTAS: 'cartas',
   ACCIDENTES: 'accidentes',
@@ -28,6 +29,10 @@ export class EstadoApp {
     this.lobbyActual = null
     this.lobbySenderName = null
     this.lobbyPlayerName = null
+    this.salaMaestra = null
+    this.jugadoresPool = []
+    this.subSalas = []
+    this.jugadoresAsignados = {}
   }
 
   setPantalla(pantalla) {
@@ -90,6 +95,77 @@ export class EstadoApp {
     this.lobbyActual = null
     this.lobbySenderName = null
     this.lobbyPlayerName = null
+  }
+
+  setSalaMaestra(salaData) {
+    this.salaMaestra = salaData
+  }
+
+  getSalaMaestra() {
+    return this.salaMaestra
+  }
+
+  limpiarSalaMaestra() {
+    this.salaMaestra = null
+    this.jugadoresPool = []
+    this.subSalas = []
+    this.jugadoresAsignados = {}
+  }
+
+  agregarJugadorPool(nombreJugador) {
+    if (!this.jugadoresPool.includes(nombreJugador)) {
+      this.jugadoresPool.push(nombreJugador)
+    }
+  }
+
+  removerJugadorPool(nombreJugador) {
+    this.jugadoresPool = this.jugadoresPool.filter(j => j !== nombreJugador)
+  }
+
+  asignarJugadorASala(nombreJugador, numeroSala) {
+    this.jugadoresAsignados[nombreJugador] = numeroSala
+    this.removerJugadorPool(nombreJugador)
+  }
+
+  desasignarJugador(nombreJugador) {
+    const numeroSala = this.jugadoresAsignados[nombreJugador]
+    if (numeroSala !== undefined) {
+      delete this.jugadoresAsignados[nombreJugador]
+      this.agregarJugadorPool(nombreJugador)
+    }
+  }
+
+  obtenerJugadoresDeSala(numeroSala) {
+    return Object.keys(this.jugadoresAsignados).filter(
+      nombre => this.jugadoresAsignados[nombre] === numeroSala
+    )
+  }
+
+  crearSubSala(numero) {
+    this.subSalas.push({ numero, jugadores: [] })
+  }
+
+  eliminarSubSala(numero) {
+    const jugadores = this.obtenerJugadoresDeSala(numero)
+    jugadores.forEach(j => this.desasignarJugador(j))
+    this.subSalas = this.subSalas.filter(s => s.numero !== numero)
+  }
+
+  renumerarSubSalas() {
+    const salasOrdenadas = [...this.subSalas].sort((a, b) => a.numero - b.numero)
+    this.subSalas = []
+    const nuevoMapeo = {}
+    salasOrdenadas.forEach((sala, indice) => {
+      const nuevoNumero = indice + 1
+      nuevoMapeo[sala.numero] = nuevoNumero
+      this.subSalas.push({ numero: nuevoNumero, jugadores: [] })
+    })
+    Object.keys(this.jugadoresAsignados).forEach(jugador => {
+      const viejoNumero = this.jugadoresAsignados[jugador]
+      if (nuevoMapeo[viejoNumero] !== undefined) {
+        this.jugadoresAsignados[jugador] = nuevoMapeo[viejoNumero]
+      }
+    })
   }
 
   regresarPantallaAnterior() {

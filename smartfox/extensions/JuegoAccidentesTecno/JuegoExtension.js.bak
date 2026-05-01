@@ -20,7 +20,6 @@ function init() {
   addRequestHandler('login', handleLogin)
   addRequestHandler('getAllLobbies', handleGetAllLobbies)
   addRequestHandler('crearSubSala', handleCrearSubSala)
-  addRequestHandler('iniciarPartida', handleIniciarPartida)
 
   trace('[JuegoExtension] Inicializada en ' + extensionState.initializedAt)
   trace('[JuegoExtension] Zona: ' + ZONE_NAME)
@@ -213,75 +212,32 @@ function handleCrearSubSala(params, sender) {
     settings.setName(nombreSala)
     settings.setMaxUsers(4)
     settings.setGame(true)
+    settings.setAutoRemoveMode(2)
 
     trace('[JuegoExtension] Intentando crear room...')
 
-    var salaExistente = zone.getRoomByName(nombreSala)
-    var nuevaSala
-    if (salaExistente) {
-      var usuariosEnSalaExistente = salaExistente.getUserList()
-      trace('[JuegoExtension] Room ya existe: ' + nombreSala + ' con ' + usuariosEnSalaExistente.length + ' usuarios')
-      if (usuariosEnSalaExistente.length > 0) {
-        trace('[JuegoExtension] Room tiene usuarios, reutilizando sala existente')
-        nuevaSala = salaExistente
-      } else {
-        trace('[JuegoExtension] Room vacia, eliminando y recreando: ' + nombreSala)
-        api.removeRoom(salaExistente)
-        nuevaSala = api.createRoom(zone, settings, null)
-      }
-    } else {
-      nuevaSala = api.createRoom(zone, settings, null)
-    }
-    trace('[JuegoExtension] Room lista: ' + nuevaSala.getName() + ' (id=' + nuevaSala.getId() + ')')
+    var nuevaSala = api.createRoom(zone, settings, null, false, null, true, true)
+    trace('[JuegoExtension] Room creada: ' + nuevaSala.getName() + ' (id=' + nuevaSala.getId() + ')')
 
     var jugadoresMovidos = []
-    trace('[JuegoExtension] Iniciando loop de jugadores, total: ' + jugadores.length)
-
     for (var i = 0; i < jugadores.length; i++) {
       var nombreJugador = jugadores[i]
-      trace('[JuegoExtension] Iteration ' + i + ': buscando jugador: ' + nombreJugador)
+      trace('[JuegoExtension] Buscando jugador: ' + nombreJugador)
       var usuario = zone.getUserByName(nombreJugador)
       if (usuario) {
-        var salaActual = usuario.joinedRoom
-        if (salaActual && salaActual.getName() === nombreSala) {
-          trace('[JuegoExtension] Jugador ' + nombreJugador + ' ya esta en sala ' + nombreSala + ',saltando')
-          jugadoresMovidos.push(nombreJugador)
-        } else {
-          trace('[JuegoExtension] Jugador encontrado, uniendo a sala: ' + nombreSala)
-          try {
-            if (salaActual) {
-              trace('[JuegoExtension] Usuario esta en sala ' + salaActual.getName() + ',sacando primero')
-              api.leaveRoom(salaActual, usuario)
-            }
-            api.joinRoom(usuario, nuevaSala)
-            jugadoresMovidos.push(nombreJugador)
-            trace('[JuegoExtension] Jugador ' + nombreJugador + ' unido exitosamente')
-          } catch (e) {
-            trace('[JuegoExtension] Error uniendo jugador ' + nombreJugador + ': ' + e)
-          }
-        }
+        trace('[JuegoExtension] Jugador encontrado, uniendo...')
+        api.joinRoom(usuario, nuevaSala)
+        jugadoresMovidos.push(nombreJugador)
+        trace('[JuegoExtension] Jugador ' + nombreJugador + ' unido a ' + nombreSala)
       } else {
         trace('[JuegoExtension] Jugador NO encontrado: ' + nombreJugador)
       }
     }
 
-    trace('[JuegoExtension] Loop completado, jugadores movidos: ' + jugadoresMovidos.length)
     trace('[JuegoExtension] GameMaster id: ' + sender.getId())
-
-    trace('[JuegoExtension] Enviando notificacion a cada jugador sobre su sala')
-
-    for (var j = 0; j < jugadoresMovidos.length; j++) {
-      var nombreJugador = jugadoresMovidos[j]
-      var usuario = zone.getUserByName(nombreJugador)
-      if (usuario) {
-        var notifResponse = new SFSObject()
-        notifResponse.putBool('ok', true)
-        notifResponse.putUtfString('nombreSala', nombreSala)
-        notifResponse.putUtfString('numeroSala', numeroSala)
-        notifResponse.putUtfString('message', 'Te uniste a sala: ' + nombreSala)
-        send('jugadorSalaAsignada', notifResponse, usuario)
-        trace('[JuegoExtension] Notificacion enviada a ' + nombreJugador)
-      }
+    if (sender.getId() !== -1) {
+      api.joinRoom(sender, nuevaSala)
+      trace('[JuegoExtension] GameMaster unido a ' + nombreSala)
     }
 
     var response = new SFSObject()
@@ -303,64 +259,6 @@ function handleCrearSubSala(params, sender) {
     response.putUtfString('message', 'Error creando room: ' + e)
 
     send('crearSubSala', response, [sender])
-  }
-}
-
-function handleIniciarPartida(params, sender) {
-  extensionState.commandsProcessed++
-
-  trace('========================================')
-  trace('[JuegoExtension] handleIniciarPartida INVOCADO')
-  trace('[JuegoExtension] sender=' + getSenderName(sender))
-  trace('========================================')
-
-  try {
-    var nombreSala = getString(params, 'nombreSala')
-
-    trace('[JuegoExtension] nombreSala: ' + nombreSala)
-
-    if (!nombreSala) {
-      trace('[JuegoExtension] ERROR: nombreSala vacio')
-      var response = new SFSObject()
-      response.putBool('ok', false)
-      response.putUtfString('message', 'nombreSala es obligatorio')
-      send('iniciarPartida', response, [sender])
-      return
-    }
-
-    var api = getApi()
-    var zone = getParentZone()
-
-    var sala = zone.getRoomByName(nombreSala)
-    if (!sala) {
-      trace('[JuegoExtension] ERROR: Sala no encontrada: ' + nombreSala)
-      var response = new SFSObject()
-      response.putBool('ok', false)
-      response.putUtfString('message', 'Sala no encontrada: ' + nombreSala)
-      send('iniciarPartida', response, [sender])
-      return
-    }
-
-    var usuariosEnSala = sala.getUserList()
-    trace('[JuegoExtension] Usuarios en sala ' + nombreSala + ': ' + usuariosEnSala.length)
-
-    trace('[JuegoExtension] Enviando senal iniciarPartida a todos los usuarios en la sala')
-    var response = new SFSObject()
-    response.putBool('ok', true)
-    response.putUtfString('message', 'Partida iniciada')
-    response.putUtfString('nombreSala', nombreSala)
-    send('iniciarPartida', response, usuariosEnSala)
-    trace('[JuegoExtension] Senal iniciarPartida enviada a ' + usuariosEnSala.length + ' usuarios')
-
-  } catch (e) {
-    trace('[JuegoExtension] EXCEPCION en handleIniciarPartida: ' + e)
-    trace('[JuegoExtension] Stack: ' + e.stack)
-
-    var response = new SFSObject()
-    response.putBool('ok', false)
-    response.putUtfString('message', 'Error iniciando partida: ' + e)
-
-    send('iniciarPartida', response, [sender])
   }
 }
 

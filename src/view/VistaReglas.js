@@ -1,8 +1,8 @@
 import { VistaListaBase } from './base/VistaListaBase.js'
 
 export class VistaReglas extends VistaListaBase {
-  constructor(gui) {
-    super(gui)
+  constructor() {
+    super()
     this.onVerCartasCallback = null
     this.onVerAccidentesCallback = null
   }
@@ -27,35 +27,31 @@ export class VistaReglas extends VistaListaBase {
   crear() {
     super.crear()
 
-    // Botón "Ver Cartas" - Izquierda
-    this.tarjeta.addControl(
-      this.crearBoton({
-        nombre: 'botonVerCartas',
-        texto: 'Ver Cartas',
-        top: '260px',
-        left: '-160px',
-        width: '280px',
-        height: '52px',
-        fondo: '#3c2d27',
-        color: '#ffd6b7',
-        callback: () => this.onVerCartasCallback && this.onVerCartasCallback()
-      })
-    )
+    const buttonsRow = document.createElement('div')
+    buttonsRow.style.cssText = `
+      display: flex;
+      gap: 20px;
+      margin-top: 15px;
+    `
+    this.tarjetaEl.appendChild(buttonsRow)
 
-    // Botón "Ver Accidentes" - Derecha
-    this.tarjeta.addControl(
-      this.crearBoton({
-        nombre: 'botonVerAccidentes',
-        texto: 'Ver Accidentes',
-        top: '260px',
-        left: '160px',
-        width: '280px',
-        height: '52px',
-        fondo: '#3c2d27',
-        color: '#ffd6b7',
-        callback: () => this.onVerAccidentesCallback && this.onVerAccidentesCallback()
-      })
+    const btnCartas = this._crearBoton(
+      'Ver Cartas',
+      '#3c2d27',
+      '#ffd6b7',
+      () => this.onVerCartasCallback && this.onVerCartasCallback()
     )
+    btnCartas.style.width = '280px'
+    buttonsRow.appendChild(btnCartas)
+
+    const btnAccidentes = this._crearBoton(
+      'Ver Accidentes',
+      '#3c2d27',
+      '#ffd6b7',
+      () => this.onVerAccidentesCallback && this.onVerAccidentesCallback()
+    )
+    btnAccidentes.style.width = '280px'
+    buttonsRow.appendChild(btnAccidentes)
   }
 
   onVerCartas(callback) {
