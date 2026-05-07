@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Usuario = require('../models/Usuario');
+const GameMaster = require('../models/GameMaster');
 
 router.post('/register', async (req, res) => {
   try {
@@ -13,20 +13,20 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ ok: false, message: 'La contrasena debe tener al menos 4 caracteres' });
     }
 
-    const usuarioExistente = await Usuario.findOne({ username: username.toLowerCase() });
-    if (usuarioExistente) {
+    const existente = await GameMaster.findOne({ username: username.toLowerCase() });
+    if (existente) {
       return res.status(409).json({ ok: false, message: 'El usuario ya existe' });
     }
 
-    const nuevoUsuario = new Usuario({
+    const nuevoGameMaster = new GameMaster({
       username,
-      password,
+      password: password,
       createdAt: new Date()
     });
 
-    await nuevoUsuario.save();
+    await nuevoGameMaster.save();
 
-    console.log(`[REGISTRO] Usuario creado: ${username}`);
+    console.log(`[REGISTRO] GameMaster creado: ${username}`);
     res.json({ ok: true, username });
   } catch (error) {
     console.error('[REGISTRO] Error:', error.message);
@@ -42,17 +42,17 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ ok: false, message: 'Usuario y contrasena son obligatorios' });
     }
 
-    const usuario = await Usuario.findOne({ username: username.toLowerCase() });
-    if (!usuario) {
+    const gameMaster = await GameMaster.findOne({ username: username.toLowerCase() });
+    if (!gameMaster) {
       return res.status(404).json({ ok: false, message: 'Usuario no encontrado' });
     }
 
-    if (usuario.password !== password) {
+    if (password !== gameMaster.password) {
       return res.status(401).json({ ok: false, message: 'Contrasena incorrecta' });
     }
 
-    console.log(`[LOGIN] Usuario logueado: ${username}`);
-    res.json({ ok: true, username: usuario.username });
+    console.log(`[LOGIN] GameMaster logueado: ${username}`);
+    res.json({ ok: true, username: gameMaster.username });
   } catch (error) {
     console.error('[LOGIN] Error:', error.message);
     res.status(500).json({ ok: false, message: error.message });
@@ -61,10 +61,10 @@ router.post('/login', async (req, res) => {
 
 router.get('/', async (req, res) => {
   try {
-    const usuarios = await Usuario.find({}, { password: 0 }).sort({ createdAt: -1 });
-    res.json({ ok: true, usuarios });
+    const gameMasters = await GameMaster.find({}, { password: 0 }).sort({ createdAt: -1 });
+    res.json({ ok: true, usuarios: gameMasters });
   } catch (error) {
-    console.error('[USUARIOS] Error:', error.message);
+    console.error('[GAME MASTERS] Error:', error.message);
     res.status(500).json({ ok: false, message: error.message });
   }
 });

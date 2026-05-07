@@ -7,10 +7,11 @@ import {
 } from '../services/SmartFoxService.js'
 
 export class ControladorEstadoApp {
-  constructor(estadoApp, vistas, controladorPartida = null) {
+  constructor(estadoApp, vistas, controladorPartida = null, controladorPartidaPrueba = null) {
     this.estadoApp = estadoApp
     this.vistas = vistas
     this.controladorPartida = controladorPartida
+    this.controladorPartidaPrueba = controladorPartidaPrueba
     this.perfilesAsignados = []
     this.unsubscribeLobbyUpdates = subscribeToLobbyUpdates((lobbyData) => {
       if (!lobbyData) {
@@ -56,7 +57,7 @@ export class ControladorEstadoApp {
       case PANTALLAS.INICIAL_PUBLICA:
         this.vistas.vistaInicial.mostrar()
         break
-      case PANTALLAS.INICIAL_REGISTRADO:
+      case PANTALLAS.INICIAL_GAMEMASTER:
         this.vistas.vistaInicialR.mostrar()
         break
       case PANTALLAS.REGISTRO:
@@ -93,6 +94,12 @@ export class ControladorEstadoApp {
           this.controladorPartida.iniciarPartida()
         }
         this.vistas.vistaPartida.mostrar()
+        break
+      case PANTALLAS.PARTIDA_PRUEBA:
+        if (this.controladorPartidaPrueba) {
+          this.controladorPartidaPrueba.iniciarPartida()
+        }
+        this.vistas.vistaPartidaPrueba.mostrar()
         break
       default:
         this.vistas.vistaInicial.mostrar()
@@ -132,6 +139,7 @@ export class ControladorEstadoApp {
     this.vistas.vistaCartas.ocultar()
     this.vistas.vistaAccidentes.ocultar()
     this.vistas.vistaPartida.ocultar()
+    this.vistas.vistaPartidaPrueba.ocultar()
   }
 
   obtenerPerfilesAsignados() {
@@ -152,7 +160,7 @@ export class ControladorEstadoApp {
     }
 
     this.estadoApp.setUsuario(null)
-    this.estadoApp.setTipoJugador(TIPOS_JUGADOR.VISITANTE)
+    this.estadoApp.setTipoJugador(TIPOS_JUGADOR.JUGADOR)
     this.estadoApp.limpiarLobbyActual()
     this.irAPantalla(PANTALLAS.INICIAL_PUBLICA)
   }

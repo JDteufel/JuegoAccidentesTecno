@@ -19,6 +19,10 @@ export class VistaPartida {
     this.accidentes = []
     this.perfil = null
     this.cartas = []
+    this.cartasData = []
+    this.dragState = null
+    this.jugadorActual = 1
+    this.totalJugadores = 4
   }
 
   crear() {
@@ -515,6 +519,34 @@ export class VistaPartida {
     materialBandaCarta.emissiveColor = new BABYLON.Color3(0.03, 0.02, 0.006)
     bandaCarta.material = materialBandaCarta
 
+    const textoCarta = BABYLON.MeshBuilder.CreatePlane(
+      `textoCartaCarrusel_${indice}`,
+      {
+        width: 0.84,
+        height: 0.22
+      },
+      this.scene
+    )
+    textoCarta.parent = contenedor
+    textoCarta.rotation.y = Math.PI
+    textoCarta.position = new BABYLON.Vector3(0, 0.32, -0.044)
+
+    const materialTextoCarta = new BABYLON.StandardMaterial(
+      `matTextoCartaCarrusel_${indice}`,
+      this.scene
+    )
+    materialTextoCarta.diffuseColor = new BABYLON.Color3(0.15, 0.1, 0.07)
+    materialTextoCarta.emissiveColor = new BABYLON.Color3(0.02, 0.01, 0.005)
+    textoCarta.material = materialTextoCarta
+
+    const codigoTexto = new BABYLON.DynamicTexture(
+      `codigoTextoCarrusel_${indice}`,
+      { width: 256, height: 64 },
+      this.scene
+    )
+    codigoTexto.drawText('---', null, 40, '#ffe2c8', 'rgba(0,0,0,0)', true)
+    materialTextoCarta.diffuseTexture = codigoTexto
+    materialTextoCarta.useAlphaFromDiffuseTexture = false
   }
 
   configurarAnimacionCarrusel() {
@@ -640,261 +672,8 @@ export class VistaPartida {
     this.guiTexture.addControl(this.overlay)
 
     this.crearEncabezadoPartida()
-    this.crearPanelDerecha()
     this.crearBotonVolver()
     this.crearPanelCartas()
-    this.crearPanelesInicio()
-  }
-
-  crearPanelesInicio() {
-    console.log('[VistaPartida] crearPanelesInicio - Iniciando')
-
-    this.panelAccidentesInicio = this.crearPanelModal('panelAccidentesInicio', 'Accidentes en Mesa')
-    this.panelPerfilInicio = this.crearPanelModal('panelPerfilInicio', 'Tu Perfil Asignado')
-
-    console.log('[VistaPartida] crearPanelesInicio - Panel accidentes:', !!this.panelAccidentesInicio)
-    console.log('[VistaPartida] crearPanelesInicio - Panel perfil:', !!this.panelPerfilInicio)
-  }
-
-  crearPanelModal(nombre, tituloTexto) {
-    const panel = new GUI.Rectangle(nombre)
-    panel.width = '600px'
-    panel.height = '500px'
-    panel.thickness = 3
-    panel.cornerRadius = 20
-    panel.color = '#8e4d22'
-    panel.background = 'rgba(28, 20, 16, 0.95)'
-    panel.shadowColor = '#000000'
-    panel.shadowBlur = 30
-    panel.shadowOffsetY = 10
-    panel.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
-    panel.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
-    panel.isVisible = false
-    panel.zIndex = 1000
-    this.overlay.addControl(panel)
-
-    const titulo = new GUI.TextBlock(`${nombre}_titulo`, tituloTexto)
-    titulo.top = '-200px'
-    titulo.height = '50px'
-    titulo.color = '#ffe2c8'
-    titulo.fontSize = 26
-    titulo.fontFamily = 'Comic Sans MS'
-    titulo.fontWeight = 'bold'
-    panel.addControl(titulo)
-
-    const container = new GUI.Rectangle(`${nombre}_container`)
-    container.width = '540px'
-    container.height = '360px'
-    container.top = '20px'
-    container.thickness = 0
-    container.background = 'transparent'
-    container.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
-    panel.addControl(container)
-
-    const grid = new GUI.Grid(`${nombre}_grid`)
-    grid.width = '520px'
-    grid.height = '340px'
-
-    for (let i = 0; i < 4; i++) {
-      grid.addRowDefinition(80)
-    }
-    for (let i = 0; i < 2; i++) {
-      grid.addColumnDefinition(0.5)
-    }
-
-    container.addControl(grid)
-
-    const botonCerrar = GUI.Button.CreateSimpleButton(`${nombre}_cerrar`, 'Omitir')
-    botonCerrar.width = '120px'
-    botonCerrar.height = '40px'
-    botonCerrar.top = '180px'
-    botonCerrar.background = '#5a3321'
-    botonCerrar.color = '#ffd8bc'
-    botonCerrar.cornerRadius = 12
-    botonCerrar.thickness = 2
-    botonCerrar.borderColor = '#8e4d22'
-    botonCerrar.fontSize = 14
-    botonCerrar.fontFamily = 'Comic Sans MS'
-    botonCerrar.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
-    botonCerrar.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_BOTTOM
-    botonCerrar.onPointerUpObservable.add(() => {
-      panel.isVisible = false
-    })
-    panel.addControl(botonCerrar)
-
-    return { panel, grid, titulo }
-  }
-
-  mostrarPanelAccidentesInicio() {
-    if (!this.panelAccidentesInicio) return
-
-    const { panel, grid } = this.panelAccidentesInicio
-
-    for (let i = 0; i < 8; i++) {
-      for (let j = 0; j < 2; j++) {
-        const control = grid.getControlByName(`accidente_${i}_${j}`)
-        if (control) {
-          grid.removeControl(control)
-        }
-      }
-    }
-
-    const accidentesEjemplo = [
-      { codigo: 'SR', nombre: 'Sobrecarga de Red', nivel: 1 },
-      { codigo: 'FD', nombre: 'Fuga de Datos', nivel: 2 },
-      { codigo: 'AS', nombre: 'Ataque de Seguridad', nivel: 2 },
-      { codigo: 'FS', nombre: 'Fallo de Software', nivel: 1 },
-      { codigo: 'FH', nombre: 'Fallo de Hardware', nivel: 2 },
-      { codigo: 'SI', nombre: 'Sesgo de IA', nivel: 3 },
-      { codigo: 'CE', nombre: 'Corte de Energia', nivel: 2 },
-      { codigo: 'PM', nombre: 'Phishing Masivo', nivel: 2 }
-    ]
-
-    accidentesEjemplo.forEach((accidente, indice) => {
-      const fila = Math.floor(indice / 2)
-      const columna = indice % 2
-
-      const tarjeta = new GUI.Rectangle(`accidente_${indice}_0`)
-      tarjeta.width = '240px'
-      tarjeta.height = '70px'
-      tarjeta.thickness = 2
-      tarjeta.cornerRadius = 10
-      tarjeta.color = '#a85a2a'
-
-      const nivel = accidente.nivel || 1
-      const coloresNivel = ['#4a2e1a', '#5a3520', '#6b4025', '#7d4a2a']
-      tarjeta.background = coloresNivel[(nivel - 1) % coloresNivel.length]
-
-      const texto = new GUI.TextBlock(`accidente_${indice}_1`, `${accidente.codigo}: ${accidente.nombre}`)
-      texto.color = '#ffe0c2'
-      texto.fontSize = 14
-      texto.fontFamily = 'Comic Sans MS'
-      texto.fontWeight = 'bold'
-      texto.textWrapping = true
-      tarjeta.addControl(texto)
-
-      grid.addControl(tarjeta, fila, columna)
-    })
-
-    panel.isVisible = true
-    console.log('[VistaPartida] Panel accidentes visible:', panel.isVisible)
-  }
-
-  mostrarPanelPerfilInicio() {
-    if (!this.panelPerfilInicio) return
-
-    const { panel, grid, titulo } = this.panelPerfilInicio
-
-    const perfilEjemplo = {
-      nombre: 'Analista de Sistemas',
-      horasRequeridas: 6,
-      descripcion: 'Analiza y optimiza sistemas tecnologicos.',
-      categoriasValidas: ['Trabajo', 'Gestion', 'Desarrollo']
-    }
-
-    titulo.text = `Perfil: ${perfilEjemplo.nombre}`
-
-    for (let i = 0; i < 4; i++) {
-      for (let j = 0; j < 2; j++) {
-        const control = grid.getControlByName(`perfil_${i}_${j}`)
-        if (control) {
-          grid.removeControl(control)
-        }
-      }
-    }
-
-    const nombrePerfil = new GUI.Rectangle('perfil_0_0')
-    nombrePerfil.width = '240px'
-    nombrePerfil.height = '70px'
-    nombrePerfil.thickness = 2
-    nombrePerfil.cornerRadius = 10
-    nombrePerfil.color = '#d66a1f'
-    nombrePerfil.background = '#3d2a1d'
-
-    const textoNombre = new GUI.TextBlock('perfil_0_1', perfilEjemplo.nombre)
-    textoNombre.color = '#ffe2c8'
-    textoNombre.fontSize = 16
-    textoNombre.fontFamily = 'Comic Sans MS'
-    textoNombre.fontWeight = 'bold'
-    nombrePerfil.addControl(textoNombre)
-    grid.addControl(nombrePerfil, 0, 0)
-
-    const horasReq = new GUI.Rectangle('perfil_1_0')
-    horasReq.width = '240px'
-    horasReq.height = '70px'
-    horasReq.thickness = 2
-    horasReq.cornerRadius = 10
-    horasReq.color = '#cf8a34'
-    horasReq.background = '#3d2a1d'
-
-    const textoHoras = new GUI.TextBlock('perfil_1_1', `Horas requeridas: ${perfilEjemplo.horasRequeridas}`)
-    textoHoras.color = '#ffe0c2'
-    textoHoras.fontSize = 14
-    textoHoras.fontFamily = 'Comic Sans MS'
-    horasReq.addControl(textoHoras)
-    grid.addControl(horasReq, 1, 0)
-
-    const descripcion = new GUI.Rectangle('perfil_2_0')
-    descripcion.width = '490px'
-    descripcion.height = '70px'
-    descripcion.thickness = 2
-    descripcion.cornerRadius = 10
-    descripcion.color = '#845a3a'
-    descripcion.background = '#2d221d'
-    descripcion.columnSpan = 2
-
-    const textoDesc = new GUI.TextBlock('perfil_2_1', perfilEjemplo.descripcion)
-    textoDesc.color = '#f4cbaa'
-    textoDesc.fontSize = 13
-    textoDesc.fontFamily = 'Comic Sans MS'
-    textoDesc.textWrapping = true
-    descripcion.addControl(textoDesc)
-    grid.addControl(descripcion, 2, 0)
-
-    const categorias = perfilEjemplo.categoriasValidas.join(', ')
-    const catsPanel = new GUI.Rectangle('perfil_3_0')
-    catsPanel.width = '490px'
-    catsPanel.height = '70px'
-    catsPanel.thickness = 2
-    catsPanel.cornerRadius = 10
-    catsPanel.color = '#6b4c3a'
-    catsPanel.background = '#2d221d'
-    catsPanel.columnSpan = 2
-
-    const textoCats = new GUI.TextBlock('perfil_3_1', `Categorias validas: ${categorias}`)
-    textoCats.color = '#e7cfbc'
-    textoCats.fontSize = 12
-    textoCats.fontFamily = 'Comic Sans MS'
-    textoCats.textWrapping = true
-    catsPanel.addControl(textoCats)
-    grid.addControl(catsPanel, 3, 0)
-
-    panel.isVisible = true
-    console.log('[VistaPartida] Panel perfil visible:', panel.isVisible)
-  }
-
-  mostrarSecuenciaInicio() {
-    console.log('[VistaPartida] mostrarSecuenciaInicio - Iniciando')
-    console.log('[VistaPartida] panelAccidentesInicio:', !!this.panelAccidentesInicio)
-    console.log('[VistaPartida] panelPerfilInicio:', !!this.panelPerfilInicio)
-
-    this.mostrarPanelAccidentesInicio()
-
-    setTimeout(() => {
-      console.log('[VistaPartida] Cerrando panel accidentes')
-      if (this.panelAccidentesInicio && this.panelAccidentesInicio.panel) {
-        this.panelAccidentesInicio.panel.isVisible = false
-      }
-
-      this.mostrarPanelPerfilInicio()
-
-      setTimeout(() => {
-        console.log('[VistaPartida] Cerrando panel perfil')
-        if (this.panelPerfilInicio && this.panelPerfilInicio.panel) {
-          this.panelPerfilInicio.panel.isVisible = false
-        }
-      }, 5000)
-    }, 5000)
   }
 
   crearEncabezadoPartida() {
@@ -937,15 +716,17 @@ export class VistaPartida {
     panelEstado.width = '92%'
     panelEstado.height = '36px'
     panelEstado.top = '34px'
-    panelEstado.addColumnDefinition(0.33)
-    panelEstado.addColumnDefinition(0.34)
-    panelEstado.addColumnDefinition(0.33)
+    panelEstado.addColumnDefinition(0.25)
+    panelEstado.addColumnDefinition(0.25)
+    panelEstado.addColumnDefinition(0.25)
+    panelEstado.addColumnDefinition(0.25)
     panelEncabezado.addControl(panelEstado)
 
     const estados = [
       'Perfil: Sin asignar',
       'Accidentes: 0 en mesa',
-      'Objetivo: 0 horas'
+      'Objetivo: 0 horas',
+      'Turno 1/4'
     ]
 
     estados.forEach((texto, indice) => {
@@ -953,7 +734,7 @@ export class VistaPartida {
       bloque.height = '32px'
       bloque.thickness = 0
       bloque.cornerRadius = 12
-      bloque.background = indice === 1 ? '#5a2e1d' : '#2d221d'
+      bloque.background = indice === 1 ? '#5a2e1d' : indice === 3 ? '#3a2a1d' : '#2d221d'
 
       const textoEstado = new GUI.TextBlock(`estadoTexto_${indice}`, texto)
       textoEstado.color = '#ffe8d3'
@@ -963,45 +744,34 @@ export class VistaPartida {
 
       panelEstado.addControl(bloque, 0, indice)
     })
-  }
 
-  crearPanelDerecha() {
-    const panelDerecha = new GUI.StackPanel()
-    panelDerecha.width = '120px'
-    panelDerecha.height = '400px'
-    panelDerecha.right = '20px'
-    panelDerecha.isVertical = true
-    panelDerecha.spacing = 15
-    panelDerecha.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
-    panelDerecha.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT
-    this.overlay.addControl(panelDerecha)
+    const barraContenedor = new GUI.Rectangle('barraProgresoContenedor')
+    barraContenedor.width = '92%'
+    barraContenedor.height = '18px'
+    barraContenedor.top = '76px'
+    barraContenedor.thickness = 1
+    barraContenedor.cornerRadius = 9
+    barraContenedor.color = '#5a3a28'
+    barraContenedor.background = '#1a1210'
+    panelEncabezado.addControl(barraContenedor)
 
-    for (let i = 1; i <= 4; i++) {
-      const botonPartida = GUI.Button.CreateSimpleButton(`btnPartida${i}`, `P${i}`)
-      botonPartida.width = '80px'
-      botonPartida.height = '80px'
-      botonPartida.cornerRadius = 40
-      botonPartida.background = i === 1 ? '#d66a1f' : '#3c2d27'
-      botonPartida.color = i === 1 ? '#fff7ef' : '#ffd6b7'
-      botonPartida.fontSize = 18
-      botonPartida.fontWeight = 'bold'
-      botonPartida.fontFamily = 'Comic Sans MS'
-      botonPartida.thickness = 2
-      botonPartida.borderColor = '#a85a2a'
+    const barra = new GUI.Rectangle('barraProgreso')
+    barra.width = '0%'
+    barra.height = '100%'
+    barra.thickness = 0
+    barra.cornerRadius = 9
+    barra.background = '#d66a1f'
+    barra.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
+    barraContenedor.addControl(barra)
 
-      botonPartida.onPointerUpObservable.add(() => {
-        console.log(`Partida ${i} seleccionada`)
-        for (let j = 1; j <= 4; j++) {
-          const btn = this.guiTexture.getControlByName(`btnPartida${j}`)
-          if (btn) {
-            btn.background = j === i ? '#d66a1f' : '#3c2d27'
-            btn.color = j === i ? '#fff7ef' : '#ffd6b7'
-          }
-        }
-      })
-
-      panelDerecha.addControl(botonPartida)
-    }
+    const textoProgreso = new GUI.TextBlock('textoProgreso', '0/0 horas')
+    textoProgreso.width = '100%'
+    textoProgreso.height = '100%'
+    textoProgreso.color = '#ffe2c8'
+    textoProgreso.fontSize = 11
+    textoProgreso.fontFamily = 'Comic Sans MS'
+    textoProgreso.fontWeight = 'bold'
+    barraContenedor.addControl(textoProgreso)
   }
 
   crearBotonVolver() {
@@ -1042,10 +812,33 @@ export class VistaPartida {
     panelInferior.zIndex = 100
     this.overlay.addControl(panelInferior)
 
+    const textoInstruccion = new GUI.TextBlock('textoInstruccionCartas', 'Arrastra una carta hacia arriba para jugarla')
+    textoInstruccion.top = '4px'
+    textoInstruccion.height = '22px'
+    textoInstruccion.color = '#a88a6a'
+    textoInstruccion.fontSize = 12
+    textoInstruccion.fontFamily = 'Comic Sans MS'
+    panelInferior.addControl(textoInstruccion)
+
+    const botonIntercambiar = GUI.Button.CreateSimpleButton('btnIntercambiar', 'Intercambiar')
+    botonIntercambiar.width = '130px'
+    botonIntercambiar.height = '26px'
+    botonIntercambiar.right = '15px'
+    botonIntercambiar.top = '2px'
+    botonIntercambiar.background = '#5a3321'
+    botonIntercambiar.color = '#ffd8bc'
+    botonIntercambiar.cornerRadius = 8
+    botonIntercambiar.fontSize = 12
+    botonIntercambiar.fontFamily = 'Comic Sans MS'
+    botonIntercambiar.onPointerUpObservable.add(() => {
+      this.mostrarModalIntercambio()
+    })
+    panelInferior.addControl(botonIntercambiar)
+
     const containerCartas = new GUI.Rectangle('containerCartas')
     containerCartas.width = '97%'
     containerCartas.height = '170px'
-    containerCartas.top = '18px'
+    containerCartas.top = '28px'
     containerCartas.background = 'transparent'
     containerCartas.thickness = 0
     panelInferior.addControl(containerCartas)
@@ -1057,76 +850,30 @@ export class VistaPartida {
     gridMano.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
     gridMano.paddingLeft = '8px'
     gridMano.paddingRight = '8px'
-    for (let columna = 0; columna < 8; columna++) {
-      gridMano.addColumnDefinition(1 / 8)
+    for (let columna = 0; columna < 5; columna++) {
+      gridMano.addColumnDefinition(1 / 5)
     }
     for (let fila = 0; fila < 1; fila++) {
       gridMano.addRowDefinition(1)
     }
     containerCartas.addControl(gridMano)
 
-    const cartas = [
-      {
-        titulo: 'GitHub',
-        categoria: 'Trabajo',
-        codigo: 'GH',
-        detalle: 'Versiona tareas y coordina entregas.',
-        color: '#d66a1f'
-      },
-      {
-        titulo: 'Discord',
-        categoria: 'Comunicacion',
-        codigo: 'DS',
-        detalle: 'Coordina mensajes y actividades grupales.',
-        color: '#b95a2e'
-      },
-      {
-        titulo: 'Google Drive',
-        categoria: 'Nube',
-        codigo: 'GD',
-        detalle: 'Respalda archivos y comparte recursos.',
-        color: '#cf8a34'
-      },
-      {
-        titulo: 'YouTube',
-        categoria: 'Difusion',
-        codigo: 'YT',
-        detalle: 'Expone contenido y tutoriales del equipo.',
-        color: '#bc4a2c'
-      },
-      {
-        titulo: 'Slack',
-        categoria: 'Trabajo',
-        codigo: 'SL',
-        detalle: 'Organiza conversaciones por canales.',
-        color: '#845a3a'
-      },
-      {
-        titulo: 'Twitch',
-        categoria: 'Streaming',
-        codigo: 'TW',
-        detalle: 'Activa eventos en vivo e interacciones.',
-        color: '#7d4d31'
-      },
-      {
-        titulo: 'Jira',
-        categoria: 'Gestion',
-        codigo: 'JR',
-        detalle: 'Gestiona proyectos y seguimiento de tareas.',
-        color: '#6b4c3a'
-      },
-      {
-        titulo: 'Notion',
-        categoria: 'Productividad',
-        codigo: 'NT',
-        detalle: 'Crea文档 y bases de conocimiento.',
-        color: '#5a4a3a'
-      }
-    ]
+    for (let i = 0; i < 5; i++) {
+      const cartaVacia = this.crearCartaManoVacia(i)
+      gridMano.addControl(cartaVacia, 0, i)
+    }
+  }
 
-    cartas.slice(0, 8).forEach((carta, indice) => {
-      gridMano.addControl(this.crearCartaMano(carta, indice), 0, indice)
-    })
+  crearCartaManoVacia(indice) {
+    const cartaPanel = new GUI.Rectangle(`carta_${indice}`)
+    cartaPanel.width = '98%'
+    cartaPanel.height = '90%'
+    cartaPanel.background = 'rgba(33, 23, 19, 0.4)'
+    cartaPanel.cornerRadius = 14
+    cartaPanel.thickness = 2
+    cartaPanel.color = '#4a3528'
+    cartaPanel.isVisible = false
+    return cartaPanel
   }
 
   crearCartaMano(carta, indice) {
@@ -1140,72 +887,63 @@ export class VistaPartida {
     cartaPanel.shadowColor = '#00000055'
     cartaPanel.shadowBlur = 8
     cartaPanel.shadowOffsetY = 3
+    cartaPanel.isPointerBlocker = true
+
+    const imagenSrc = carta.obtenerImagen ? carta.obtenerImagen() : null
+    if (imagenSrc) {
+      const imagen = new GUI.Image(`imagen_${indice}`, imagenSrc)
+      imagen.width = '42px'
+      imagen.height = '42px'
+      imagen.left = '4px'
+      imagen.top = '4px'
+      imagen.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
+      imagen.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP
+      imagen.stretch = GUI.Image.STRETCH_UNIFORM
+      cartaPanel.addControl(imagen)
+    }
 
     const bandaSuperior = new GUI.Rectangle(`cartaBanda_${indice}`)
-    bandaSuperior.width = '18px'
-    bandaSuperior.height = '100%'
+    bandaSuperior.width = '6px'
+    bandaSuperior.height = '85%'
     bandaSuperior.thickness = 0
     bandaSuperior.background = carta.color
     bandaSuperior.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
     cartaPanel.addControl(bandaSuperior)
 
-    const placaCodigo = new GUI.Ellipse(`placaCodigo_${indice}`)
-    placaCodigo.width = '34px'
-    placaCodigo.height = '34px'
-    placaCodigo.left = '-46px'
-    placaCodigo.top = '0px'
-    placaCodigo.thickness = 2
-    placaCodigo.color = '#f6d9b8'
-    placaCodigo.background = '#5a3321'
-    cartaPanel.addControl(placaCodigo)
-
     const codigo = new GUI.TextBlock(`codigo_${indice}`, carta.codigo)
+    codigo.left = '-52px'
+    codigo.top = '2px'
+    codigo.width = '30px'
+    codigo.height = '20px'
     codigo.color = '#fff0df'
-    codigo.fontSize = 16
+    codigo.fontSize = 13
     codigo.fontFamily = 'Comic Sans MS'
     codigo.fontWeight = 'bold'
-    placaCodigo.addControl(codigo)
+    codigo.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT
+    cartaPanel.addControl(codigo)
 
     const categoria = new GUI.TextBlock(
       `categoria_${indice}`,
-      carta.categoria.toUpperCase()
+      carta.categorias.map(c => c.toUpperCase()).join(', ')
     )
-    categoria.top = '-22px'
-    categoria.left = '18px'
-    categoria.width = '96px'
-    categoria.height = '18px'
+    categoria.top = '-30px'
+    categoria.left = '50px'
+    categoria.width = '100px'
+    categoria.height = '16px'
     categoria.color = '#fff4ea'
-    categoria.fontSize = 9
+    categoria.fontSize = 8
     categoria.fontFamily = 'Comic Sans MS'
     categoria.fontWeight = 'bold'
     categoria.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
     cartaPanel.addControl(categoria)
 
-    const ilustracion = new GUI.Rectangle(`ilustracion_${indice}`)
-    ilustracion.width = '34px'
-    ilustracion.height = '34px'
-    ilustracion.left = '2px'
-    ilustracion.top = '10px'
-    ilustracion.thickness = 2
-    ilustracion.cornerRadius = 8
-    ilustracion.color = '#8a5a37'
-    ilustracion.background = '#31211b'
-    cartaPanel.addControl(ilustracion)
-
-    const icono = new GUI.TextBlock(`iconoCarta_${indice}`, carta.codigo)
-    icono.color = '#f6d5b3'
-    icono.fontSize = 14
-    icono.fontFamily = 'Comic Sans MS'
-    icono.fontWeight = 'bold'
-    ilustracion.addControl(icono)
-
     const nombre = new GUI.TextBlock(`nombre_${indice}`, carta.titulo)
-    nombre.top = '2px'
-    nombre.left = '26px'
-    nombre.width = '96px'
-    nombre.height = '24px'
+    nombre.top = '-10px'
+    nombre.left = '50px'
+    nombre.width = '100px'
+    nombre.height = '22px'
     nombre.color = '#ffe0c2'
-    nombre.fontSize = 13
+    nombre.fontSize = 12
     nombre.fontFamily = 'Comic Sans MS'
     nombre.fontWeight = 'bold'
     nombre.textWrapping = true
@@ -1213,26 +951,63 @@ export class VistaPartida {
     cartaPanel.addControl(nombre)
 
     const descripcion = new GUI.TextBlock(`detalle_${indice}`, carta.detalle)
-    descripcion.top = '24px'
-    descripcion.left = '26px'
-    descripcion.width = '96px'
-    descripcion.height = '30px'
+    descripcion.top = '12px'
+    descripcion.left = '50px'
+    descripcion.width = '100px'
+    descripcion.height = '28px'
     descripcion.color = '#e7cfbc'
-    descripcion.fontSize = 8.5
+    descripcion.fontSize = 8
     descripcion.fontFamily = 'Comic Sans MS'
     descripcion.textWrapping = true
     descripcion.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
     cartaPanel.addControl(descripcion)
 
-    const pieCarta = new GUI.Rectangle(`pieCarta_${indice}`)
-    pieCarta.width = '104px'
-    pieCarta.height = '8px'
-    pieCarta.top = '30px'
-    pieCarta.left = '22px'
-    pieCarta.thickness = 0
-    pieCarta.cornerRadius = 4
-    pieCarta.background = carta.color
-    cartaPanel.addControl(pieCarta)
+    const horas = new GUI.TextBlock(`horas_${indice}`, `${carta.horas}h`)
+    horas.top = '38px'
+    horas.left = '50px'
+    horas.width = '40px'
+    horas.height = '16px'
+    horas.color = '#a88a6a'
+    horas.fontSize = 10
+    horas.fontFamily = 'Comic Sans MS'
+    horas.fontWeight = 'bold'
+    horas.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
+    cartaPanel.addControl(horas)
+
+    cartaPanel.onPointerDownObservable.add((coords) => {
+      if (carta.estaDeshabilitada()) return
+      this.dragState = {
+        indice,
+        carta,
+        inicioY: coords.y,
+        inicioX: coords.x,
+        moviendo: false
+      }
+    })
+
+    cartaPanel.onPointerUpObservable.add((coords) => {
+      if (!this.dragState || this.dragState.indice !== indice) return
+      const deltaY = this.dragState.inicioY - coords.y
+      if (this.dragState.moviendo && deltaY > 60) {
+        if (this.callbackJugarCarta) {
+          this.callbackJugarCarta(carta)
+        }
+      }
+      this.dragState = null
+    })
+
+    cartaPanel.onPointerMoveObservable.add((coords) => {
+      if (!this.dragState || this.dragState.indice !== indice) return
+      const deltaY = this.dragState.inicioY - coords.y
+      const deltaX = Math.abs(this.dragState.inicioX - coords.x)
+      if (deltaY > 10 || deltaX > 10) {
+        this.dragState.moviendo = true
+      }
+      if (this.dragState.moviendo && deltaY > 0) {
+        cartaPanel.top = `${-Math.min(deltaY, 80)}px`
+        cartaPanel.alpha = Math.max(0.5, 1 - deltaY / 200)
+      }
+    })
 
     return cartaPanel
   }
@@ -1255,19 +1030,51 @@ export class VistaPartida {
     for (let i = 0; i < 8; i++) {
       const caraCarta = this.scene.getMeshByName(`caraCartaCarrusel_${i}`)
       const bandaCarta = this.scene.getMeshByName(`bandaCartaCarrusel_${i}`)
+      const textoCarta = this.scene.getMeshByName(`textoCartaCarrusel_${i}`)
 
       if (i < cantidad && this.accidentes[i]) {
         const accidente = this.accidentes[i]
         const color = this.obtenerColorAccidente(accidente)
+        const nivelColor = accidente.nivel >= 3
+          ? new BABYLON.Color3(0.8, 0.2, 0.15)
+          : accidente.nivel === 2
+            ? new BABYLON.Color3(0.85, 0.5, 0.15)
+            : new BABYLON.Color3(0.85, 0.7, 0.2)
 
-        if (caraCarta && caraCarta.material) {
+        const imagenSrc = accidente.obtenerImagen ? accidente.obtenerImagen() : null
+        if (imagenSrc && caraCarta && caraCarta.material) {
+          const textura = new BABYLON.Texture(imagenSrc, this.scene, true, false, BABYLON.Texture.NEAREST_SAMPLINGMODE)
+          textura.hasAlpha = true
+          caraCarta.material.diffuseTexture = textura
+          caraCarta.material.emissiveTexture = textura
+          caraCarta.material.diffuseColor = new BABYLON.Color3(1, 1, 1)
+          caraCarta.material.specularColor = new BABYLON.Color3(0.1, 0.08, 0.06)
+          caraCarta.material.useAlphaFromDiffuseTexture = true
+        } else if (caraCarta && caraCarta.material) {
           caraCarta.material.diffuseColor = color
           caraCarta.material.emissiveColor = color.scale(0.08)
+          caraCarta.material.diffuseTexture = null
+          caraCarta.material.emissiveTexture = null
         }
 
         if (bandaCarta && bandaCarta.material) {
-          bandaCarta.material.diffuseColor = new BABYLON.Color3(0.84, 0.66, 0.3)
-          bandaCarta.material.emissiveColor = new BABYLON.Color3(0.03, 0.02, 0.006)
+          bandaCarta.material.diffuseColor = nivelColor
+          bandaCarta.material.emissiveColor = nivelColor.scale(0.15)
+        }
+
+        if (textoCarta && textoCarta.material && textoCarta.material.diffuseTexture) {
+          const dt = textoCarta.material.diffuseTexture
+          dt.clear()
+          dt.drawText(`${accidente.codigo}: ${accidente.nombre}`, null, 22, '#ffe2c8', 'rgba(0,0,0,0)', true)
+          dt.update(false)
+        }
+      } else {
+        const caraCarta = this.scene.getMeshByName(`caraCartaCarrusel_${i}`)
+        if (caraCarta && caraCarta.material) {
+          caraCarta.material.diffuseColor = new BABYLON.Color3(0.2, 0.13, 0.09)
+          caraCarta.material.emissiveColor = new BABYLON.Color3(0.008, 0.004, 0.002)
+          caraCarta.material.diffuseTexture = null
+          caraCarta.material.emissiveTexture = null
         }
       }
     }
@@ -1294,7 +1101,12 @@ export class VistaPartida {
 
     const tituloPartida = this.guiTexture.getControlByName('tituloPartida')
     if (tituloPartida) {
-      tituloPartida.text = `${this.perfil.nombre}`
+      tituloPartida.text = `Perfil: ${this.perfil.nombre}`
+    }
+
+    const subtitulo = this.guiTexture.getControlByName('subtituloPartida')
+    if (subtitulo) {
+      subtitulo.text = this.perfil.descripcion
     }
 
     const estado0 = this.guiTexture.getControlByName('estado_0')
@@ -1333,50 +1145,24 @@ export class VistaPartida {
     const gridMano = this.guiTexture.getControlByName('gridManoCartas')
     if (!gridMano) return
 
-    for (let i = 0; i < 8; i++) {
+    while (gridMano.children.length > 0) {
+      gridMano.removeControl(gridMano.children[0])
+    }
+
+    for (let i = 0; i < 5; i++) {
       if (i < this.cartas.length) {
         const carta = this.cartas[i]
-        this.actualizarCartaMano(i, carta)
+        const cartaPanel = this.crearCartaMano(carta, i)
+        cartaPanel.isEnabled = !carta.estaDeshabilitada()
+        cartaPanel.color = carta.estaDeshabilitada() ? '#666666' : '#d3a06a'
+        cartaPanel.alpha = carta.estaDeshabilitada() ? 0.5 : 1
+        gridMano.addControl(cartaPanel, 0, i)
+      } else {
+        const cartaVacia = this.crearCartaManoVacia(i)
+        cartaVacia.isVisible = true
+        gridMano.addControl(cartaVacia, 0, i)
       }
     }
-  }
-
-  actualizarCartaMano(indice, carta) {
-    const cartaPanel = this.guiTexture.getControlByName(`carta_${indice}`)
-    if (!cartaPanel) return
-
-    const categoria = cartaPanel.children.find(c => c.name === `categoria_${indice}`)
-    if (categoria) {
-      categoria.text = carta.categoria.toUpperCase()
-    }
-
-    const nombre = cartaPanel.children.find(c => c.name === `nombre_${indice}`)
-    if (nombre) {
-      nombre.text = carta.titulo
-    }
-
-    const detalle = cartaPanel.children.find(c => c.name === `detalle_${indice}`)
-    if (detalle) {
-      detalle.text = carta.detalle
-    }
-
-    const icono = cartaPanel.children.find(c => c.name === `iconoCarta_${indice}`)
-    if (icono) {
-      icono.text = carta.codigo
-    }
-
-    const banda = cartaPanel.children.find(c => c.name?.startsWith('cartaBanda_'))
-    if (banda) {
-      banda.background = carta.color
-    }
-
-    const pie = cartaPanel.children.find(c => c.name?.startsWith('pieCarta_'))
-    if (pie) {
-      pie.background = carta.color
-    }
-
-    cartaPanel.color = carta.estaDeshabilitada() ? '#666666' : '#d3a06a'
-    cartaPanel.isEnabled = !carta.estaDeshabilitada()
   }
 
   mostrar() {
@@ -1391,8 +1177,22 @@ export class VistaPartida {
       this.actualizarCarruselAccidentes()
       this.actualizarHUDPerfil()
       this.actualizarPanelCartas()
+      this.actualizarProgresoPerfil()
+      this.actualizarEstadoTurno(this.jugadorActual || 1, this.totalJugadores || 4)
 
-      this.mostrarPanelesInicioDirecto()
+      if (this.accidentes && this.accidentes.length > 0 && this.perfil) {
+        this.mostrarPanelesInicioDirecto()
+      }
+    }
+  }
+
+  ocultar() {
+    if (this.scene && this.overlay) {
+      if (this.sceneAnterior) {
+        this.engine.activeScene = this.sceneAnterior
+      }
+      this.overlay.isVisible = false
+      this.visible = false
     }
   }
 
@@ -1425,20 +1225,72 @@ export class VistaPartida {
     tituloAcc.fontWeight = 'bold'
     panelAccidentes.addControl(tituloAcc)
 
-    const accidentesTexto = new GUI.TextBlock('textoAccidentes',
-      'SR: Sobrecarga de Red\n' +
-      'FD: Fuga de Datos\n' +
-      'AS: Ataque de Seguridad\n' +
-      'FS: Fallo de Software\n' +
-      'FH: Fallo de Hardware\n' +
-      'SI: Sesgo de IA\n' +
-      'CE: Corte de Energia\n' +
-      'PM: Phishing Masivo')
-    accidentesTexto.color = '#ffe0c2'
-    accidentesTexto.fontSize = 18
-    accidentesTexto.fontFamily = 'Comic Sans MS'
-    accidentesTexto.textWrapping = true
-    panelAccidentes.addControl(accidentesTexto)
+    const gridAccidentes = new GUI.Grid('gridAccidentesInicio')
+    gridAccidentes.width = '540px'
+    gridAccidentes.height = '340px'
+    gridAccidentes.top = '20px'
+    for (let i = 0; i < 4; i++) {
+      gridAccidentes.addRowDefinition(80)
+    }
+    for (let i = 0; i < 2; i++) {
+      gridAccidentes.addColumnDefinition(0.5)
+    }
+    panelAccidentes.addControl(gridAccidentes)
+
+    const accidentesMostrar = this.accidentes && this.accidentes.length > 0
+      ? this.accidentes.slice(0, 8)
+      : []
+
+    accidentesMostrar.forEach((accidente, indice) => {
+      const fila = Math.floor(indice / 2)
+      const columna = indice % 2
+
+      const nivelColor = accidente.nivel >= 3 ? '#cc3333' : accidente.nivel === 2 ? '#e67e22' : '#e6a817'
+
+      const tarjeta = new GUI.Rectangle(`accidenteInicio_${indice}`)
+      tarjeta.width = '240px'
+      tarjeta.height = '70px'
+      tarjeta.thickness = 2
+      tarjeta.cornerRadius = 10
+      tarjeta.color = nivelColor
+      tarjeta.background = '#2d1e16'
+
+      const imagenSrc = accidente.obtenerImagen ? accidente.obtenerImagen() : null
+      if (imagenSrc) {
+        const imagen = new GUI.Image(`accidenteImg_${indice}`, imagenSrc)
+        imagen.width = '56px'
+        imagen.height = '56px'
+        imagen.left = '8px'
+        imagen.stretch = GUI.Image.STRETCH_UNIFORM
+        imagen.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
+        tarjeta.addControl(imagen)
+      }
+
+      const texto = new GUI.TextBlock(`accidenteTexto_${indice}`, `${accidente.codigo}: ${accidente.nombre}`)
+      texto.color = '#ffe0c2'
+      texto.fontSize = 13
+      texto.fontFamily = 'Comic Sans MS'
+      texto.fontWeight = 'bold'
+      texto.textWrapping = true
+      texto.left = '70px'
+      texto.width = '155px'
+      texto.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
+      tarjeta.addControl(texto)
+
+      const nivelBadge = new GUI.TextBlock(`accidenteNivel_${indice}`, `Nivel ${accidente.nivel}`)
+      nivelBadge.color = nivelColor
+      nivelBadge.fontSize = 11
+      nivelBadge.fontFamily = 'Comic Sans MS'
+      nivelBadge.fontWeight = 'bold'
+      nivelBadge.left = '70px'
+      nivelBadge.top = '28px'
+      nivelBadge.width = '80px'
+      nivelBadge.height = '18px'
+      nivelBadge.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
+      tarjeta.addControl(nivelBadge)
+
+      gridAccidentes.addControl(tarjeta, fila, columna)
+    })
 
     const botonOmitir = GUI.Button.CreateSimpleButton('btnOmitirAccidentes', 'Omitir')
     botonOmitir.width = '120px'
@@ -1469,6 +1321,13 @@ export class VistaPartida {
   mostrarPanelPerfilDirecto() {
     console.log('[VistaPartida] mostrarPanelPerfilDirecto - Iniciando')
 
+    const perfilReal = this.perfil || {
+      nombre: 'Sin asignar',
+      horasRequeridas: 0,
+      categoriasValidas: [],
+      descripcion: 'Perfil no disponible'
+    }
+
     const panelPerfil = new GUI.Rectangle('panelPerfilInicio')
     panelPerfil.width = '500px'
     panelPerfil.height = '400px'
@@ -1490,8 +1349,8 @@ export class VistaPartida {
     tituloPerf.fontWeight = 'bold'
     panelPerfil.addControl(tituloPerf)
 
-    const nombrePerf = new GUI.TextBlock('nombrePerfil', 'Analista de Sistemas')
-    nombrePerf.top = '-60px'
+    const nombrePerf = new GUI.TextBlock('nombrePerfil', perfilReal.nombre)
+    nombrePerf.top = '-70px'
     nombrePerf.height = '40px'
     nombrePerf.color = '#d66a1f'
     nombrePerf.fontSize = 22
@@ -1499,30 +1358,49 @@ export class VistaPartida {
     nombrePerf.fontWeight = 'bold'
     panelPerfil.addControl(nombrePerf)
 
-    const horasPerf = new GUI.TextBlock('horasPerfil', 'Horas requeridas: 6')
-    horasPerf.top = '-10px'
+    const horasPerf = new GUI.TextBlock('horasPerfil', `Horas requeridas: ${perfilReal.horasRequeridas}`)
+    horasPerf.top = '-20px'
     horasPerf.height = '30px'
     horasPerf.color = '#cf8a34'
     horasPerf.fontSize = 18
     horasPerf.fontFamily = 'Comic Sans MS'
     panelPerfil.addControl(horasPerf)
 
-    const descPerf = new GUI.TextBlock('descPerfil', 'Analiza y optimiza sistemas tecnologicos.')
-    descPerf.top = '40px'
-    descPerf.height = '40px'
+    const descPerf = new GUI.TextBlock('descPerfil', perfilReal.descripcion)
+    descPerf.top = '30px'
+    descPerf.height = '50px'
     descPerf.color = '#f4cbaa'
-    descPerf.fontSize = 16
+    descPerf.fontSize = 15
     descPerf.fontFamily = 'Comic Sans MS'
     descPerf.textWrapping = true
     panelPerfil.addControl(descPerf)
 
-    const catsPerf = new GUI.TextBlock('catsPerfil', 'Categorias: Trabajo, Gestion, Desarrollo')
+    const catsTexto = perfilReal.categoriasValidas && perfilReal.categoriasValidas.length > 0
+      ? `Categorias: ${perfilReal.categoriasValidas.join(', ')}`
+      : 'Sin categorias asignadas'
+    const catsPerf = new GUI.TextBlock('catsPerfil', catsTexto)
     catsPerf.top = '100px'
     catsPerf.height = '30px'
     catsPerf.color = '#e7cfbc'
     catsPerf.fontSize = 14
     catsPerf.fontFamily = 'Comic Sans MS'
+    catsPerf.textWrapping = true
     panelPerfil.addControl(catsPerf)
+
+    const botonComenzar = GUI.Button.CreateSimpleButton('btnComenzarPartida', 'Comenzar Partida')
+    botonComenzar.width = '180px'
+    botonComenzar.height = '44px'
+    botonComenzar.top = '150px'
+    botonComenzar.background = '#d66a1f'
+    botonComenzar.color = '#fff7ef'
+    botonComenzar.cornerRadius = 14
+    botonComenzar.fontSize = 16
+    botonComenzar.fontFamily = 'Comic Sans MS'
+    botonComenzar.fontWeight = 'bold'
+    botonComenzar.onPointerUpObservable.add(() => {
+      panelPerfil.dispose()
+    })
+    panelPerfil.addControl(botonComenzar)
 
     console.log('[VistaPartida] Panel perfil creado y agregado')
 
@@ -1531,16 +1409,304 @@ export class VistaPartida {
       if (panelPerfil && panelPerfil.isVisible) {
         panelPerfil.isVisible = false
       }
-    }, 5000)
+    }, 8000)
   }
 
-  ocultar() {
-    if (this.scene && this.overlay) {
-      if (this.sceneAnterior) {
-        this.engine.activeScene = this.sceneAnterior
-      }
-      this.overlay.isVisible = false
-      this.visible = false
+  obtenerImagenCarta(carta) {
+    if (typeof carta.obtenerImagen === 'function') {
+      return carta.obtenerImagen()
     }
+    return null
+  }
+
+  mostrarMensajeAccidente(accidente, cartasAfectadas) {
+    const panel = this.guiTexture.getControlByName('panelMensajeAccidente')
+    if (!panel) return
+
+    const texto = panel.getControlByName('textoAccidente')
+    if (texto) {
+      texto.text = accidente.obtenerMensaje()
+    }
+
+    const nombres = panel.getControlByName('cartasAfectadas')
+    if (nombres) {
+      nombres.text = cartasAfectadas.length > 0
+        ? `Cartas afectadas: ${cartasAfectadas.map(c => c.titulo).join(', ')}`
+        : 'No se vieron afectadas cartas de este jugador.'
+    }
+
+    panel.isVisible = true
+    setTimeout(() => { panel.isVisible = false }, 5000)
+  }
+
+  actualizarProgresoPerfil() {
+    if (!this.perfil) return
+
+    const progreso = this.perfil.getProgreso()
+    const porcentaje = Math.round(progreso * 100)
+
+    const barra = this.guiTexture.getControlByName('barraProgreso')
+    if (barra) {
+      barra.width = `${porcentaje}%`
+      if (progreso >= 1) {
+        barra.background = '#4caf50'
+      } else if (progreso >= 0.5) {
+        barra.background = '#d66a1f'
+      } else {
+        barra.background = '#a85a2a'
+      }
+    }
+
+    const texto = this.guiTexture.getControlByName('textoProgreso')
+    if (texto) {
+      texto.text = `${this.perfil.horasCompletadas}/${this.perfil.horasRequeridas} horas (${porcentaje}%)`
+    }
+  }
+
+  actualizarEstadoTurno(jugadorActual, totalJugadores) {
+    const estado3 = this.guiTexture.getControlByName('estado_3')
+    if (estado3) {
+      const texto = estado3.children[0]
+      if (texto) {
+        texto.text = `Turno ${jugadorActual}/${totalJugadores}`
+      }
+    }
+  }
+
+  mostrarModalIntercambio() {
+    if (!this.cartas || this.cartas.length === 0) return
+
+    const overlay = new GUI.Rectangle('overlayIntercambio')
+    overlay.width = 1
+    overlay.height = 1
+    overlay.thickness = 0
+    overlay.background = 'rgba(0,0,0,0.6)'
+    overlay.zIndex = 500
+    this.overlay.addControl(overlay)
+
+    const panel = new GUI.Rectangle('panelIntercambio')
+    panel.width = '500px'
+    panel.height = '350px'
+    panel.thickness = 3
+    panel.cornerRadius = 20
+    panel.color = '#8e4d22'
+    panel.background = 'rgba(28, 20, 16, 0.98)'
+    panel.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
+    panel.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
+    overlay.addControl(panel)
+
+    const titulo = new GUI.TextBlock('tituloIntercambio', 'Intercambiar Cartas')
+    titulo.top = '-130px'
+    titulo.height = '40px'
+    titulo.color = '#ffe2c8'
+    titulo.fontSize = 24
+    titulo.fontFamily = 'Comic Sans MS'
+    titulo.fontWeight = 'bold'
+    panel.addControl(titulo)
+
+    const subtitulo = new GUI.TextBlock('subtituloIntercambio', 'Selecciona una carta para intercambiar (mismas horas)')
+    subtitulo.top = '-90px'
+    subtitulo.height = '24px'
+    subtitulo.color = '#a88a6a'
+    subtitulo.fontSize = 13
+    subtitulo.fontFamily = 'Comic Sans MS'
+    panel.addControl(subtitulo)
+
+    const grid = new GUI.Grid('gridIntercambio')
+    grid.width = '460px'
+    grid.height = '200px'
+    grid.top = '-40px'
+    for (let i = 0; i < 2; i++) {
+      grid.addRowDefinition(90)
+    }
+    for (let i = 0; i < 3; i++) {
+      grid.addColumnDefinition(1 / 3)
+    }
+    panel.addControl(grid)
+
+    this.cartas.forEach((carta, indice) => {
+      if (indice >= 6) return
+      const fila = Math.floor(indice / 3)
+      const col = indice % 3
+
+      const btnCarta = GUI.Button.CreateSimpleButton(`btnIntercambio_${indice}`, `${carta.titulo} (${carta.horas}h)`)
+      btnCarta.width = '140px'
+      btnCarta.height = '70px'
+      btnCarta.background = carta.estaDeshabilitada() ? '#3a2a1d' : '#5a3321'
+      btnCarta.color = carta.estaDeshabilitada() ? '#666' : '#ffe0c2'
+      btnCarta.cornerRadius = 10
+      btnCarta.fontSize = 13
+      btnCarta.fontFamily = 'Comic Sans MS'
+      btnCarta.isEnabled = !carta.estaDeshabilitada()
+      btnCarta.onPointerUpObservable.add(() => {
+        this.seleccionarCartaParaIntercambio(carta, overlay)
+      })
+      grid.addControl(btnCarta, fila, col)
+    })
+
+    const btnCerrar = GUI.Button.CreateSimpleButton('btnCerrarIntercambio', 'Cancelar')
+    btnCerrar.width = '120px'
+    btnCerrar.height = '36px'
+    btnCerrar.top = '130px'
+    btnCerrar.background = '#362924'
+    btnCerrar.color = '#ffd8bc'
+    btnCerrar.cornerRadius = 10
+    btnCerrar.fontSize = 14
+    btnCerrar.fontFamily = 'Comic Sans MS'
+    btnCerrar.onPointerUpObservable.add(() => {
+      overlay.dispose()
+    })
+    panel.addControl(btnCerrar)
+  }
+
+  seleccionarCartaParaIntercambio(cartaSeleccionada, overlay) {
+    overlay.dispose()
+
+    const horasIguales = this.cartas.filter(c =>
+      c.horas === cartaSeleccionada.horas &&
+      c !== cartaSeleccionada &&
+      !c.estaDeshabilitada() &&
+      !cartaSeleccionada.estaDeshabilitada()
+    )
+
+    if (horasIguales.length === 0) {
+      this.mostrarMensajeFlotante(`No hay cartas con ${cartaSeleccionada.horas}h para intercambiar`)
+      return
+    }
+
+    const overlay2 = new GUI.Rectangle('overlayIntercambio2')
+    overlay2.width = 1
+    overlay2.height = 1
+    overlay2.thickness = 0
+    overlay2.background = 'rgba(0,0,0,0.6)'
+    overlay2.zIndex = 500
+    this.overlay.addControl(overlay2)
+
+    const panel = new GUI.Rectangle('panelIntercambio2')
+    panel.width = '450px'
+    panel.height = '300px'
+    panel.thickness = 3
+    panel.cornerRadius = 20
+    panel.color = '#8e4d22'
+    panel.background = 'rgba(28, 20, 16, 0.98)'
+    panel.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
+    panel.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
+    overlay2.addControl(panel)
+
+    const titulo = new GUI.TextBlock('tituloIntercambio2', `Intercambiar ${cartaSeleccionada.titulo}`)
+    titulo.top = '-110px'
+    titulo.height = '40px'
+    titulo.color = '#ffe2c8'
+    titulo.fontSize = 22
+    titulo.fontFamily = 'Comic Sans MS'
+    titulo.fontWeight = 'bold'
+    panel.addControl(titulo)
+
+    const subtitulo = new GUI.TextBlock('subtituloIntercambio2', `Selecciona carta de ${cartaSeleccionada.horas}h para intercambiar`)
+    subtitulo.top = '-75px'
+    subtitulo.height = '24px'
+    subtitulo.color = '#a88a6a'
+    subtitulo.fontSize = 13
+    subtitulo.fontFamily = 'Comic Sans MS'
+    panel.addControl(subtitulo)
+
+    const grid = new GUI.Grid('gridIntercambio2')
+    grid.width = '400px'
+    grid.height = '150px'
+    grid.top = '-20px'
+    grid.addRowDefinition(70)
+    grid.addRowDefinition(70)
+    for (let i = 0; i < 3; i++) {
+      grid.addColumnDefinition(1 / 3)
+    }
+    panel.addControl(grid)
+
+    horasIguales.forEach((carta, indice) => {
+      if (indice >= 6) return
+      const fila = Math.floor(indice / 3)
+      const col = indice % 3
+
+      const btnCarta = GUI.Button.CreateSimpleButton(`btnIntercambio2_${indice}`, `${carta.titulo} (${carta.horas}h)`)
+      btnCarta.width = '120px'
+      btnCarta.height = '55px'
+      btnCarta.background = '#5a3321'
+      btnCarta.color = '#ffe0c2'
+      btnCarta.cornerRadius = 10
+      btnCarta.fontSize = 12
+      btnCarta.fontFamily = 'Comic Sans MS'
+      btnCarta.onPointerUpObservable.add(() => {
+        this.ejecutarIntercambio(cartaSeleccionada, carta)
+        overlay2.dispose()
+      })
+      grid.addControl(btnCarta, fila, col)
+    })
+
+    const btnCerrar = GUI.Button.CreateSimpleButton('btnCerrarIntercambio2', 'Cancelar')
+    btnCerrar.width = '120px'
+    btnCerrar.height = '36px'
+    btnCerrar.top = '110px'
+    btnCerrar.background = '#362924'
+    btnCerrar.color = '#ffd8bc'
+    btnCerrar.cornerRadius = 10
+    btnCerrar.fontSize = 14
+    btnCerrar.fontFamily = 'Comic Sans MS'
+    btnCerrar.onPointerUpObservable.add(() => {
+      overlay2.dispose()
+    })
+    panel.addControl(btnCerrar)
+  }
+
+  ejecutarIntercambio(carta1, carta2) {
+    const indice1 = this.cartas.indexOf(carta1)
+    const indice2 = this.cartas.indexOf(carta2)
+
+    if (indice1 === -1 || indice2 === -1) return
+
+    this.cartas[indice1] = carta2
+    this.cartas[indice2] = carta1
+
+    this.actualizarPanelCartas()
+    this.mostrarMensajeFlotante(`Intercambiaste ${carta1.titulo} por ${carta2.titulo}`)
+
+    if (this.callbackIntercambioCarta) {
+      this.callbackIntercambioCarta(carta1, carta2)
+    }
+  }
+
+  mostrarMensajeFlotante(texto) {
+    const mensaje = new GUI.TextBlock('mensajeFlotante', texto)
+    mensaje.width = '400px'
+    mensaje.height = '50px'
+    mensaje.bottom = '260px'
+    mensaje.color = '#ffe2c8'
+    mensaje.fontSize = 16
+    mensaje.fontFamily = 'Comic Sans MS'
+    mensaje.fontWeight = 'bold'
+    mensaje.background = 'rgba(28, 20, 16, 0.9)'
+    mensaje.cornerRadius = 12
+    mensaje.thickness = 2
+    mensaje.color = '#ffe2c8'
+    mensaje.borderColor = '#8e4d22'
+    this.overlay.addControl(mensaje)
+
+    setTimeout(() => {
+      mensaje.dispose()
+    }, 3000)
+  }
+
+  onJugarCarta(callback) {
+    this.callbackJugarCarta = callback
+  }
+
+  onFinTurno(callback) {
+    this.callbackFinTurno = callback
+  }
+
+  onPasarTurno(callback) {
+    this.callbackPasarTurno = callback
+  }
+
+  onIntercambioCarta(callback) {
+    this.callbackIntercambioCarta = callback
   }
 }

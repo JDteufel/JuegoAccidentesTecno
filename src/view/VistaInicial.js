@@ -400,15 +400,22 @@ export class VistaInicial {
       font-family: 'Comic Sans MS', cursive;
       cursor: pointer;
       transition: transform 0.2s, opacity 0.2s;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     `
-    btn.addEventListener('mouseenter', () => {
+    const aplicarActivo = () => {
       btn.style.opacity = '0.85'
-      btn.style.transform = 'scale(1.05)'
-    })
-    btn.addEventListener('mouseleave', () => {
+      btn.style.transform = 'scale(0.98)'
+    }
+    const removerActivo = () => {
       btn.style.opacity = '1'
       btn.style.transform = 'scale(1)'
-    })
+    }
+    btn.addEventListener('mouseenter', aplicarActivo)
+    btn.addEventListener('mouseleave', removerActivo)
+    btn.addEventListener('touchstart', aplicarActivo, { passive: true })
+    btn.addEventListener('touchend', removerActivo, { passive: true })
+    btn.addEventListener('touchcancel', removerActivo, { passive: true })
     btn.addEventListener('click', callback)
     return btn
   }

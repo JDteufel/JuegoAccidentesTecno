@@ -28,8 +28,8 @@ export class ControladorVistaRegistro {
 
         if (result.ok) {
           this.estadoApp.setUsuario(result.user.username)
-          this.estadoApp.setTipoJugador(TIPOS_JUGADOR.REGISTRADO)
-          this.controladorEstadoApp.irAPantalla(PANTALLAS.INICIAL_REGISTRADO)
+          this.estadoApp.setTipoJugador(TIPOS_JUGADOR.GAMEMASTER)
+          this.controladorEstadoApp.irAPantalla(PANTALLAS.INICIAL_GAMEMASTER)
         } else {
           this.vistaRegistro.limpiarCampos()
           this.vistaRegistro.mostrarError(result.message)

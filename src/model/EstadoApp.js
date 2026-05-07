@@ -1,8 +1,8 @@
-import { Usuario } from './Usuario.js'
+import { GameMaster } from './GameMaster.js'
 
 export const PANTALLAS = {
   INICIAL_PUBLICA: 'inicial_publica',
-  INICIAL_REGISTRADO: 'inicial_registrado',
+  INICIAL_GAMEMASTER: 'inicial_gamemaster',
   REGISTRO: 'registro',
   INICIO_SESION: 'inicio_sesion',
   UNIRSE_LOBBY: 'unirse_lobby',
@@ -11,12 +11,13 @@ export const PANTALLAS = {
   REGLAS: 'reglas',
   CARTAS: 'cartas',
   ACCIDENTES: 'accidentes',
-  PARTIDA: 'partida'
+  PARTIDA: 'partida',
+  PARTIDA_PRUEBA: 'partida_prueba'
 }
 
 export const TIPOS_JUGADOR = {
-  VISITANTE: 'visitante',
-  REGISTRADO: 'registrado',
+  JUGADOR: 'jugador',
+  GAMEMASTER: 'gamemaster',
   INVITADO: 'invitado'
 }
 
@@ -24,7 +25,7 @@ export class EstadoApp {
   constructor() {
     this.pantallaActual = PANTALLAS.INICIAL_PUBLICA
     this.pantallaAnterior = null
-    this.tipoJugador = TIPOS_JUGADOR.VISITANTE
+    this.tipoJugador = TIPOS_JUGADOR.JUGADOR
     this.usuario = null
     this.lobbyActual = null
     this.lobbySenderName = null
@@ -46,7 +47,7 @@ export class EstadoApp {
 
   setUsuario(username) {
     if (username) {
-      this.usuario = new Usuario(username)
+      this.usuario = new GameMaster(username)
       this.usuario.actualizarUltimaSesion()
     } else {
       this.usuario = null
@@ -62,12 +63,12 @@ export class EstadoApp {
   }
 
   estaLogueado() {
-    return this.usuario !== null && this.tipoJugador === TIPOS_JUGADOR.REGISTRADO
+    return this.usuario !== null && this.tipoJugador === TIPOS_JUGADOR.GAMEMASTER
   }
 
   cerrarSesion() {
     this.usuario = null
-    this.tipoJugador = TIPOS_JUGADOR.VISITANTE
+    this.tipoJugador = TIPOS_JUGADOR.JUGADOR
     this.pantallaActual = PANTALLAS.INICIAL_PUBLICA
     this.pantallaAnterior = null
     this.limpiarLobbyActual()

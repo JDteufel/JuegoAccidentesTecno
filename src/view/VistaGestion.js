@@ -1,10 +1,11 @@
-import { VistaPanelBase } from './base/VistaPanelBase.js'
+import './estilos/VistaGestion.css'
 
 export class VistaGestion {
   constructor() {
     this.onVolverCallback = null
     this.onAutoDistribuirCallback = null
     this.onIniciarTodasCallback = null
+    this.onProbarCallback = null
     this.onIniciarSalaCallbacks = {}
     this.onEliminarSalaCallbacks = {}
     this.onJugadorSoltadoCallback = null
@@ -34,107 +35,42 @@ export class VistaGestion {
 
     const container = document.createElement('div')
     container.id = 'gestionContainer'
-    container.style.cssText = `
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      display: none;
-      justify-content: center;
-      align-items: center;
-      background: rgba(12, 9, 8, 0.64);
-      z-index: 100;
-      font-family: 'Comic Sans MS', cursive;
-    `
     document.body.appendChild(container)
     this.containerEl = container
 
     const tarjeta = document.createElement('div')
-    tarjeta.style.cssText = `
-      width: 1300px;
-      max-width: 95vw;
-      min-height: 660px;
-      background: rgba(28, 21, 18, 0.95);
-      border: 2px solid #8e4d22;
-      border-radius: 28px;
-      box-shadow: 0 0 22px rgba(0,0,0,0.4);
-      padding: 50px 40px 40px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: relative;
-    `
+    tarjeta.className = 'tarjeta-gestion'
     container.appendChild(tarjeta)
 
     const titulo = document.createElement('div')
+    titulo.className = 'titulo-gestion'
     titulo.textContent = 'Gestión de Partidas'
-    titulo.style.cssText = `
-      color: #ffe4cf;
-      font-size: 28px;
-      margin-bottom: 20px;
-      text-align: center;
-    `
     tarjeta.appendChild(titulo)
 
     const headerRow = document.createElement('div')
-    headerRow.style.cssText = `
-      display: flex;
-      justify-content: space-between;
-      width: 100%;
-      margin-bottom: 25px;
-    `
+    headerRow.className = 'header-row'
     tarjeta.appendChild(headerRow)
 
     this.codigoEl = document.createElement('div')
+    this.codigoEl.className = 'codigo-lobby'
     this.codigoEl.textContent = 'Código: -'
-    this.codigoEl.style.cssText = `
-      color: #cf8a34;
-      font-size: 20px;
-      min-width: 200px;
-    `
     headerRow.appendChild(this.codigoEl)
 
     this.contadorEl = document.createElement('div')
+    this.contadorEl.className = 'contador-jugadores'
     this.contadorEl.textContent = 'Jugadores: 0'
-    this.contadorEl.style.cssText = `
-      color: #f4cbaa;
-      font-size: 18px;
-      min-width: 200px;
-      text-align: right;
-    `
     headerRow.appendChild(this.contadorEl)
 
     const mainArea = document.createElement('div')
-    mainArea.style.cssText = `
-      display: flex;
-      gap: 40px;
-      width: 100%;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 30px;
-      margin-bottom: 30px;
-    `
+    mainArea.className = 'main-area'
     tarjeta.appendChild(mainArea)
 
     this.poolEl = document.createElement('div')
-    this.poolEl.style.cssText = `
-      display: grid;
-      grid-template-columns: repeat(8, 1fr);
-      grid-template-rows: repeat(4, auto);
-      gap: 4px;
-      width: 520px;
-      min-width: 400px;
-      align-content: start;
-    `
+    this.poolEl.className = 'pool-jugadores'
     mainArea.appendChild(this.poolEl)
 
     this.salasEl = document.createElement('div')
-    this.salasEl.style.cssText = `
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      grid-template-rows: repeat(2, 1fr);
-      gap: 12px;
-      width: 720px;
-      min-width: 500px;
-    `
+    this.salasEl.className = 'salas-container'
     mainArea.appendChild(this.salasEl)
 
     for (let i = 1; i <= 32; i++) {
@@ -146,33 +82,19 @@ export class VistaGestion {
     }
 
     this.errorEl = document.createElement('div')
-    this.errorEl.style.cssText = `
-      color: #ff6b6b;
-      font-size: 16px;
-      height: 28px;
-      text-align: center;
-      visibility: hidden;
-      margin-bottom: 15px;
-    `
+    this.errorEl.className = 'error-global'
     tarjeta.appendChild(this.errorEl)
 
     const buttonsRow = document.createElement('div')
-    buttonsRow.style.cssText = `
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: wrap;
-      margin-top: 30px;
-    `
+    buttonsRow.className = 'buttons-row'
     tarjeta.appendChild(buttonsRow)
 
-    const btnAuto = this._crearBoton('Auto-distribuir', '#d66a1f', '#fff7ef', () => {
+    const btnAuto = this._crearBoton('Auto-distribuir', 'boton-gestion', () => {
       if (this.onAutoDistribuirCallback) this.onAutoDistribuirCallback()
     })
     buttonsRow.appendChild(btnAuto)
 
-    const btnIniciar = this._crearBoton('Iniciar Todas', '#a84f16', '#fff1e3', () => {
+    const btnIniciar = this._crearBoton('Iniciar Todas', 'boton-gestion', () => {
       for (let i = 1; i <= 8; i++) {
         if (this.onIniciarSalaCallbacks[i]) {
           this.onIniciarSalaCallbacks[i]()
@@ -182,7 +104,12 @@ export class VistaGestion {
     })
     buttonsRow.appendChild(btnIniciar)
 
-    const btnVolver = this._crearBoton('Volver al Menú', '#362924', '#ffd8bc', () => {
+    const btnProbar = this._crearBoton('Probar', 'boton-gestion', () => {
+      if (this.onProbarCallback) this.onProbarCallback()
+    })
+    buttonsRow.appendChild(btnProbar)
+
+    const btnVolver = this._crearBoton('Volver al Menú', 'boton-gestion', () => {
       if (this.onVolverCallback) this.onVolverCallback()
     })
     buttonsRow.appendChild(btnVolver)
@@ -193,28 +120,10 @@ export class VistaGestion {
     console.log('[VistaGestion] Vista DOM creada exitosamente')
   }
 
-  _crearBoton(texto, fondo, color, callback) {
+  _crearBoton(texto, claseCss, callback) {
     const btn = document.createElement('button')
     btn.textContent = texto
-    btn.style.cssText = `
-      padding: 10px 24px;
-      border: none;
-      border-radius: 18px;
-      background: ${fondo};
-      color: ${color};
-      font-size: 16px;
-      font-family: 'Comic Sans MS', cursive;
-      cursor: pointer;
-      transition: transform 0.2s, opacity 0.2s;
-    `
-    btn.addEventListener('mouseenter', () => {
-      btn.style.opacity = '0.85'
-      btn.style.transform = 'scale(1.05)'
-    })
-    btn.addEventListener('mouseleave', () => {
-      btn.style.opacity = '1'
-      btn.style.transform = 'scale(1)'
-    })
+    btn.className = claseCss
     btn.addEventListener('click', callback)
     return btn
   }
@@ -223,60 +132,20 @@ export class VistaGestion {
     const chip = document.createElement('div')
     chip.id = `jugadorChip${numero}`
     chip.dataset.numero = numero
-    chip.style.cssText = `
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: grab;
-      padding: 2px;
-      position: relative;
-      z-index: 1;
-      user-select: none;
-      justify-self: center;
-    `
+    chip.className = 'jugador-chip'
 
     const circle = document.createElement('div')
     circle.className = 'jugador-circle'
-    circle.style.cssText = `
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      border: 2px solid #5a4a3a;
-      background: rgba(30, 22, 18, 0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: border-color 0.2s, background 0.2s;
-      flex-shrink: 0;
-    `
 
     const letra = document.createElement('span')
     letra.className = 'jugador-letra'
     letra.textContent = `J${numero}`
-    letra.style.cssText = `
-      color: #8a7a6a;
-      font-size: 13px;
-      font-family: 'Comic Sans MS', cursive;
-      line-height: 1;
-    `
     circle.appendChild(letra)
     chip.appendChild(circle)
 
     const nombre = document.createElement('span')
     nombre.className = 'jugador-nombre'
     nombre.textContent = `Jugador ${numero}`
-    nombre.style.cssText = `
-      color: #8a7a6a;
-      font-size: 10px;
-      font-family: 'Comic Sans MS', cursive;
-      margin-top: 2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 60px;
-      text-align: center;
-    `
     chip.appendChild(nombre)
 
     this.poolEl.appendChild(chip)
@@ -288,29 +157,10 @@ export class VistaGestion {
   crearSalaPredefinida(numero) {
     const sala = document.createElement('div')
     sala.id = `sala${numero}`
-    sala.style.cssText = `
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 16px 10px;
-    `
+    sala.className = 'sala-panel'
 
     const panel = document.createElement('div')
-    panel.className = 'sala-panel'
-    panel.style.cssText = `
-      width: 120px;
-      height: 120px;
-      border-radius: 12px;
-      border: 2px solid #5a4a3a;
-      background: rgba(30, 22, 18, 0.5);
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1fr 1fr;
-      gap: 8px;
-      padding: 10px;
-      box-sizing: border-box;
-      transition: border-color 0.2s, background 0.2s;
-    `
+    panel.className = 'sala-tablero'
 
     const slots = []
     for (let i = 0; i < 4; i++) {
@@ -318,52 +168,17 @@ export class VistaGestion {
       slotWrapper.className = 'sala-slot-wrapper'
       slotWrapper.dataset.sala = numero
       slotWrapper.dataset.slot = i
-      slotWrapper.style.cssText = `
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        margin: auto;
-      `
 
       const circle = document.createElement('div')
       circle.className = 'slot-circle'
-      circle.style.cssText = `
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        border: 2px solid #5a4a3a;
-        background: rgba(30, 22, 18, 0.5);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: border-color 0.2s, background 0.2s;
-      `
 
       const letra = document.createElement('span')
       letra.className = 'slot-letra'
-      letra.style.cssText = `
-        color: #5a4a3a;
-        font-size: 12px;
-        font-family: 'Comic Sans MS', cursive;
-        line-height: 1;
-      `
       circle.appendChild(letra)
       slotWrapper.appendChild(circle)
 
       const nombre = document.createElement('span')
       nombre.className = 'slot-nombre'
-      nombre.style.cssText = `
-        color: #5a4a3a;
-        font-size: 8px;
-        font-family: 'Comic Sans MS', cursive;
-        margin-top: 1px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 40px;
-        text-align: center;
-      `
       slotWrapper.appendChild(nombre)
 
       panel.appendChild(slotWrapper)
@@ -375,12 +190,6 @@ export class VistaGestion {
     const titulo = document.createElement('div')
     titulo.className = 'sala-titulo'
     titulo.textContent = `Sala ${numero}`
-    titulo.style.cssText = `
-      color: #8a7a6a;
-      font-size: 14px;
-      font-family: 'Comic Sans MS', cursive;
-      margin-top: 6px;
-    `
     sala.appendChild(titulo)
 
     const btnIniciar = this._crearBotonSala('Iniciar', numero)
@@ -388,15 +197,6 @@ export class VistaGestion {
 
     const errorSala = document.createElement('div')
     errorSala.className = 'sala-error'
-    errorSala.style.cssText = `
-      color: #ff6b6b;
-      font-size: 11px;
-      font-family: 'Comic Sans MS', cursive;
-      margin-top: 4px;
-      min-height: 16px;
-      text-align: center;
-      max-width: 120px;
-    `
     sala.appendChild(errorSala)
 
     this.salasEl.appendChild(sala)
@@ -406,26 +206,7 @@ export class VistaGestion {
   _crearBotonSala(texto, numeroSala) {
     const btn = document.createElement('button')
     btn.textContent = texto
-    btn.style.cssText = `
-      padding: 4px 14px;
-      border: none;
-      border-radius: 12px;
-      background: #8e4d22;
-      color: #ffe4cf;
-      font-size: 12px;
-      font-family: 'Comic Sans MS', cursive;
-      cursor: pointer;
-      transition: transform 0.2s, opacity 0.2s;
-      margin-top: 6px;
-    `
-    btn.addEventListener('mouseenter', () => {
-      btn.style.opacity = '0.85'
-      btn.style.transform = 'scale(1.05)'
-    })
-    btn.addEventListener('mouseleave', () => {
-      btn.style.opacity = '1'
-      btn.style.transform = 'scale(1)'
-    })
+    btn.className = 'boton-sala'
     btn.addEventListener('click', () => {
       if (this.onIniciarSalaCallbacks[numeroSala]) {
         this.onIniciarSalaCallbacks[numeroSala]()
@@ -475,18 +256,13 @@ export class VistaGestion {
     ds.dragOffsetX = pos.x - rect.left - rect.width / 2
     ds.dragOffsetY = pos.y - rect.top - rect.height / 2
 
-    chipEl.style.position = 'fixed'
-    chipEl.style.zIndex = '1000'
+    chipEl.classList.add('dragging')
     chipEl.style.left = (pos.x - ds.dragOffsetX) + 'px'
     chipEl.style.top = (pos.y - ds.dragOffsetY) + 'px'
-    chipEl.style.cursor = 'grabbing'
-    chipEl.style.pointerEvents = 'none'
 
     const circle = chipEl.querySelector('.jugador-circle')
     if (circle) {
-      circle.style.borderColor = '#cf8a34'
-      circle.style.transform = 'scale(1.2)'
-      circle.style.boxShadow = '0 0 15px rgba(207,138,52,0.5)'
+      circle.classList.add('dragging')
     }
 
     if (e.type === 'touchstart') e.preventDefault()
@@ -500,13 +276,13 @@ export class VistaGestion {
       return
     }
 
+    e.preventDefault()
+
     const pos = this._getPointerPos(e)
     ds.element.style.left = (pos.x - ds.dragOffsetX) + 'px'
     ds.element.style.top = (pos.y - ds.dragOffsetY) + 'px'
 
     this._resaltarSlotBajoCursor(e)
-
-    if (e.type === 'touchmove') e.preventDefault()
   }
 
   _dragEnd(e) {
@@ -526,25 +302,25 @@ export class VistaGestion {
     if (dropExitoso) {
       console.log(`[VistaGestion] Jugador "${nombreJugador}" soltado en Sala ${dropTarget.salaNumero}, slot ${dropTarget.slotIndex}`)
       ds.element.style.display = 'none'
+      ds.element.classList.remove('dragging')
       ds.element.style.position = ''
       ds.element.style.zIndex = ''
       ds.element.style.pointerEvents = ''
+      ds.element.style.left = ''
+      ds.element.style.top = ''
       this.onJugadorSoltadoCallback(nombreJugador, dropTarget.salaNumero, dropTarget.slotIndex)
     } else {
       console.log(`[VistaGestion] Chip ${ds.numero} devuelto a posición original`)
+      ds.element.classList.remove('dragging')
       ds.element.style.position = ''
       ds.element.style.zIndex = ''
       ds.element.style.left = ''
       ds.element.style.top = ''
-      ds.element.style.cursor = 'grab'
-      ds.element.style.display = ''
       ds.element.style.pointerEvents = ''
 
       const circle = ds.element.querySelector('.jugador-circle')
       if (circle) {
-        circle.style.borderColor = ''
-        circle.style.transform = ''
-        circle.style.boxShadow = ''
+        circle.classList.remove('dragging')
       }
     }
 
@@ -561,7 +337,7 @@ export class VistaGestion {
 
     const pos = this._getPointerPos(e)
 
-    for (const [numStr, salaData] of Object.entries(this.salaSlots)) {
+    for (const salaData of Object.values(this.salaSlots)) {
       for (let i = 0; i < 4; i++) {
         const slotData = salaData.slots[i]
         const rect = slotData.wrapper.getBoundingClientRect()
@@ -572,8 +348,7 @@ export class VistaGestion {
           pos.y >= rect.top &&
           pos.y <= rect.bottom
         ) {
-          slotData.circle.style.borderColor = '#cf8a34'
-          slotData.circle.style.borderWidth = '3px'
+          slotData.circle.classList.add('resaltado')
           return
         }
       }
@@ -584,8 +359,7 @@ export class VistaGestion {
     for (const salaData of Object.values(this.salaSlots)) {
       for (let i = 0; i < 4; i++) {
         const slotData = salaData.slots[i]
-        slotData.circle.style.borderColor = ''
-        slotData.circle.style.borderWidth = ''
+        slotData.circle.classList.remove('resaltado')
       }
     }
   }
@@ -634,6 +408,10 @@ export class VistaGestion {
     this.onIniciarTodasCallback = callback
   }
 
+  onProbar(callback) {
+    this.onProbarCallback = callback
+  }
+
   onIniciarSala(numeroSala, callback) {
     this.onIniciarSalaCallbacks[numeroSala] = callback
   }
@@ -671,23 +449,21 @@ export class VistaGestion {
       if (!chip) continue
 
       chip.element.style.display = ''
+      chip.circle.classList.remove('activo', 'activo-par', 'dragging')
+      chip.letra.classList.remove('activo')
+      chip.nombre.classList.remove('activo')
 
       if (i <= nombresJugadores.length) {
         const nombre = nombresJugadores[i - 1]
         chip.letra.textContent = nombre.charAt(0).toUpperCase()
         chip.nombre.textContent = nombre
-        chip.circle.style.borderColor = '#cf8a34'
-        chip.circle.style.background = (i - 1) % 2 === 0 ? 'rgba(60, 45, 39, 0.9)' : 'rgba(47, 34, 29, 0.9)'
-        chip.letra.style.color = '#ffe4cf'
-        chip.nombre.style.color = '#d6a98a'
+        chip.circle.classList.add((i - 1) % 2 === 0 ? 'activo' : 'activo-par')
+        chip.letra.classList.add('activo')
+        chip.nombre.classList.add('activo')
         this.jugadorLabels[i] = nombre
       } else {
         chip.letra.textContent = `J${i}`
         chip.nombre.textContent = `Jugador ${i}`
-        chip.circle.style.borderColor = '#5a4a3a'
-        chip.circle.style.background = 'rgba(30, 22, 18, 0.5)'
-        chip.letra.style.color = '#8a7a6a'
-        chip.nombre.style.color = '#8a7a6a'
         this.jugadorLabels[i] = `Jugador ${i}`
       }
     }
@@ -706,20 +482,18 @@ export class VistaGestion {
         ? Object.keys(jugadoresAsignados).filter(j => jugadoresAsignados[j] === n)
         : []
 
+      salaData.panel.classList.remove('activa', 'activa-par', 'activa-impar')
+      salaData.titulo.classList.remove('activa')
+
       if (salaDefinida && jugadoresEnSala.length > 0) {
-        salaData.panel.style.borderColor = '#8e4d22'
-        salaData.panel.style.background = n % 2 === 0 ? 'rgba(47, 34, 29, 0.8)' : 'rgba(58, 42, 36, 0.8)'
-        salaData.titulo.style.color = '#ffe4cf'
+        salaData.panel.classList.add('activa', n % 2 === 0 ? 'activa-par' : 'activa-impar')
+        salaData.titulo.classList.add('activa')
         salaData.titulo.textContent = `Sala ${n}`
         salaData.activa = true
         salaData.btnIniciar.style.opacity = '1'
         salaData.btnIniciar.style.pointerEvents = 'auto'
         this.limpiarErrorSala(n)
       } else {
-        salaData.panel.style.borderColor = '#5a4a3a'
-        salaData.panel.style.background = 'rgba(30, 22, 18, 0.5)'
-        salaData.titulo.style.color = '#8a7a6a'
-        salaData.titulo.textContent = `Sala ${n}`
         salaData.activa = false
         salaData.btnIniciar.style.opacity = '0.4'
         salaData.btnIniciar.style.pointerEvents = 'none'
@@ -730,20 +504,19 @@ export class VistaGestion {
         const slotData = salaData.slots[i]
         const jugador = jugadoresEnSala[i]
 
+        slotData.circle.classList.remove('ocupado', 'resaltado')
+        slotData.letra.classList.remove('ocupado')
+        slotData.nombre.classList.remove('ocupado')
+
         if (jugador) {
-          slotData.circle.style.borderColor = '#4a8c3f'
-          slotData.circle.style.background = 'rgba(74, 140, 63, 0.3)'
+          slotData.circle.classList.add('ocupado')
           slotData.letra.textContent = jugador.charAt(0).toUpperCase()
-          slotData.letra.style.color = '#a8e6a0'
+          slotData.letra.classList.add('ocupado')
           slotData.nombre.textContent = jugador
-          slotData.nombre.style.color = '#a8e6a0'
+          slotData.nombre.classList.add('ocupado')
         } else {
-          slotData.circle.style.borderColor = '#5a4a3a'
-          slotData.circle.style.background = 'rgba(30, 22, 18, 0.5)'
           slotData.letra.textContent = ''
-          slotData.letra.style.color = '#5a4a3a'
           slotData.nombre.textContent = ''
-          slotData.nombre.style.color = '#5a4a3a'
         }
       }
     })
@@ -752,16 +525,15 @@ export class VistaGestion {
   mostrarError(mensaje) {
     if (this.errorEl) {
       this.errorEl.textContent = mensaje
-      this.errorEl.style.color = '#ff6b6b'
-      this.errorEl.style.visibility = 'visible'
+      this.errorEl.classList.remove('exito')
+      this.errorEl.classList.add('visible')
     }
   }
 
   limpiarError() {
     if (this.errorEl) {
       this.errorEl.textContent = ''
-      this.errorEl.style.color = '#ff6b6b'
-      this.errorEl.style.visibility = 'hidden'
+      this.errorEl.classList.remove('visible', 'exito')
     }
   }
 
@@ -839,8 +611,7 @@ export class VistaGestion {
   mostrarMensajeFinal(mensaje) {
     if (this.errorEl) {
       this.errorEl.textContent = mensaje
-      this.errorEl.style.color = '#4ade80'
-      this.errorEl.style.visibility = 'visible'
+      this.errorEl.classList.add('exito', 'visible')
     }
   }
 }

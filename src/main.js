@@ -10,6 +10,7 @@ import { VistaGestion } from './view/VistaGestion.js'
 import { VistaCartas } from './view/VistaCartas.js'
 import { VistaAccidentes } from './view/VistaAccidentes.js'
 import { VistaPartida } from './view/VistaPartida.js'
+import { VistaPartidaPrueba } from './view/VistaPartidaPrueba.js'
 import { EstadoApp } from './model/EstadoApp.js'
 import { ControladorVistaInicial } from './controller/ControladorVistaInicial.js'
 import { ControladorVistaInicialR } from './controller/ControladorVistaInicialR.js'
@@ -24,6 +25,7 @@ import { ControladorVistaGestion } from './controller/ControladorVistaGestion.js
 import { ControladorVistaCartas } from './controller/ControladorVistaCartas.js'
 import { ControladorVistaAccidentes } from './controller/ControladorVistaAccidentes.js'
 import { ControladorVistaPartida } from './controller/ControladorVistaPartida.js'
+import { ControladorVistaPartidaPrueba } from './controller/ControladorVistaPartidaPrueba.js'
 import { testSmartFoxPing, getSmartFoxInstance } from './services/SmartFoxService.js'
 import { initLogsService } from './services/LogsService.js'
 
@@ -59,10 +61,13 @@ const vistaAccidentes = new VistaAccidentes()
 vistaAccidentes.crear()
 const vistaPartida = new VistaPartida(canvas, vistaInicial.engine, vistaInicial.scene)
 vistaPartida.crear()
+const vistaPartidaPrueba = new VistaPartidaPrueba(canvas, vistaInicial.engine, vistaInicial.scene)
+vistaPartidaPrueba.crear()
 
 const estadoApp = new EstadoApp()
 
 const controladorPartida = new ControladorVistaPartida(vistaPartida, null)
+const controladorPartidaPrueba = new ControladorVistaPartidaPrueba(vistaPartidaPrueba, null)
 
 const controladorEstadoApp = new ControladorEstadoApp(estadoApp, {
   vistaInicial,
@@ -75,10 +80,12 @@ const controladorEstadoApp = new ControladorEstadoApp(estadoApp, {
   vistaGestion,
   vistaCartas,
   vistaAccidentes,
-  vistaPartida
-}, controladorPartida)
+  vistaPartida,
+  vistaPartidaPrueba
+}, controladorPartida, controladorPartidaPrueba)
 
 controladorPartida.controladorEstadoApp = controladorEstadoApp
+controladorPartidaPrueba.controladorEstadoApp = controladorEstadoApp
 
 const controladorVistaInicial = new ControladorVistaInicial(
   vistaInicial,
@@ -135,6 +142,7 @@ controladorGestion.init()
 controladorCartas.init()
 controladorAccidentes.init()
 controladorPartida.init()
+controladorPartidaPrueba.init()
 controladorEstadoApp.actualizarVista()
 
 testSmartFoxPing()

@@ -9,6 +9,83 @@ import {
   emitLobbyUpdate
 } from '../services/SmartFoxService.js'
 
+class EstrategiaDistribucion {
+  ejecutar(jugadores, salasDisponibles) {
+    throw new Error('Método ejecutar() debe ser implementado')
+  }
+}
+
+class EstrategiaBalanceada extends EstrategiaDistribucion {
+  ejecutar(jugadores, salasDisponibles) {
+    if (!jugadores || jugadores.length === 0) return {}
+    if (!salasDisponibles || salasDisponibles.length === 0) return {}
+
+    const asignacion = {}
+    const capacidadPorSala = 4
+    let salaIndex = 0
+    let jugadoresEnSalaActual = 0
+
+    for (const jugador of jugadores) {
+      if (salaIndex >= salasDisponibles.length) break
+
+      const salaNumero = salasDisponibles[salaIndex]
+      asignacion[jugador] = salaNumero
+      jugadoresEnSalaActual++
+
+      if (jugadoresEnSalaActual >= capacidadPorSala) {
+        salaIndex++
+        jugadoresEnSalaActual = 0
+      }
+    }
+
+    return asignacion
+  }
+}
+
+class EstrategiaSecuencial extends EstrategiaDistribucion {
+  ejecutar(jugadores, salasDisponibles) {
+    if (!jugadores || jugadores.length === 0) return {}
+    if (!salasDisponibles || salasDisponibles.length === 0) return {}
+
+    const asignacion = {}
+    const capacidadPorSala = 4
+
+    for (let i = 0; i < jugadores.length; i++) {
+      const salaIndex = Math.floor(i / capacidadPorSala)
+      if (salaIndex >= salasDisponibles.length) break
+      asignacion[jugadores[i]] = salasDisponibles[salaIndex]
+    }
+
+    return asignacion
+  }
+}
+
+class EstrategiaPersonalizada extends EstrategiaDistribucion {
+  constructor() {
+    super()
+    this._asignacionPrevia = {}
+  }
+
+  ejecutar(jugadores, salasDisponibles) {
+    if (!jugadores || jugadores.length === 0) return {}
+    const asignacion = {}
+    for (const jugador of jugadores) {
+      if (this._asignacionPrevia[jugador]) {
+        asignacion[jugador] = this._asignacionPrevia[jugador]
+      }
+    }
+    return asignacion
+  }
+
+  actualizarAsignacion(jugador, salaNumero) {
+    this._asignacionPrevia[jugador] = salaNumero
+  }
+
+  eliminarAsignacion(jugador) {
+    delete this._asignacionPrevia[jugador]
+  }
+}
+
 export class ControladorVistaGestion {
   constructor(vistaGestion, estadoApp, controladorEstadoApp) {
     this.vistaGestion = vistaGestion
@@ -19,6 +96,8 @@ export class ControladorVistaGestion {
     this.unsubscribeRoomEnter = null
     this.extensionResponseHandler = null
     this.salaTransitionTimeout = null
+    this.estrategiaActual = new EstrategiaBalanceada()
+    this.estrategiaPersonalizada = new EstrategiaPersonalizada()
   }
 
   init() {
@@ -74,7 +153,7 @@ export class ControladorVistaGestion {
         this.estadoApp.limpiarSalaMaestra()
       }
 
-      this.controladorEstadoApp.irAPantalla(PANTALLAS.INICIAL_REGISTRADO)
+      this.controladorEstadoApp.irAPantalla(PANTALLAS.INICIAL_GAMEMASTER)
     })
 
     this.vistaGestion.onAutoDistribuir(() => {
@@ -83,6 +162,10 @@ export class ControladorVistaGestion {
 
     this.vistaGestion.onIniciarTodas(() => {
       this.iniciarTodasLasSalas()
+    })
+
+    this.vistaGestion.onProbar(() => {
+      this.controladorEstadoApp.irAPantalla(PANTALLAS.PARTIDA_PRUEBA)
     })
 
     for (let i = 1; i <= 8; i++) {
@@ -103,8 +186,8 @@ export class ControladorVistaGestion {
     const tipoJugador = this.estadoApp.tipoJugador
     console.log('[ControladorVistaGestion] Tipo jugador actual:', tipoJugador)
 
-    if (tipoJugador === TIPOS_JUGADOR.REGISTRADO) {
-      console.log('[ControladorVistaGestion] GameMaster (REGISTRADO) NO debe entrar a VistaPartida - permaneciendo en GESTION')
+    if (tipoJugador === TIPOS_JUGADOR.GAMEMASTER) {
+      console.log('[ControladorVistaGestion] GameMaster (GAMEMASTER) NO debe entrar a VistaPartida - permaneciendo en GESTION')
       this.vistaGestion.mostrarMensajeFinal('Esperando a que los jugadores terminen...')
       return
     }
@@ -129,6 +212,22 @@ export class ControladorVistaGestion {
     this.vistaGestion.actualizarSalas(subSalas, jugadoresAsignados)
   }
 
+  establecerEstrategia(tipo) {
+    switch (tipo) {
+      case 'balanceada':
+        this.estrategiaActual = new EstrategiaBalanceada()
+        break
+      case 'secuencial':
+        this.estrategiaActual = new EstrategiaSecuencial()
+        break
+      case 'personalizada':
+        this.estrategiaActual = this.estrategiaPersonalizada
+        break
+      default:
+        this.estrategiaActual = new EstrategiaBalanceada()
+    }
+  }
+
   autoDistribuir() {
     const jugadoresPool = [...this.estadoApp.jugadoresPool]
     if (jugadoresPool.length === 0) {
@@ -136,7 +235,6 @@ export class ControladorVistaGestion {
       return
     }
 
-    const jugadoresAsignados = { ...this.estadoApp.jugadoresAsignados }
     const subSalas = this.estadoApp.subSalas || []
     if (subSalas.length === 0) {
       for (let i = 1; i <= 8; i++) {
@@ -144,20 +242,16 @@ export class ControladorVistaGestion {
       }
     }
 
-    let indiceSala = 0
-    jugadoresPool.forEach(jugador => {
-      while (indiceSala < subSalas.length) {
-        const sala = subSalas[indiceSala]
-        const jugadoresEnSala = Object.keys(jugadoresAsignados).filter(
-          j => jugadoresAsignados[j] === sala.numero
-        ).length
-        if (jugadoresEnSala < 4) {
-          jugadoresAsignados[jugador] = sala.numero
-          break
-        }
-        indiceSala++
+    const salasDisponibles = subSalas.map(s => s.numero)
+    const asignacion = this.estrategiaActual.ejecutar(jugadoresPool, salasDisponibles)
+
+    const jugadoresAsignados = { ...this.estadoApp.jugadoresAsignados }
+    for (const [jugador, sala] of Object.entries(asignacion)) {
+      jugadoresAsignados[jugador] = sala
+      if (this.estrategiaActual instanceof EstrategiaPersonalizada) {
+        this.estrategiaPersonalizada.actualizarAsignacion(jugador, sala)
       }
-    })
+    }
 
     this.estadoApp.subSalas = subSalas
     this.estadoApp.jugadoresAsignados = jugadoresAsignados
@@ -194,6 +288,10 @@ export class ControladorVistaGestion {
     this.estadoApp.jugadoresPool = jugadoresPoolActualizado
     this.estadoApp.jugadoresAsignados = jugadoresAsignados
     this.estadoApp.subSalas = subSalas
+
+    if (this.estrategiaActual instanceof EstrategiaPersonalizada) {
+      this.estrategiaPersonalizada.actualizarAsignacion(nombreJugador, salaNumero)
+    }
 
     this.actualizarVistaGestion()
   }

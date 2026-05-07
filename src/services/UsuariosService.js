@@ -41,7 +41,7 @@ class UsuariosService {
       })
       return {
         ok: true,
-        message: 'Usuario registrado exitosamente',
+        message: 'Gamemaster registrado exitosamente',
         user: {
           username: username,
           createdAt: this.usuariosRegistrados[normalizedUsername].createdAt

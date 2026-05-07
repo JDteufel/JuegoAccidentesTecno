@@ -1,22 +1,47 @@
-import carta1 from '../assets/cartas/carta1.svg'
-import carta2 from '../assets/cartas/carta2.svg'
-import carta3 from '../assets/cartas/carta3.svg'
-import carta4 from '../assets/cartas/carta4.svg'
-import carta5 from '../assets/cartas/carta5.svg'
-import carta6 from '../assets/cartas/carta6.svg'
+import { seleccionarAccidentesAleatorios } from '../model/accidentes/index.js'
+import { GestorAjusteRatio } from './base/GestorAjusteRatio.js'
 
 export class VistaAccidentes {
   constructor() {
     this.callbackVolver = null
     this.visible = false
     this.containerEl = null
+    this.modalEl = null
+    this.gridEl = null
+    this.sliderEl = null
+    this.touchStartY = 0
   }
 
   crear() {
-    this.crearUI()
+    this.crearModal()
+  }
+
+  _obtenerConfiguracion() {
+    const esLandscape = GestorAjusteRatio.esLandscape()
+    const esMovil = GestorAjusteRatio.esMovil()
+    const esTablet = GestorAjusteRatio.esTablet()
+
+    return {
+      tamanoAccidente: esLandscape ? (esMovil ? 220 : esTablet ? 250 : 280) : (esMovil ? 150 : 280),
+      altoMin: esLandscape ? (esMovil ? 160 : 180) : (esMovil ? 140 : 180),
+      columnas: !esLandscape && esMovil ? 'repeat(2, 150px)' : 'auto-fill',
+      gap: esMovil ? 12 : 20,
+      paddingLateral: esMovil ? 10 : 20,
+      tamanoTitulo: esMovil ? '24px' : esTablet ? '34px' : '42px',
+      tamanoNombre: esLandscape ? (esMovil ? 15 : 18) : (esMovil ? 12 : 18),
+      tamanoImagen: esLandscape ? (esMovil ? 70 : 90) : (esMovil ? 55 : 90),
+      tamanoNivel: esLandscape ? (esMovil ? 11 : 12) : (esMovil ? 9 : 12),
+      tamanoCat: esLandscape ? (esMovil ? 9 : 10) : (esMovil ? 7 : 10),
+      tamanoDesc: esLandscape ? (esMovil ? 10 : 11) : (esMovil ? 8 : 11),
+      headerGap: esMovil ? '12px' : '30px',
+      paddingSuperior: esMovil ? '3%' : '4%',
+      sliderAncho: 36
+    }
   }
 
   crearUI() {
+    const cfg = this._obtenerConfiguracion()
+
     const container = document.createElement('div')
     container.id = 'vistaAccidentes'
     container.style.cssText = `
@@ -28,7 +53,9 @@ export class VistaAccidentes {
       background: rgba(12, 9, 8, 0.75);
       z-index: 100;
       font-family: 'Comic Sans MS', cursive;
-      padding-top: 5%;
+      padding-top: ${cfg.paddingSuperior};
+      box-sizing: border-box;
+      overflow: hidden;
     `
     document.body.appendChild(container)
     this.containerEl = container
@@ -38,128 +65,498 @@ export class VistaAccidentes {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 40px;
-      margin-bottom: 30px;
+      gap: ${cfg.headerGap};
+      margin-bottom: 8px;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+      padding: 0 ${cfg.paddingLateral}px;
+      width: 100%;
+      box-sizing: border-box;
     `
     container.appendChild(header)
 
     const titulo = document.createElement('h1')
-    titulo.textContent = 'Accidentes Tecnológicos'
+    titulo.textContent = 'Accidentes Tecnologicos'
     titulo.style.cssText = `
       color: #ffe6d1;
-      font-size: 42px;
+      font-size: ${cfg.tamanoTitulo};
       margin: 0;
+      text-align: center;
     `
     header.appendChild(titulo)
 
     const btnVolver = this._crearBoton('Volver a Reglas', '#362924', '#ffd8bc', () => {
       this.callbackVolver && this.callbackVolver()
-    })
+    }, GestorAjusteRatio.esMovil())
     header.appendChild(btnVolver)
 
+    const contenidoWrapper = document.createElement('div')
+    contenidoWrapper.style.cssText = `
+      flex: 1;
+      display: flex;
+      width: 100%;
+      min-height: 0;
+      overflow: hidden;
+    `
+    container.appendChild(contenidoWrapper)
+
+    const gridWrapper = document.createElement('div')
+    gridWrapper.style.cssText = `
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 5px ${cfg.paddingLateral}px 20px;
+      box-sizing: border-box;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
+      margin-right: ${cfg.sliderAncho}px;
+    `
+    gridWrapper.addEventListener('wheel', (e) => {
+      e.preventDefault()
+      gridWrapper.scrollTop += e.deltaY
+    }, { passive: false })
+
+    gridWrapper.addEventListener('touchstart', (e) => {
+      this.touchStartY = e.touches[0].clientY
+    }, { passive: true })
+
+    gridWrapper.addEventListener('touchmove', (e) => {
+      const deltaY = this.touchStartY - e.touches[0].clientY
+      this.touchStartY = e.touches[0].clientY
+      gridWrapper.scrollTop += deltaY
+    }, { passive: true })
+
+    contenidoWrapper.appendChild(gridWrapper)
+
     const grid = document.createElement('div')
+    const tamanoCSS = typeof cfg.columnas === 'string' && cfg.columnas.startsWith('repeat')
+      ? cfg.columnas
+      : `repeat(${cfg.columnas}, ${cfg.tamanoAccidente}px)`
     grid.style.cssText = `
       display: grid;
-      grid-template-columns: repeat(3, 220px);
-      grid-template-rows: repeat(2, 220px);
-      gap: 20px;
+      grid-template-columns: ${tamanoCSS};
+      gap: ${cfg.gap}px;
       justify-content: center;
+      padding-bottom: 20px;
     `
-    container.appendChild(grid)
+    gridWrapper.appendChild(grid)
+    this.gridEl = gridWrapper
 
-    const accidentes = [
-      { nombre: 'Falla Eléctrica', desc: 'Sobrecarga en el sistema.', img: carta1 },
-      { nombre: 'Cortocircuito', desc: 'Conexión defectuosa.', img: carta2 },
-      { nombre: 'Explosión', desc: 'Liberación de energía violenta.', img: carta3 },
-      { nombre: 'Error Humano', desc: 'Decisión incorrecta.', img: carta4 },
-      { nombre: 'Fuga Química', desc: 'Sustancias peligrosas.', img: carta5 },
-      { nombre: 'Incendio', desc: 'Combustión descontrolada.', img: carta6 }
-    ]
-
+    const accidentes = seleccionarAccidentesAleatorios(16)
     accidentes.forEach((accidente) => {
-      grid.appendChild(this._crearAccidente(accidente))
+      grid.appendChild(this._crearAccidente(accidente, cfg))
+    })
+
+    const sliderBar = document.createElement('div')
+    sliderBar.style.cssText = `
+      width: ${cfg.sliderAncho}px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      padding: 10px 0;
+    `
+
+    const slider = document.createElement('input')
+    slider.type = 'range'
+    slider.min = '0'
+    slider.max = '100'
+    slider.value = '0'
+    slider.style.cssText = `
+      writing-mode: vertical-lr;
+      height: 95%;
+      width: ${cfg.sliderAncho - 8}px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: rgba(168, 90, 42, 0.3);
+      border-radius: 4px;
+      outline: none;
+      cursor: pointer;
+    `
+    slider.addEventListener('input', () => {
+      const maxScroll = gridWrapper.scrollHeight - gridWrapper.clientHeight
+      gridWrapper.scrollTop = (slider.value / 100) * maxScroll
+    })
+
+    sliderBar.appendChild(slider)
+    contenidoWrapper.appendChild(sliderBar)
+    this.sliderEl = slider
+
+    if (!document.getElementById('estilosVistaAccidentes')) {
+      const style = document.createElement('style')
+      style.id = 'estilosVistaAccidentes'
+      style.textContent = `
+        input[type="range"]::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 26px;
+          height: 26px;
+          border-radius: 50%;
+          background: #a85a2a;
+          cursor: pointer;
+          border: 2px solid #ffd8bc;
+        }
+        input[type="range"]::-moz-range-thumb {
+          width: 26px;
+          height: 26px;
+          border-radius: 50%;
+          background: #a85a2a;
+          cursor: pointer;
+          border: 2px solid #ffd8bc;
+        }
+        .vista-accidentes-scroll::-webkit-scrollbar {
+          width: 0;
+          height: 0;
+        }
+      `
+      document.head.appendChild(style)
+    }
+
+    gridWrapper.classList.add('vista-accidentes-scroll')
+
+    gridWrapper.addEventListener('scroll', () => {
+      const maxScroll = gridWrapper.scrollHeight - gridWrapper.clientHeight
+      if (maxScroll > 0 && this.sliderEl) {
+        this.sliderEl.value = (gridWrapper.scrollTop / maxScroll) * 100
+      }
     })
   }
 
-  _crearBoton(texto, fondo, color, callback) {
+  crearModal() {
+    if (this.modalEl) return
+
+    const overlay = document.createElement('div')
+    overlay.id = 'modalAccidente'
+    overlay.style.cssText = `
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      z-index: 200;
+    `
+
+    const contenido = document.createElement('div')
+    contenido.id = 'modalAccidenteContenido'
+    contenido.style.cssText = `
+      position: fixed;
+      border-radius: 20px;
+      background: rgba(28, 20, 18, 0.98);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px;
+      box-sizing: border-box;
+      gap: 12px;
+      overflow-y: auto;
+      opacity: 0;
+      transform: scale(0.3);
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+      -webkit-overflow-scrolling: touch;
+    `
+
+    overlay.appendChild(contenido)
+    document.body.appendChild(overlay)
+    this.modalEl = { overlay, contenido }
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) this.cerrarModal()
+    })
+  }
+
+  abrirModal(accidente, origenRect) {
+    if (!this.modalEl) return
+    const { overlay, contenido } = this.modalEl
+    const nivelColor = accidente.nivel >= 3 ? '#ff4444' : accidente.nivel === 2 ? '#ffaa00' : '#ffcc66'
+    const esMovil = GestorAjusteRatio.esMovil()
+    const esLandscape = GestorAjusteRatio.esLandscape()
+
+    const altoViewport = window.innerHeight
+    const anchoViewport = window.innerWidth
+
+    const altoModal = altoViewport * (esMovil && !esLandscape ? 0.85 : 0.7)
+    const anchoModal = esMovil && !esLandscape
+      ? anchoViewport * 0.9
+      : Math.min(altoViewport * 0.55, anchoViewport * 0.6)
+
+    const centroX = anchoViewport / 2
+    const centroY = altoViewport / 2
+
+    contenido.style.width = `${anchoModal}px`
+    contenido.style.maxHeight = `${altoModal}px`
+    contenido.style.left = `${centroX}px`
+    contenido.style.top = `${centroY}px`
+    contenido.style.transform = 'translate(-50%, -50%) scale(0.3)'
+    contenido.style.opacity = '0'
+    contenido.style.padding = `${Math.max(16, altoModal * 0.04)}px`
+    contenido.style.gap = `${Math.max(10, altoModal * 0.015)}px`
+
+    if (origenRect && !(esMovil && !esLandscape)) {
+      const origenX = origenRect.left + origenRect.width / 2
+      const origenY = origenRect.top + origenRect.height / 2
+      contenido.style.transformOrigin = `${origenX - centroX + anchoModal / 2}px ${origenY - centroY + altoModal / 2}px`
+    }
+
+    contenido.innerHTML = ''
+    contenido.style.border = `4px solid ${nivelColor}`
+
+    const imagenSrc = accidente.obtenerImagen()
+    if (imagenSrc) {
+      const imagen = document.createElement('img')
+      imagen.src = imagenSrc
+      imagen.alt = accidente.nombre
+      imagen.style.cssText = `
+        width: 100%;
+        max-height: ${altoModal * 0.35}px;
+        object-fit: contain;
+        border-radius: 14px;
+      `
+      contenido.appendChild(imagen)
+    }
+
+    const nivelBadge = document.createElement('span')
+    nivelBadge.textContent = `Nivel ${accidente.nivel}`
+    nivelBadge.style.cssText = `
+      font-size: clamp(16px, ${altoModal * 0.035}px, 24px);
+      font-weight: bold;
+      color: ${nivelColor};
+      background: rgba(0,0,0,0.5);
+      padding: 8px 22px;
+      border-radius: 10px;
+    `
+    contenido.appendChild(nivelBadge)
+
+    const titulo = document.createElement('h2')
+    titulo.textContent = accidente.nombre
+    titulo.style.cssText = `
+      font-size: clamp(28px, ${altoModal * 0.065}px, 44px);
+      font-weight: bold;
+      color: ${nivelColor};
+      font-family: 'Comic Sans MS', cursive;
+      margin: 14px 0 8px;
+      text-align: center;
+    `
+    contenido.appendChild(titulo)
+
+    const codigo = document.createElement('span')
+    codigo.textContent = `Codigo: ${accidente.codigo}`
+    codigo.style.cssText = `
+      font-size: clamp(14px, ${altoModal * 0.028}px, 20px);
+      color: #aaa;
+      font-family: 'Comic Sans MS', cursive;
+    `
+    contenido.appendChild(codigo)
+
+    const categoriasLabel = document.createElement('span')
+    categoriasLabel.textContent = 'Categorias afectadas'
+    categoriasLabel.style.cssText = `
+      font-size: clamp(13px, ${altoModal * 0.025}px, 18px);
+      color: #999;
+      font-family: 'Comic Sans MS', cursive;
+      margin-top: 12px;
+    `
+    contenido.appendChild(categoriasLabel)
+
+    const categorias = document.createElement('div')
+    categorias.style.cssText = `
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    `
+    accidente.categoriasAfectadas.forEach((cat) => {
+      const catBadge = document.createElement('span')
+      catBadge.textContent = cat
+      catBadge.style.cssText = `
+        font-size: clamp(12px, ${altoModal * 0.024}px, 18px);
+        color: #ffd8bc;
+        background: rgba(168, 90, 42, 0.4);
+        padding: 7px 16px;
+        border-radius: 8px;
+      `
+      categorias.appendChild(catBadge)
+    })
+    contenido.appendChild(categorias)
+
+    const descripcion = document.createElement('p')
+    descripcion.textContent = accidente.descripcion
+    descripcion.style.cssText = `
+      font-size: clamp(15px, ${altoModal * 0.032}px, 22px);
+      color: #ffe9d6;
+      font-family: 'Comic Sans MS', cursive;
+      text-align: center;
+      margin: 16px 0 0;
+      line-height: 1.6;
+    `
+    contenido.appendChild(descripcion)
+
+    overlay.style.display = 'block'
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        contenido.style.transform = 'translate(-50%, -50%) scale(1)'
+        contenido.style.opacity = '1'
+      })
+    })
+  }
+
+  cerrarModal() {
+    if (!this.modalEl) return
+    const { overlay, contenido } = this.modalEl
+    contenido.style.transform = 'translate(-50%, -50%) scale(0.3)'
+    contenido.style.opacity = '0'
+    setTimeout(() => {
+      overlay.style.display = 'none'
+    }, 350)
+  }
+
+  _crearBoton(texto, fondo, color, callback, esMovil = false) {
     const btn = document.createElement('button')
     btn.textContent = texto
+    const tamanoMinimo = esMovil ? '44px' : '36px'
     btn.style.cssText = `
-      padding: 10px 24px;
+      padding: ${esMovil ? '12px 20px' : '10px 24px'};
+      min-height: ${tamanoMinimo};
       border: none;
       border-radius: 18px;
       background: ${fondo};
       color: ${color};
-      font-size: 21px;
+      font-size: ${esMovil ? '16px' : '21px'};
       font-family: 'Comic Sans MS', cursive;
       cursor: pointer;
       transition: transform 0.2s, opacity 0.2s;
+      -webkit-tap-highlight-color: transparent;
     `
-    btn.addEventListener('mouseenter', () => {
+    const aplicarHover = () => {
       btn.style.opacity = '0.85'
       btn.style.transform = 'scale(1.05)'
-    })
-    btn.addEventListener('mouseleave', () => {
+    }
+    const removerHover = () => {
       btn.style.opacity = '1'
       btn.style.transform = 'scale(1)'
-    })
+    }
+    if (!esMovil) {
+      btn.addEventListener('mouseenter', aplicarHover)
+      btn.addEventListener('mouseleave', removerHover)
+    }
+    btn.addEventListener('touchstart', (e) => {
+      e.preventDefault()
+      aplicarHover()
+    }, { passive: false })
+    btn.addEventListener('touchend', (e) => {
+      e.preventDefault()
+      removerHover()
+      callback()
+    }, { passive: false })
     btn.addEventListener('click', callback)
     return btn
   }
 
-  _crearAccidente({ nombre, desc, img }) {
+  _crearAccidente(accidente, cfg) {
+    const nivelColor = accidente.nivel >= 3 ? '#ff4444' : accidente.nivel === 2 ? '#ffaa00' : '#ffcc66'
+
     const contenedor = document.createElement('div')
     contenedor.style.cssText = `
-      width: 200px;
-      height: 220px;
+      width: ${cfg.tamanoAccidente}px;
+      min-height: ${cfg.altoMin}px;
       border-radius: 15px;
-      border: 2px solid #a85a2a;
+      border: 2px solid ${nivelColor};
       background: rgba(28,20,18,0.95);
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 10px;
+      padding: 12px;
       box-sizing: border-box;
-      gap: 3px;
+      gap: 6px;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
     `
 
-    const imagen = document.createElement('img')
-    imagen.src = img
-    imagen.alt = nombre
-    imagen.style.cssText = `
-      width: 100%;
-      height: 90px;
-      object-fit: cover;
-      border-radius: 8px;
+    if (GestorAjusteRatio.esLandscape() && !GestorAjusteRatio.esMovil()) {
+      contenedor.addEventListener('mouseenter', () => {
+        contenedor.style.transform = 'scale(1.05)'
+        contenedor.style.boxShadow = `0 0 20px ${nivelColor}44`
+      })
+      contenedor.addEventListener('mouseleave', () => {
+        contenedor.style.transform = 'scale(1)'
+        contenedor.style.boxShadow = 'none'
+      })
+    }
+    contenedor.addEventListener('click', () => {
+      const rect = contenedor.getBoundingClientRect()
+      this.abrirModal(accidente, rect)
+    })
+
+    const imagenSrc = accidente.obtenerImagen()
+    if (imagenSrc) {
+      const imagen = document.createElement('img')
+      imagen.src = imagenSrc
+      imagen.alt = accidente.nombre
+      imagen.style.cssText = `
+        width: 100%;
+        height: ${cfg.tamanoImagen}px;
+        object-fit: contain;
+        border-radius: 8px;
+      `
+      contenedor.appendChild(imagen)
+    }
+
+    const nivelBadge = document.createElement('span')
+    nivelBadge.textContent = `Nivel ${accidente.nivel}`
+    nivelBadge.style.cssText = `
+      font-size: ${cfg.tamanoNivel}px;
+      font-weight: bold;
+      color: ${nivelColor};
+      background: rgba(0,0,0,0.5);
+      padding: 4px 10px;
+      border-radius: 5px;
     `
-    contenedor.appendChild(imagen)
+    contenedor.appendChild(nivelBadge)
 
     const titulo = document.createElement('h3')
-    titulo.textContent = nombre
+    titulo.textContent = accidente.nombre
     titulo.style.cssText = `
-      font-size: 16px;
+      font-size: ${cfg.tamanoNombre}px;
       font-weight: bold;
-      color: #ffd6b5;
+      color: ${nivelColor};
       font-family: 'Comic Sans MS', cursive;
-      margin: 5px 0;
+      margin: 4px 0;
       text-align: center;
       word-wrap: break-word;
     `
     contenedor.appendChild(titulo)
 
+    const categorias = document.createElement('div')
+    categorias.style.cssText = `
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      justify-content: center;
+    `
+    accidente.categoriasAfectadas.forEach((cat) => {
+      const catBadge = document.createElement('span')
+      catBadge.textContent = cat
+      catBadge.style.cssText = `
+        font-size: ${cfg.tamanoCat}px;
+        color: #ffd8bc;
+        background: rgba(168, 90, 42, 0.4);
+        padding: 3px 6px;
+        border-radius: 4px;
+      `
+      categorias.appendChild(catBadge)
+    })
+    contenedor.appendChild(categorias)
+
     const descripcion = document.createElement('p')
-    descripcion.textContent = desc
+    descripcion.textContent = accidente.descripcion
     descripcion.style.cssText = `
-      font-size: 12px;
+      font-size: ${cfg.tamanoDesc}px;
       color: #ffe9d6;
       font-family: 'Comic Sans MS', cursive;
       text-align: center;
       margin: 0;
       word-wrap: break-word;
-      flex-grow: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      line-height: 1.4;
     `
     contenedor.appendChild(descripcion)
 
@@ -171,12 +568,20 @@ export class VistaAccidentes {
   }
 
   mostrar() {
-    if (this.containerEl) this.containerEl.style.display = 'flex'
+    if (this.containerEl) {
+      this.containerEl.remove()
+      this.containerEl = null
+      this.gridEl = null
+      this.sliderEl = null
+    }
+    this.crearUI()
+    this.containerEl.style.display = 'flex'
     this.visible = true
   }
 
   ocultar() {
     if (this.containerEl) this.containerEl.style.display = 'none'
     this.visible = false
+    this.cerrarModal()
   }
 }

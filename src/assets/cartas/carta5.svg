@@ -1,6 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="200" height="280">
-  <rect width="200" height="280" fill="#1c1412"/>
-  <rect x="5" y="5" width="190" height="270" fill="none" stroke="#a85a2a" stroke-width="2" rx="10"/>
-  <text x="100" y="100" text-anchor="middle" fill="#ffd6b5" font-size="16" font-weight="bold">Fuga Química</text>
-  <text x="100" y="180" text-anchor="middle" fill="#ffe9d6" font-size="12">Sustancias peligrosas</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280">
+  <defs>
+    <filter id="shadow5" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+  <rect x="2" y="2" width="196" height="276" rx="8" ry="8" fill="#2a2a3a" stroke="#3498db" stroke-width="4" filter="url(#shadow5)"/>
+  <text x="100" y="22" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="13" font-weight="bold">Obsidian</text>
+  <circle cx="22" cy="42" r="14" fill="#1a1a2e" stroke="#3498db" stroke-width="2"/>
+  <text x="22" y="47" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="14" font-weight="bold">2</text>
+  <rect x="15" y="65" width="170" height="110" rx="6" ry="6" fill="#3a3a4a"/>
+  <text x="100" y="130" text-anchor="middle" fill="#7c3aed" font-family="monospace, sans-serif" font-size="40" font-weight="bold">OB</text>
+  <text x="100" y="195" text-anchor="middle" fill="#cccccc" font-family="Arial, sans-serif" font-size="9">Toma notas y conecta ideas con grafos de conocimiento.</text>
+  <rect x="15" y="215" width="50" height="18" rx="9" ry="9" fill="#3498db"/>
+  <text x="40" y="227" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="8" font-weight="bold">Estudio</text>
+  <rect x="70" y="215" width="55" height="18" rx="9" ry="9" fill="#e67e22"/>
+  <text x="97" y="227" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="8" font-weight="bold">Trabajo</text>
+  <rect x="10" y="240" width="180" height="28" fill="#1a1a2e"/>
+  <circle cx="30" cy="254" r="7" fill="none" stroke="#ffffff" stroke-width="1.5"/>
+  <line x1="30" y1="250" x2="30" y2="254" stroke="#ffffff" stroke-width="1.5"/>
+  <line x1="30" y1="254" x2="33" y2="257" stroke="#ffffff" stroke-width="1.5"/>
+  <text x="105" y="258" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="12" font-weight="bold">2 horas</text>
 </svg>

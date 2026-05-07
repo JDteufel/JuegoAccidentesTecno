@@ -1,3 +1,5 @@
+import { GestorAjusteRatio } from './GestorAjusteRatio.js'
+
 export class VistaListaBase {
   constructor() {
     this.onVolverCallback = null
@@ -10,6 +12,7 @@ export class VistaListaBase {
 
   crear() {
     const configuracion = this.obtenerConfiguracionLista()
+    const esMovil = GestorAjusteRatio.esMovil()
 
     const container = document.createElement('div')
     container.id = configuracion.nombreOverlay
@@ -22,6 +25,8 @@ export class VistaListaBase {
       background: rgba(12, 9, 8, 0.64);
       z-index: 100;
       font-family: 'Comic Sans MS', cursive;
+      padding: ${esMovil ? '12px' : '20px'};
+      box-sizing: border-box;
     `
     document.body.appendChild(container)
     this.containerEl = container
@@ -30,17 +35,18 @@ export class VistaListaBase {
     tarjeta.style.cssText = `
       width: 720px;
       max-width: 92vw;
-      height: 620px;
+      height: auto;
       max-height: 90vh;
-      border-radius: 28px;
+      border-radius: ${esMovil ? '18px' : '28px'};
       border: 2px solid #8e4d22;
       background: rgba(28, 21, 18, 0.95);
       box-shadow: 0 14px 22px rgba(0,0,0,0.4);
-      padding: 40px;
+      padding: ${esMovil ? '24px 18px' : '40px'};
       display: flex;
       flex-direction: column;
       align-items: center;
       position: relative;
+      overflow-y: auto;
     `
     container.appendChild(tarjeta)
     this.tarjetaEl = tarjeta
@@ -49,8 +55,8 @@ export class VistaListaBase {
     this.tituloEl.textContent = configuracion.titulo
     this.tituloEl.style.cssText = `
       color: #ffe4cf;
-      font-size: 30px;
-      margin: 0 0 30px 0;
+      font-size: ${esMovil ? '24px' : '30px'};
+      margin: 0 0 ${esMovil ? '20px' : '30px'} 0;
       text-align: center;
     `
     tarjeta.appendChild(this.tituloEl)
@@ -69,8 +75,8 @@ export class VistaListaBase {
     this.errorEl = document.createElement('div')
     this.errorEl.style.cssText = `
       color: #ff6b6b;
-      font-size: 16px;
-      height: 40px;
+      font-size: ${esMovil ? '14px' : '16px'};
+      min-height: 40px;
       text-align: center;
       visibility: hidden;
       margin-top: 10px;
@@ -88,15 +94,16 @@ export class VistaListaBase {
   }
 
   _crearItemInfo({ nombre, texto, alterno = false }) {
+    const esMovil = GestorAjusteRatio.esMovil()
     const bloque = document.createElement('div')
     bloque.style.cssText = `
-      width: 78%;
-      height: 52px;
+      width: ${esMovil ? '92%' : '78%'};
+      min-height: ${esMovil ? '48px' : '52px'};
       border-radius: 14px;
       background: ${alterno ? '#3a2a24' : '#2f221d'};
       display: flex;
       align-items: center;
-      padding: 0 18px;
+      padding: 0 ${esMovil ? '14px' : '18px'};
       box-sizing: border-box;
       margin-bottom: 8px;
     `
@@ -105,8 +112,9 @@ export class VistaListaBase {
     textoEl.textContent = texto
     textoEl.style.cssText = `
       color: #ffe2cc;
-      font-size: 18px;
+      font-size: ${esMovil ? '16px' : '18px'};
       font-family: 'Comic Sans MS', cursive;
+      line-height: 1.4;
     `
     bloque.appendChild(textoEl)
 
@@ -114,30 +122,44 @@ export class VistaListaBase {
   }
 
   _crearBoton(texto, fondo, color, callback) {
+    const esMovil = GestorAjusteRatio.esMovil()
     const btn = document.createElement('button')
     btn.textContent = texto
     btn.style.cssText = `
-      width: 320px;
+      width: ${esMovil ? '90%' : '320px'};
+      max-width: 320px;
       height: 52px;
+      min-height: 48px;
       border: none;
       border-radius: 18px;
       background: ${fondo};
       color: ${color};
-      font-size: 21px;
+      font-size: ${esMovil ? '18px' : '21px'};
       font-family: 'Comic Sans MS', cursive;
       cursor: pointer;
       transition: transform 0.2s, opacity 0.2s;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     `
-    btn.addEventListener('mouseenter', () => {
-      btn.style.opacity = '0.85'
-      btn.style.transform = 'scale(1.05)'
-    })
-    btn.addEventListener('mouseleave', () => {
-      btn.style.opacity = '1'
-      btn.style.transform = 'scale(1)'
-    })
+    this._agregarFeedbackBoton(btn)
     btn.addEventListener('click', callback)
     return btn
+  }
+
+  _agregarFeedbackBoton(btn) {
+    const aplicarActivo = () => {
+      btn.style.opacity = '0.85'
+      btn.style.transform = 'scale(0.98)'
+    }
+    const removerActivo = () => {
+      btn.style.opacity = '1'
+      btn.style.transform = 'scale(1)'
+    }
+    btn.addEventListener('mouseenter', aplicarActivo)
+    btn.addEventListener('mouseleave', removerActivo)
+    btn.addEventListener('touchstart', aplicarActivo, { passive: true })
+    btn.addEventListener('touchend', removerActivo, { passive: true })
+    btn.addEventListener('touchcancel', removerActivo, { passive: true })
   }
 
   obtenerConfiguracionLista() {

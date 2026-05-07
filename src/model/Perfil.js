@@ -1,140 +1,87 @@
 export class Perfil {
-  constructor({ nombre, horasRequeridas, categoriasValidas, descripcion }) {
+  constructor({ nombre, horasPorCategoria, categoriasValidas, descripcion }) {
     this.nombre = nombre
-    this.horasRequeridas = horasRequeridas
+    this.horasPorCategoria = horasPorCategoria || {}
     this.categoriasValidas = categoriasValidas
     this.descripcion = descripcion
-    this.horasCompletadas = 0
+    this.horasCompletadasPorCategoria = {}
     this.completado = false
+
+    Object.keys(this.horasPorCategoria).forEach(cat => {
+      this.horasCompletadasPorCategoria[cat] = 0
+    })
   }
 
-  agregarHoras(horas) {
-    this.horasCompletadas += horas
-    if (this.horasCompletadas >= this.horasRequeridas) {
-      this.horasCompletadas = this.horasRequeridas
-      this.completado = true
+  get horasRequeridas() {
+    return Object.values(this.horasPorCategoria).reduce((sum, h) => sum + h, 0)
+  }
+
+  get horasCompletadas() {
+    return Object.values(this.horasCompletadasPorCategoria).reduce((sum, h) => sum + h, 0)
+  }
+
+  agregarHoras(horas, tipoHora) {
+    const tipo = tipoHora || Object.keys(this.horasPorCategoria)[0]
+    if (this.horasCompletadasPorCategoria[tipo] !== undefined) {
+      const maximo = this.horasPorCategoria[tipo]
+      const actual = this.horasCompletadasPorCategoria[tipo]
+      this.horasCompletadasPorCategoria[tipo] = Math.min(actual + horas, maximo)
     }
+    this.verificarCompletado()
+  }
+
+  verificarCompletado() {
+    this.completado = Object.keys(this.horasPorCategoria).every(cat => {
+      return this.horasCompletadasPorCategoria[cat] >= this.horasPorCategoria[cat]
+    })
   }
 
   getProgreso() {
-    return Math.min(this.horasCompletadas / this.horasRequeridas, 1)
+    const totalRequerido = this.horasRequeridas
+    if (totalRequerido === 0) return 0
+    return Math.min(this.horasCompletadas / totalRequerido, 1)
   }
 
-  cartaEsValida(categoria) {
-    return this.categoriasValidas.includes(categoria)
+  getProgresoPorCategoria(tipoHora) {
+    const requerido = this.horasPorCategoria[tipoHora] || 0
+    if (requerido === 0) return 0
+    const completado = this.horasCompletadasPorCategoria[tipoHora] || 0
+    return Math.min(completado / requerido, 1)
+  }
+
+  cartaEsValida(categorias) {
+    const cats = Array.isArray(categorias) ? categorias : [categorias]
+    return cats.some(cat => this.categoriasValidas.includes(cat))
   }
 
   reset() {
-    this.horasCompletadas = 0
+    Object.keys(this.horasCompletadasPorCategoria).forEach(cat => {
+      this.horasCompletadasPorCategoria[cat] = 0
+    })
     this.completado = false
   }
 
   toJSON() {
     return {
+      tipo: this.constructor.name,
       nombre: this.nombre,
-      horasRequeridas: this.horasRequeridas,
+      horasPorCategoria: this.horasPorCategoria,
       categoriasValidas: this.categoriasValidas,
       descripcion: this.descripcion,
-      horasCompletadas: this.horasCompletadas,
+      horasCompletadasPorCategoria: this.horasCompletadasPorCategoria,
       completado: this.completado
     }
   }
 
   static fromJSON(json) {
-    const perfil = new Perfil(json)
-    perfil.horasCompletadas = json.horasCompletadas || 0
+    const perfil = new this(json)
+    perfil.horasCompletadasPorCategoria = json.horasCompletadasPorCategoria || {}
     perfil.completado = json.completado || false
+    Object.keys(perfil.horasPorCategoria).forEach(cat => {
+      if (perfil.horasCompletadasPorCategoria[cat] === undefined) {
+        perfil.horasCompletadasPorCategoria[cat] = 0
+      }
+    })
     return perfil
   }
-}
-
-export const PERFILES_PREDETERMINADOS = [
-  {
-    nombre: 'Analista de Sistemas',
-    horasRequeridas: 6,
-    categoriasValidas: ['Trabajo', 'Gestion', 'Desarrollo'],
-    descripcion: 'Analiza y optimiza sistemas tecnologicos.'
-  },
-  {
-    nombre: 'Desarrollador Full Stack',
-    horasRequeridas: 8,
-    categoriasValidas: ['Desarrollo', 'Gestion', 'Nube'],
-    descripcion: 'Desarrolla aplicaciones de extremo a extremo.'
-  },
-  {
-    nombre: 'Especialista en Redes',
-    horasRequeridas: 6,
-    categoriasValidas: ['Red', 'Seguridad'],
-    descripcion: 'Administra infraestructura de redes.'
-  },
-  {
-    nombre: 'Cientifico de Datos',
-    horasRequeridas: 8,
-    categoriasValidas: ['Datos', 'Inteligencia Artificial', 'Nube'],
-    descripcion: 'Analiza datos y crea modelos predictivos.'
-  },
-  {
-    nombre: 'Administrador de Bases de Datos',
-    horasRequeridas: 6,
-    categoriasValidas: ['Datos', 'Gestion', 'Seguridad'],
-    descripcion: 'Administra y optimiza bases de datos.'
-  },
-  {
-    nombre: 'Ingeniero de Software',
-    horasRequeridas: 8,
-    categoriasValidas: ['Desarrollo', 'Gestion', 'Trabajo'],
-    descripcion: 'Diseña y desarrolla soluciones software.'
-  },
-  {
-    nombre: 'Especialista en Seguridad',
-    horasRequeridas: 6,
-    categoriasValidas: ['Seguridad', 'Red', 'Datos'],
-    descripcion: 'Protege sistemas de amenazas.'
-  },
-  {
-    nombre: 'Arquitecto de Soluciones',
-    horasRequeridas: 8,
-    categoriasValidas: ['Gestion', 'Desarrollo', 'Nube'],
-    descripcion: 'Disena arquitecturas tecnologicas.'
-  },
-  {
-    nombre: 'Desarrollador DevOps',
-    horasRequeridas: 6,
-    categoriasValidas: ['Desarrollo', 'Red', 'Gestion'],
-    descripcion: 'Automatiza procesos de desarrollo.'
-  },
-  {
-    nombre: 'Especialista en Cloud',
-    horasRequeridas: 6,
-    categoriasValidas: ['Nube', 'Red', 'Seguridad'],
-    descripcion: 'Administra servicios en la nube.'
-  },
-  {
-    nombre: 'Analista de IA',
-    horasRequeridas: 8,
-    categoriasValidas: ['Inteligencia Artificial', 'Datos', 'Desarrollo'],
-    descripcion: 'Desarrolla modelos de inteligencia artificial.'
-  },
-  {
-    nombre: 'Gerente de Proyectos TI',
-    horasRequeridas: 6,
-    categoriasValidas: ['Gestion', 'Trabajo', 'Comunicacion'],
-    descripcion: 'Lidera proyectos tecnologicos.'
-  }
-]
-
-export function seleccionarPerfilAleatorio() {
-  const indiceAleatorio = Math.floor(Math.random() * PERFILES_PREDETERMINADOS.length)
-  return new Perfil(PERFILES_PREDETERMINADOS[indiceAleatorio])
-}
-
-export function seleccionarPerfilAleatorioExcluyendo(excluidos = []) {
-  const disponibles = PERFILES_PREDETERMINADOS.filter(
-    p => !excluidos.some(e => e.nombre === p.nombre)
-  )
-  if (disponibles.length === 0) {
-    return new Perfil(PERFILES_PREDETERMINADOS[Math.floor(Math.random() * PERFILES_PREDETERMINADOS.length)])
-  }
-  const indiceAleatorio = Math.floor(Math.random() * disponibles.length)
-  return new Perfil(disponibles[indiceAleatorio])
 }

@@ -1,3 +1,5 @@
+import { GestorAjusteRatio } from './GestorAjusteRatio.js'
+
 export class VistaFormularioBase {
   constructor() {
     this.onVolverCallback = null
@@ -11,6 +13,7 @@ export class VistaFormularioBase {
 
   crear() {
     const configuracion = this.obtenerConfiguracionFormulario()
+    const esMovil = GestorAjusteRatio.esMovil()
 
     const container = document.createElement('div')
     container.id = configuracion.nombreOverlay
@@ -23,6 +26,8 @@ export class VistaFormularioBase {
       background: rgba(12, 9, 8, 0.64);
       z-index: 100;
       font-family: 'Comic Sans MS', cursive;
+      padding: ${esMovil ? '12px' : '20px'};
+      box-sizing: border-box;
     `
     document.body.appendChild(container)
     this.containerEl = container
@@ -31,17 +36,19 @@ export class VistaFormularioBase {
     tarjeta.style.cssText = `
       width: 720px;
       max-width: 92vw;
-      height: 620px;
+      height: auto;
+      min-height: ${esMovil ? 'auto' : '400px'};
       max-height: 90vh;
-      border-radius: 28px;
+      border-radius: ${esMovil ? '18px' : '28px'};
       border: 2px solid #8e4d22;
       background: rgba(28, 21, 18, 0.95);
       box-shadow: 0 14px 22px rgba(0,0,0,0.4);
-      padding: 40px;
+      padding: ${esMovil ? '24px 18px' : '40px'};
       display: flex;
       flex-direction: column;
       align-items: center;
       position: relative;
+      overflow-y: auto;
     `
     container.appendChild(tarjeta)
     this.tarjetaEl = tarjeta
@@ -50,8 +57,8 @@ export class VistaFormularioBase {
     titulo.textContent = configuracion.titulo
     titulo.style.cssText = `
       color: #ffe4cf;
-      font-size: 30px;
-      margin: 0 0 30px 0;
+      font-size: ${esMovil ? '24px' : '30px'};
+      margin: 0 0 ${esMovil ? '20px' : '30px'} 0;
       text-align: center;
     `
     tarjeta.appendChild(titulo)
@@ -66,8 +73,8 @@ export class VistaFormularioBase {
     this.errorEl = document.createElement('div')
     this.errorEl.style.cssText = `
       color: #ff6b6b;
-      font-size: 16px;
-      height: 40px;
+      font-size: ${esMovil ? '14px' : '16px'};
+      min-height: 40px;
       text-align: center;
       visibility: hidden;
       margin-top: 10px;
@@ -96,22 +103,27 @@ export class VistaFormularioBase {
   }
 
   _crearCampoEntrada({ nombre, placeholder, isPassword = false, showPasswordButton = false }) {
+    const esMovil = GestorAjusteRatio.esMovil()
     const wrapper = document.createElement('div')
     wrapper.style.cssText = `
       display: flex;
       align-items: center;
       gap: 8px;
       margin-bottom: 12px;
-      width: 76%;
+      width: ${esMovil ? '90%' : '76%'};
       max-width: 520px;
     `
 
     const input = document.createElement('input')
     input.type = isPassword ? 'password' : 'text'
     input.placeholder = placeholder
+    input.autocomplete = 'off'
+    input.autocorrect = 'off'
+    input.autocapitalize = 'off'
+    input.spellcheck = false
     input.style.cssText = `
       flex: 1;
-      height: 54px;
+      height: ${esMovil ? '48px' : '54px'};
       padding: 0 14px;
       color: #fff2e8;
       background: #2b211d;
@@ -121,6 +133,7 @@ export class VistaFormularioBase {
       font-family: 'Comic Sans MS', cursive;
       outline: none;
       transition: background 0.2s;
+      -webkit-appearance: none;
     `
     input.addEventListener('focus', () => input.style.background = '#352821')
     input.addEventListener('blur', () => input.style.background = '#2b211d')
@@ -132,8 +145,8 @@ export class VistaFormularioBase {
       toggleBtn = document.createElement('button')
       toggleBtn.textContent = 'Ver'
       toggleBtn.style.cssText = `
-        width: 80px;
-        height: 54px;
+        width: ${esMovil ? '70px' : '80px'};
+        height: ${esMovil ? '48px' : '54px'};
         color: #ffd8bc;
         background: #4a3328;
         border: 2px solid #8e4d22;
@@ -142,9 +155,10 @@ export class VistaFormularioBase {
         font-family: 'Comic Sans MS', cursive;
         cursor: pointer;
         transition: opacity 0.2s;
+        -webkit-tap-highlight-color: transparent;
+        flex-shrink: 0;
       `
-      toggleBtn.addEventListener('mouseenter', () => toggleBtn.style.opacity = '0.85')
-      toggleBtn.addEventListener('mouseleave', () => toggleBtn.style.opacity = '1')
+      this._agregarFeedbackBoton(toggleBtn)
 
       let passwordVisible = false
       toggleBtn.addEventListener('click', () => {
@@ -166,30 +180,44 @@ export class VistaFormularioBase {
   }
 
   _crearBoton(texto, fondo, color, callback) {
+    const esMovil = GestorAjusteRatio.esMovil()
     const btn = document.createElement('button')
     btn.textContent = texto
     btn.style.cssText = `
-      width: 320px;
+      width: ${esMovil ? '90%' : '320px'};
+      max-width: 320px;
       height: 52px;
+      min-height: 48px;
       border: none;
       border-radius: 18px;
       background: ${fondo};
       color: ${color};
-      font-size: 21px;
+      font-size: ${esMovil ? '18px' : '21px'};
       font-family: 'Comic Sans MS', cursive;
       cursor: pointer;
       transition: transform 0.2s, opacity 0.2s;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     `
-    btn.addEventListener('mouseenter', () => {
-      btn.style.opacity = '0.85'
-      btn.style.transform = 'scale(1.05)'
-    })
-    btn.addEventListener('mouseleave', () => {
-      btn.style.opacity = '1'
-      btn.style.transform = 'scale(1)'
-    })
+    this._agregarFeedbackBoton(btn)
     btn.addEventListener('click', callback)
     return btn
+  }
+
+  _agregarFeedbackBoton(btn) {
+    const aplicarActivo = () => {
+      btn.style.opacity = '0.85'
+      btn.style.transform = 'scale(0.98)'
+    }
+    const removerActivo = () => {
+      btn.style.opacity = '1'
+      btn.style.transform = 'scale(1)'
+    }
+    btn.addEventListener('mouseenter', aplicarActivo)
+    btn.addEventListener('mouseleave', removerActivo)
+    btn.addEventListener('touchstart', aplicarActivo, { passive: true })
+    btn.addEventListener('touchend', removerActivo, { passive: true })
+    btn.addEventListener('touchcancel', removerActivo, { passive: true })
   }
 
   _configurarNavegacionEnter() {
@@ -254,7 +282,9 @@ export class VistaFormularioBase {
 
   mostrar() {
     if (this.containerEl) this.containerEl.style.display = 'flex'
-    this._enfocarPrimerCampo()
+    if (!GestorAjusteRatio.esMovil()) {
+      this._enfocarPrimerCampo()
+    }
   }
 
   ocultar() {

@@ -6,6 +6,34 @@ export class GestorAjusteRatio {
     maxHeightRatio: 0.8
   }
 
+  static esMovil() {
+    return window.innerWidth <= 768 || ('ontouchstart' in window && window.innerWidth < 1024)
+  }
+
+  static esTablet() {
+    return window.innerWidth > 768 && window.innerWidth <= 1024
+  }
+
+  static esEscritorio() {
+    return window.innerWidth > 1024
+  }
+
+  static esLandscape() {
+    return window.innerWidth > window.innerHeight
+  }
+
+  static esPortrait() {
+    return window.innerWidth <= window.innerHeight
+  }
+
+  static obtenerFactorEscala() {
+    const ancho = window.innerWidth
+    const alto = window.innerHeight
+    const idealW = GestorAjusteRatio.DEFAULTS.idealWidth
+    const idealH = GestorAjusteRatio.DEFAULTS.idealHeight
+    return Math.min(ancho / idealW, alto / idealH, 1)
+  }
+
   static configurarGUI(guiTexture, options = {}) {
     if (!guiTexture) return guiTexture
 
@@ -40,6 +68,12 @@ export class GestorAjusteRatio {
     return { ancho, alto }
   }
 
+  static calcularTamanoResponsive(tamanoBase, tamanoMovil, tamanoTablet) {
+    if (GestorAjusteRatio.esMovil()) return tamanoMovil
+    if (GestorAjusteRatio.esTablet()) return tamanoTablet || tamanoBase
+    return tamanoBase
+  }
+
   static crearAjustadorElemento(element, options = {}) {
     if (!element) {
       return () => {}
@@ -63,5 +97,17 @@ export class GestorAjusteRatio {
     return () => {
       window.removeEventListener('resize', aplicarTamano)
     }
+  }
+
+  static aplicarEstilosResponsive(estilos) {
+    const sufijo = GestorAjusteRatio.esMovil() ? 'Movil' : GestorAjusteRatio.esTablet() ? 'Tablet' : ''
+
+    const estilosAplicar = {}
+    for (const [clave, valor] of Object.entries(estilos)) {
+      const claveSufijo = clave + sufijo
+      estilosAplicar[clave] = estilos[claveSufijo] !== undefined ? estilos[claveSufijo] : valor
+    }
+
+    return estilosAplicar
   }
 }

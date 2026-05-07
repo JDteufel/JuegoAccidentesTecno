@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280">
+  <defs>
+    <filter id="shadow9" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+  <rect x="2" y="2" width="196" height="276" rx="8" ry="8" fill="#2a2a3a" stroke="#e67e22" stroke-width="4" filter="url(#shadow9)"/>
+  <text x="100" y="22" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="13" font-weight="bold">Phishing Masivo</text>
+  <polygon points="15,10 19,17 11,17" fill="#e67e22" stroke="#e67e22" stroke-width="0.5"/>
+  <rect x="15" y="65" width="170" height="110" rx="6" ry="6" fill="#3a3a4a"/>
+  <text x="100" y="130" text-anchor="middle" fill="#e67e22" font-family="monospace, sans-serif" font-size="40" font-weight="bold">PM</text>
+  <rect x="60" y="185" width="80" height="22" rx="11" ry="11" fill="#e67e22"/>
+  <text x="100" y="200" text-anchor="middle" fill="#1a1a2e" font-family="Arial, sans-serif" font-size="11" font-weight="bold">Nivel 2</text>
+  <rect x="67" y="215" width="65" height="18" rx="9" ry="9" fill="#e67e22"/>
+  <text x="100" y="227" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="9" font-weight="bold">Trabajo</text>
+  <rect x="10" y="240" width="180" height="28" rx="0" ry="0" fill="#1a1a2e"/>
+  <polygon points="25,246 30,255 20,255" fill="#e67e22"/>
+  <text x="105" y="258" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="12" font-weight="bold" letter-spacing="2">ACCIDENTE</text>
+</svg>

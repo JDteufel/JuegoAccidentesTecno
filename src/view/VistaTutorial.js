@@ -70,8 +70,8 @@ export class VistaTutorial {
       position: absolute;
       top: -20px;
       right: -20px;
-      width: 40px;
-      height: 40px;
+      width: 44px;
+      height: 44px;
       border: 2px solid rgba(255, 216, 188, 0.85);
       border-radius: 50%;
       background: rgba(54, 41, 36, 0.9);
@@ -81,13 +81,22 @@ export class VistaTutorial {
       font-family: 'Comic Sans MS', cursive;
       cursor: pointer;
       transition: transform 0.2s, opacity 0.2s;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     `
-    btnCerrar.addEventListener('mouseenter', () => {
-      btnCerrar.style.transform = 'scale(1.05)'
-    })
-    btnCerrar.addEventListener('mouseleave', () => {
+    const aplicarActivo = () => {
+      btnCerrar.style.transform = 'scale(0.95)'
+      btnCerrar.style.opacity = '0.85'
+    }
+    const removerActivo = () => {
       btnCerrar.style.transform = 'scale(1)'
-    })
+      btnCerrar.style.opacity = '1'
+    }
+    btnCerrar.addEventListener('mouseenter', aplicarActivo)
+    btnCerrar.addEventListener('mouseleave', removerActivo)
+    btnCerrar.addEventListener('touchstart', aplicarActivo, { passive: true })
+    btnCerrar.addEventListener('touchend', removerActivo, { passive: true })
+    btnCerrar.addEventListener('touchcancel', removerActivo, { passive: true })
     contenedorVideo.appendChild(btnCerrar)
     this.botonCerrar = btnCerrar
   }

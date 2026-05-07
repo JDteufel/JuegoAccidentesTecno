@@ -3,7 +3,7 @@ const cors = require('cors');
 require('dotenv').config();
 
 const connectDB = require('./config/database');
-const usuariosRoutes = require('./routes/usuarios');
+const gameMastersRoutes = require('./routes/gameMasters');
 const logsRoutes = require('./routes/logs');
 
 const app = express();
@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-app.use('/api/usuarios', usuariosRoutes);
+app.use('/api/usuarios', gameMastersRoutes);
 app.use('/api/logs', logsRoutes);
 
 app.get('/health', (req, res) => {

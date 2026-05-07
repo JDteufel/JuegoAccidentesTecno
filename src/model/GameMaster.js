@@ -1,7 +1,7 @@
-export class Usuario {
+export class GameMaster {
   constructor(username) {
     this.username = username
-    this.tipo = 'registrado'
+    this.tipo = 'gamemaster'
     this.fechaRegistro = new Date().toISOString()
     this.ultimaSesion = null
   }

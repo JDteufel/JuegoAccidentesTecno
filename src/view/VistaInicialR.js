@@ -42,7 +42,7 @@ export class VistaInicialR {
     container.appendChild(panelAcciones)
 
     const titulo = document.createElement('h2')
-    titulo.textContent = 'Menú de Usuario Registrado'
+    titulo.textContent = 'Menú de Gamemaster'
     titulo.style.cssText = `
       color: #ffd9bd;
       font-size: 24px;
@@ -121,15 +121,22 @@ export class VistaInicialR {
       font-family: 'Comic Sans MS', cursive;
       cursor: pointer;
       transition: transform 0.2s, opacity 0.2s;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     `
-    btn.addEventListener('mouseenter', () => {
+    const aplicarActivo = () => {
       btn.style.opacity = '0.85'
-      btn.style.transform = 'scale(1.05)'
-    })
-    btn.addEventListener('mouseleave', () => {
+      btn.style.transform = 'scale(0.98)'
+    }
+    const removerActivo = () => {
       btn.style.opacity = '1'
       btn.style.transform = 'scale(1)'
-    })
+    }
+    btn.addEventListener('mouseenter', aplicarActivo)
+    btn.addEventListener('mouseleave', removerActivo)
+    btn.addEventListener('touchstart', aplicarActivo, { passive: true })
+    btn.addEventListener('touchend', removerActivo, { passive: true })
+    btn.addEventListener('touchcancel', removerActivo, { passive: true })
     btn.addEventListener('click', callback)
     return btn
   }

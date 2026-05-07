@@ -12,7 +12,7 @@ async function cleanupDB() {
       console.log(`  - ${col.name}`);
     });
     console.log('');
-    const collectionsToDelete = ['usuarios', 'logs'];
+    const collectionsToDelete = ['gamemasters', 'logs'];
     for (const colName of collectionsToDelete) {
       const exists = collections.some(col => col.name === colName);
       if (exists) {
@@ -24,7 +24,7 @@ async function cleanupDB() {
       }
     }
     console.log('[Cleanup] Verificando colecciones correctas...');
-    const correctCollections = ['Usuarios', 'Logs'];
+    const correctCollections = ['GameMasters', 'Logs'];
     const updatedCollections = await db.listCollections().toArray();
     correctCollections.forEach(colName => {
       const exists = updatedCollections.some(col => col.name === colName);

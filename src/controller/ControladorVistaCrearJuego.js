@@ -45,8 +45,8 @@ export class ControladorVistaCrearJuego {
       }
 
       const pantallaRetorno =
-        this.estadoApp.tipoJugador === TIPOS_JUGADOR.REGISTRADO
-          ? PANTALLAS.INICIAL_REGISTRADO
+        this.estadoApp.tipoJugador === TIPOS_JUGADOR.GAMEMASTER
+          ? PANTALLAS.INICIAL_GAMEMASTER
           : PANTALLAS.INICIAL_PUBLICA
 
       this.controladorEstadoApp.irAPantalla(pantallaRetorno)

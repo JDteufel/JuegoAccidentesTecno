@@ -1,0 +1,552 @@
+#gestionContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  background: rgba(12, 9, 8, 0.64);
+  z-index: 100;
+  font-family: 'Comic Sans MS', cursive;
+}
+
+#gestionContainer .tarjeta-gestion {
+  width: 1300px;
+  max-width: 95vw;
+  min-height: 660px;
+  background: rgba(28, 21, 18, 0.95);
+  border: 2px solid #8e4d22;
+  border-radius: 28px;
+  box-shadow: 0 0 22px rgba(0, 0, 0, 0.4);
+  padding: 50px 40px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+#gestionContainer .titulo-gestion {
+  color: #ffe4cf;
+  font-size: 28px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+#gestionContainer .header-row {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 25px;
+}
+
+#gestionContainer .codigo-lobby {
+  color: #cf8a34;
+  font-size: 20px;
+  min-width: 200px;
+}
+
+#gestionContainer .contador-jugadores {
+  color: #f4cbaa;
+  font-size: 18px;
+  min-width: 200px;
+  text-align: right;
+}
+
+#gestionContainer .main-area {
+  display: flex;
+  gap: 40px;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+#gestionContainer .pool-jugadores {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(4, auto);
+  gap: 4px;
+  width: 520px;
+  min-width: 400px;
+  align-content: start;
+}
+
+#gestionContainer .salas-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 12px;
+  width: 720px;
+  min-width: 500px;
+}
+
+#gestionContainer .jugador-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  padding: 2px;
+  position: relative;
+  z-index: 1;
+  user-select: none;
+  justify-self: center;
+}
+
+#gestionContainer .jugador-chip.dragging {
+  position: fixed;
+  z-index: 1000;
+  cursor: grabbing;
+  pointer-events: none;
+}
+
+#gestionContainer .jugador-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid #5a4a3a;
+  background: rgba(30, 22, 18, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s, background 0.2s;
+  flex-shrink: 0;
+}
+
+#gestionContainer .jugador-circle.activo {
+  border-color: #cf8a34;
+  background: rgba(60, 45, 39, 0.9);
+}
+
+#gestionContainer .jugador-circle.activo-par {
+  border-color: #cf8a34;
+  background: rgba(47, 34, 29, 0.9);
+}
+
+#gestionContainer .jugador-circle.dragging {
+  border-color: #cf8a34;
+  transform: scale(1.2);
+  box-shadow: 0 0 15px rgba(207, 138, 52, 0.5);
+}
+
+#gestionContainer .jugador-letra {
+  color: #8a7a6a;
+  font-size: 13px;
+  line-height: 1;
+}
+
+#gestionContainer .jugador-letra.activo {
+  color: #ffe4cf;
+}
+
+#gestionContainer .jugador-nombre {
+  color: #8a7a6a;
+  font-size: 10px;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 60px;
+  text-align: center;
+}
+
+#gestionContainer .jugador-nombre.activo {
+  color: #d6a98a;
+}
+
+#gestionContainer .sala-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 10px;
+}
+
+#gestionContainer .sala-tablero {
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+  border: 2px solid #5a4a3a;
+  background: rgba(30, 22, 18, 0.5);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 8px;
+  padding: 10px;
+  box-sizing: border-box;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+#gestionContainer .sala-tablero.activa {
+  border-color: #8e4d22;
+}
+
+#gestionContainer .sala-tablero.activa-par {
+  background: rgba(47, 34, 29, 0.8);
+}
+
+#gestionContainer .sala-tablero.activa-impar {
+  background: rgba(58, 42, 36, 0.8);
+}
+
+#gestionContainer .sala-slot-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+}
+
+#gestionContainer .slot-circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid #5a4a3a;
+  background: rgba(30, 22, 18, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+#gestionContainer .slot-circle.resaltado {
+  border-color: #cf8a34;
+  border-width: 3px;
+}
+
+#gestionContainer .slot-circle.ocupado {
+  border-color: #4a8c3f;
+  background: rgba(74, 140, 63, 0.3);
+}
+
+#gestionContainer .slot-letra {
+  color: #5a4a3a;
+  font-size: 12px;
+  line-height: 1;
+}
+
+#gestionContainer .slot-letra.ocupado {
+  color: #a8e6a0;
+}
+
+#gestionContainer .slot-nombre {
+  color: #5a4a3a;
+  font-size: 8px;
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 40px;
+  text-align: center;
+}
+
+#gestionContainer .slot-nombre.ocupado {
+  color: #a8e6a0;
+}
+
+#gestionContainer .sala-titulo {
+  color: #8a7a6a;
+  font-size: 14px;
+  margin-top: 6px;
+}
+
+#gestionContainer .sala-titulo.activa {
+  color: #ffe4cf;
+}
+
+#gestionContainer .sala-error {
+  color: #ff6b6b;
+  font-size: 11px;
+  margin-top: 4px;
+  min-height: 16px;
+  text-align: center;
+  max-width: 120px;
+}
+
+#gestionContainer .boton-gestion {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 18px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+#gestionContainer .boton-gestion:hover {
+  opacity: 0.85;
+  transform: scale(1.05);
+}
+
+#gestionContainer .boton-gestion:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+#gestionContainer .boton-sala {
+  padding: 4px 14px;
+  border: none;
+  border-radius: 12px;
+  background: #8e4d22;
+  color: #ffe4cf;
+  font-size: 12px;
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s;
+  margin-top: 6px;
+}
+
+#gestionContainer .boton-sala:hover {
+  opacity: 0.85;
+  transform: scale(1.05);
+}
+
+#gestionContainer .error-global {
+  color: #ff6b6b;
+  font-size: 16px;
+  height: 28px;
+  text-align: center;
+  visibility: hidden;
+  margin-bottom: 15px;
+}
+
+#gestionContainer .error-global.visible {
+  visibility: visible;
+}
+
+#gestionContainer .error-global.exito {
+  color: #4ade80;
+}
+
+#gestionContainer .buttons-row {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+
+/* ========== TABLET (769px - 1024px) ========== */
+@media (max-width: 1024px) {
+  #gestionContainer .tarjeta-gestion {
+    width: 95vw;
+    min-height: auto;
+    padding: 30px 20px 25px;
+  }
+
+  #gestionContainer .titulo-gestion {
+    font-size: 24px;
+  }
+
+  #gestionContainer .main-area {
+    gap: 20px;
+  }
+
+  #gestionContainer .pool-jugadores {
+    width: 45%;
+    min-width: unset;
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  #gestionContainer .salas-container {
+    width: 50%;
+    min-width: unset;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  #gestionContainer .sala-tablero {
+    width: 100px;
+    height: 100px;
+  }
+
+  #gestionContainer .boton-gestion {
+    padding: 8px 18px;
+    font-size: 14px;
+  }
+}
+
+/* ========== MOVIL (<= 768px) ========== */
+@media (max-width: 768px) {
+  #gestionContainer {
+    padding: 8px;
+    align-items: flex-start;
+    overflow-y: auto;
+  }
+
+  #gestionContainer .tarjeta-gestion {
+    width: 100%;
+    min-height: auto;
+    padding: 20px 12px 15px;
+    border-radius: 16px;
+    margin: 0;
+  }
+
+  #gestionContainer .titulo-gestion {
+    font-size: 20px;
+    margin-bottom: 12px;
+  }
+
+  #gestionContainer .header-row {
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 12px;
+    align-items: center;
+  }
+
+  #gestionContainer .codigo-lobby,
+  #gestionContainer .contador-jugadores {
+    min-width: unset;
+    font-size: 16px;
+    text-align: center;
+  }
+
+  #gestionContainer .main-area {
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 12px;
+    margin-bottom: 12px;
+  }
+
+  #gestionContainer .pool-jugadores {
+    width: 100%;
+    min-width: unset;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(4, auto);
+    gap: 2px;
+  }
+
+  #gestionContainer .salas-container {
+    width: 100%;
+    min-width: unset;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(4, auto);
+    gap: 8px;
+  }
+
+  #gestionContainer .sala-panel {
+    padding: 8px 4px;
+  }
+
+  #gestionContainer .sala-tablero {
+    width: 90px;
+    height: 90px;
+    padding: 6px;
+    gap: 4px;
+  }
+
+  #gestionContainer .jugador-circle {
+    width: 32px;
+    height: 32px;
+  }
+
+  #gestionContainer .jugador-letra {
+    font-size: 11px;
+  }
+
+  #gestionContainer .jugador-nombre {
+    font-size: 8px;
+    max-width: 40px;
+  }
+
+  #gestionContainer .slot-circle {
+    width: 26px;
+    height: 26px;
+  }
+
+  #gestionContainer .slot-letra {
+    font-size: 10px;
+  }
+
+  #gestionContainer .slot-nombre {
+    font-size: 7px;
+    max-width: 30px;
+  }
+
+  #gestionContainer .sala-titulo {
+    font-size: 12px;
+    margin-top: 4px;
+  }
+
+  #gestionContainer .sala-error {
+    font-size: 10px;
+    min-height: 14px;
+  }
+
+  #gestionContainer .boton-sala {
+    padding: 6px 12px;
+    font-size: 11px;
+    min-height: 32px;
+  }
+
+  #gestionContainer .boton-gestion {
+    padding: 10px 16px;
+    font-size: 14px;
+    min-height: 44px;
+    width: 100%;
+    max-width: 280px;
+  }
+
+  #gestionContainer .buttons-row {
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  #gestionContainer .error-global {
+    font-size: 14px;
+    height: auto;
+    min-height: 24px;
+    margin-bottom: 10px;
+  }
+}
+
+/* ========== MOVIL PEQUENO (<= 400px) ========== */
+@media (max-width: 400px) {
+  #gestionContainer .tarjeta-gestion {
+    padding: 16px 8px 12px;
+  }
+
+  #gestionContainer .titulo-gestion {
+    font-size: 18px;
+  }
+
+  #gestionContainer .pool-jugadores {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(8, auto);
+  }
+
+  #gestionContainer .salas-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  #gestionContainer .sala-tablero {
+    width: 75px;
+    height: 75px;
+    padding: 4px;
+    gap: 3px;
+  }
+
+  #gestionContainer .jugador-circle {
+    width: 28px;
+    height: 28px;
+  }
+
+  #gestionContainer .jugador-letra {
+    font-size: 10px;
+  }
+
+  #gestionContainer .jugador-nombre {
+    display: none;
+  }
+
+  #gestionContainer .slot-circle {
+    width: 22px;
+    height: 22px;
+  }
+
+  #gestionContainer .slot-nombre {
+    display: none;
+  }
+}
