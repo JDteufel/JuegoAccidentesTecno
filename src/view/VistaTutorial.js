@@ -78,7 +78,7 @@ export class VistaTutorial {
       color: #ffd8bc;
       font-size: 20px;
       font-weight: 700;
-      font-family: 'Comic Sans MS', cursive;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
       cursor: pointer;
       transition: transform 0.2s, opacity 0.2s;
       -webkit-tap-highlight-color: transparent;

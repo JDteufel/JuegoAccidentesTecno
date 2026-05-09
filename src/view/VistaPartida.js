@@ -1174,6 +1174,28 @@ export class VistaPartida {
       this.overlay.isVisible = true
       this.visible = true
 
+      const esMovil = window.innerWidth <= 768 || ('ontouchstart' in window && window.innerWidth < 1024)
+      const esPortrait = window.innerHeight > window.innerWidth
+
+      if (esMovil && esPortrait) {
+        this.hardwareScalingAnterior = this.engine.getHardwareScalingLevel()
+        this.engine.setHardwareScalingLevel(1 / window.devicePixelRatio)
+
+        const anchoReal = window.innerWidth
+        const altoReal = window.innerHeight
+
+        this.canvas.style.width = `${altoReal}px`
+        this.canvas.style.height = `${anchoReal}px`
+        this.canvas.style.transform = `rotate(90deg) translate(${(altoReal - anchoReal) / 2}px, ${(altoReal - anchoReal) / 2}px)`
+        this.canvas.style.transformOrigin = 'center center'
+        this.canvas.style.position = 'fixed'
+        this.canvas.style.top = '0'
+        this.canvas.style.left = '0'
+        this.canvas.style.zIndex = '1000'
+
+        this.engine.resize()
+      }
+
       this.actualizarCarruselAccidentes()
       this.actualizarHUDPerfil()
       this.actualizarPanelCartas()
@@ -1193,6 +1215,24 @@ export class VistaPartida {
       }
       this.overlay.isVisible = false
       this.visible = false
+
+      const esMovil = window.innerWidth <= 768 || ('ontouchstart' in window && window.innerWidth < 1024)
+      const esPortrait = window.innerHeight > window.innerWidth
+
+      if (esMovil && esPortrait && this.hardwareScalingAnterior !== undefined) {
+        this.engine.setHardwareScalingLevel(this.hardwareScalingAnterior)
+
+        this.canvas.style.width = '100%'
+        this.canvas.style.height = '100%'
+        this.canvas.style.transform = ''
+        this.canvas.style.position = ''
+        this.canvas.style.top = ''
+        this.canvas.style.left = ''
+        this.canvas.style.zIndex = ''
+
+        this.engine.resize()
+        this.hardwareScalingAnterior = undefined
+      }
     }
   }
 
@@ -1708,5 +1748,76 @@ export class VistaPartida {
 
   onIntercambioCarta(callback) {
     this.callbackIntercambioCarta = callback
+  }
+
+  onActivarActividadGrupal(callback) {
+    this.callbackActividadGrupal = callback
+  }
+
+  configurarActividades(actividades) {
+    this.actividades = actividades
+  }
+
+  mostrarMensajeActividadGrupal(actividad) {
+    this.mostrarMensajeFlotante(`Actividad grupal: ${actividad.nombre} - ${actividad.descripcion}`)
+  }
+
+  mostrarLogFinal(logJSON) {
+    const panel = new GUI.Rectangle('panelLogFinal')
+    panel.width = '700px'
+    panel.height = '500px'
+    panel.thickness = 3
+    panel.cornerRadius = 20
+    panel.color = '#8e4d22'
+    panel.background = 'rgba(28, 20, 16, 0.98)'
+    panel.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
+    panel.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
+    panel.zIndex = 2000
+    this.overlay.addControl(panel)
+
+    const titulo = new GUI.TextBlock('tituloLogFinal', 'Log de la Partida')
+    titulo.top = '-200px'
+    titulo.height = '50px'
+    titulo.color = '#ffe2c8'
+    titulo.fontSize = 26
+    titulo.fontFamily = 'Comic Sans MS'
+    titulo.fontWeight = 'bold'
+    panel.addControl(titulo)
+
+    const scrollViewer = new GUI.ScrollViewer('scrollLog')
+    scrollViewer.width = '640px'
+    scrollViewer.height = '340px'
+    scrollViewer.top = '-130px'
+    scrollViewer.thickness = 2
+    scrollViewer.color = '#8e4d22'
+    scrollViewer.background = 'rgba(18, 14, 13, 0.9)'
+    scrollViewer.cornerRadius = 10
+    panel.addControl(scrollViewer)
+
+    const textoLog = new GUI.TextBlock('textoLogFinal', logJSON)
+    textoLog.width = '620px'
+    textoLog.height = '800px'
+    textoLog.color = '#e7cfbc'
+    textoLog.fontSize = 11
+    textoLog.fontFamily = 'monospace'
+    textoLog.textWrapping = true
+    textoLog.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
+    textoLog.textVerticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP
+    scrollViewer.addControl(textoLog)
+
+    const btnCerrar = GUI.Button.CreateSimpleButton('btnCerrarLog', 'Cerrar')
+    btnCerrar.width = '150px'
+    btnCerrar.height = '44px'
+    btnCerrar.top = '200px'
+    btnCerrar.background = '#d66a1f'
+    btnCerrar.color = '#fff7ef'
+    btnCerrar.cornerRadius = 14
+    btnCerrar.fontSize = 16
+    btnCerrar.fontFamily = 'Comic Sans MS'
+    btnCerrar.fontWeight = 'bold'
+    btnCerrar.onPointerUpObservable.add(() => {
+      panel.dispose()
+    })
+    panel.addControl(btnCerrar)
   }
 }

@@ -25,7 +25,7 @@ export class VistaFormularioBase {
       align-items: center;
       background: rgba(12, 9, 8, 0.64);
       z-index: 100;
-      font-family: 'Comic Sans MS', cursive;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
       padding: ${esMovil ? '12px' : '20px'};
       box-sizing: border-box;
     `
@@ -57,7 +57,7 @@ export class VistaFormularioBase {
     titulo.textContent = configuracion.titulo
     titulo.style.cssText = `
       color: #ffe4cf;
-      font-size: ${esMovil ? '24px' : '30px'};
+      font-size: ${esMovil ? '26px' : '32px'};
       margin: 0 0 ${esMovil ? '20px' : '30px'} 0;
       text-align: center;
     `
@@ -130,7 +130,7 @@ export class VistaFormularioBase {
       border: 2px solid transparent;
       border-radius: 16px;
       font-size: 20px;
-      font-family: 'Comic Sans MS', cursive;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
       outline: none;
       transition: background 0.2s;
       -webkit-appearance: none;
@@ -152,7 +152,7 @@ export class VistaFormularioBase {
         border: 2px solid #8e4d22;
         border-radius: 16px;
         font-size: 16px;
-        font-family: 'Comic Sans MS', cursive;
+        font-family: 'Comic Neue', 'Comic Sans MS', cursive;
         cursor: pointer;
         transition: opacity 0.2s;
         -webkit-tap-highlight-color: transparent;
@@ -192,8 +192,8 @@ export class VistaFormularioBase {
       border-radius: 18px;
       background: ${fondo};
       color: ${color};
-      font-size: ${esMovil ? '18px' : '21px'};
-      font-family: 'Comic Sans MS', cursive;
+      font-size: ${esMovil ? '19px' : '22px'};
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
       cursor: pointer;
       transition: transform 0.2s, opacity 0.2s;
       -webkit-tap-highlight-color: transparent;

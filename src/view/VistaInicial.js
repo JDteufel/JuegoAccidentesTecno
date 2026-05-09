@@ -262,6 +262,7 @@ export class VistaInicial {
   }
 
   crearMenuDOM() {
+    const esMovil = window.innerWidth <= 768 || ('ontouchstart' in window && window.innerWidth < 1024)
     const overlay = document.createElement('div')
     overlay.id = 'pantallaMenuInicial'
     overlay.style.cssText = `
@@ -270,39 +271,74 @@ export class VistaInicial {
       display: none;
       background: rgba(12, 9, 8, 0.48);
       z-index: 100;
-      font-family: 'Comic Sans MS', cursive;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
     `
     document.body.appendChild(overlay)
     this.overlayEl = overlay
 
     const barraSuperior = document.createElement('div')
-    barraSuperior.style.cssText = `
-      position: absolute;
-      top: 6%;
-      right: 40px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      height: 92px;
-      background: rgba(18, 14, 13, 0.72);
-      padding: 0 20px;
-      border-radius: 18px;
-      box-sizing: border-box;
-    `
+    if (esMovil) {
+      barraSuperior.style.cssText = `
+        position: absolute;
+        top: 1%;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        width: 88%;
+        max-width: 340px;
+        background: rgba(18, 14, 13, 0.72);
+        padding: 10px 16px;
+        border-radius: 14px;
+        box-sizing: border-box;
+      `
+    } else {
+      barraSuperior.style.cssText = `
+        position: absolute;
+        top: 6%;
+        right: 40px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        height: 92px;
+        background: rgba(18, 14, 13, 0.72);
+        padding: 0 20px;
+        border-radius: 18px;
+        box-sizing: border-box;
+      `
+    }
     overlay.appendChild(barraSuperior)
 
     const titulo = document.createElement('h1')
     titulo.textContent = 'Juego de Accidentes Tecnológicos'
-    titulo.style.cssText = `
-      color: #ffe6d1;
-      font-size: 42px;
-      margin: 0;
-      position: absolute;
-      top: 15%;
-      left: 50%;
-      transform: translateX(-50%);
-      text-align: center;
-    `
+    if (esMovil) {
+      titulo.style.cssText = `
+        color: #ffe6d1;
+        font-size: 26px;
+        margin: 0;
+        position: absolute;
+        top: 20%;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        width: 90%;
+        word-wrap: break-word;
+        line-height: 1.2;
+      `
+    } else {
+      titulo.style.cssText = `
+        color: #ffe6d1;
+        font-size: 42px;
+        margin: 0;
+        position: absolute;
+        top: 15%;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+      `
+    }
     overlay.appendChild(titulo)
 
     const btnRegistro = this._crearBoton(
@@ -311,11 +347,19 @@ export class VistaInicial {
       '#ffd6b5',
       () => this.onRegistro && this.onRegistro()
     )
-    btnRegistro.style.cssText += `
-      width: 200px;
-      height: 44px;
-      font-size: 18px;
-    `
+    if (esMovil) {
+      btnRegistro.style.cssText += `
+        width: 100%;
+        height: 42px;
+        font-size: 17px;
+      `
+    } else {
+      btnRegistro.style.cssText += `
+        width: 200px;
+        height: 44px;
+        font-size: 18px;
+      `
+    }
     barraSuperior.appendChild(btnRegistro)
 
     const btnInicioSesion = this._crearBoton(
@@ -324,37 +368,67 @@ export class VistaInicial {
       '#fff1e3',
       () => this.onInicioSesion && this.onInicioSesion()
     )
-    btnInicioSesion.style.cssText += `
-      width: 220px;
-      height: 44px;
-      font-size: 18px;
-    `
+    if (esMovil) {
+      btnInicioSesion.style.cssText += `
+        width: 100%;
+        height: 42px;
+        font-size: 17px;
+      `
+    } else {
+      btnInicioSesion.style.cssText += `
+        width: 220px;
+        height: 44px;
+        font-size: 18px;
+      `
+    }
     barraSuperior.appendChild(btnInicioSesion)
 
     const panelAcciones = document.createElement('div')
-    panelAcciones.style.cssText = `
-      position: absolute;
-      top: 35%;
-      left: 10%;
-      width: 320px;
-      height: 280px;
-      border-radius: 30px;
-      border: 2px solid #8a4a20;
-      background: rgba(28, 20, 18, 0.92);
-      box-shadow: 0 16px 28px rgba(0,0,0,0.4);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 25px;
-    `
+    if (esMovil) {
+      panelAcciones.style.cssText = `
+        position: absolute;
+        top: 34%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 88%;
+        max-width: 340px;
+        height: auto;
+        min-height: 260px;
+        border-radius: 22px;
+        border: 2px solid #8a4a20;
+        background: rgba(28, 20, 18, 0.92);
+        box-shadow: 0 16px 28px rgba(0,0,0,0.4);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 16px;
+        box-sizing: border-box;
+      `
+    } else {
+      panelAcciones.style.cssText = `
+        position: absolute;
+        top: 35%;
+        left: 10%;
+        width: 320px;
+        height: 280px;
+        border-radius: 30px;
+        border: 2px solid #8a4a20;
+        background: rgba(28, 20, 18, 0.92);
+        box-shadow: 0 16px 28px rgba(0,0,0,0.4);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 25px;
+      `
+    }
     overlay.appendChild(panelAcciones)
 
     const tituloPanel = document.createElement('h2')
     tituloPanel.textContent = 'Menú Principal'
     tituloPanel.style.cssText = `
       color: #ffd9bd;
-      font-size: 26px;
-      margin: 0 0 20px 0;
+      font-size: ${esMovil ? '22px' : '26px'};
+      margin: 0 0 ${esMovil ? '16px' : '20px'} 0;
       text-align: center;
     `
     panelAcciones.appendChild(tituloPanel)
@@ -365,7 +439,24 @@ export class VistaInicial {
       '#fff7ef',
       () => this.onJugar && this.onJugar()
     )
-    btnJugar.style.marginBottom = '10px'
+    if (esMovil) {
+      btnJugar.style.cssText = `
+        width: 100%;
+        height: 48px;
+        border: none;
+        border-radius: 18px;
+        background: #d66a1f;
+        color: #fff7ef;
+        font-size: 20px;
+        font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+        cursor: pointer;
+        margin-bottom: 10px;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+      `
+    } else {
+      btnJugar.style.marginBottom = '10px'
+    }
     panelAcciones.appendChild(btnJugar)
 
     const btnTutorial = this._crearBoton(
@@ -374,7 +465,24 @@ export class VistaInicial {
       '#ffd6b7',
       () => this.onTutorial && this.onTutorial()
     )
-    btnTutorial.style.marginBottom = '10px'
+    if (esMovil) {
+      btnTutorial.style.cssText = `
+        width: 100%;
+        height: 48px;
+        border: none;
+        border-radius: 18px;
+        background: #3c2d27;
+        color: #ffd6b7;
+        font-size: 20px;
+        font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+        cursor: pointer;
+        margin-bottom: 10px;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+      `
+    } else {
+      btnTutorial.style.marginBottom = '10px'
+    }
     panelAcciones.appendChild(btnTutorial)
 
     const btnReglas = this._crearBoton(
@@ -383,6 +491,21 @@ export class VistaInicial {
       '#ffd6b7',
       () => this.onReglas && this.onReglas()
     )
+    if (esMovil) {
+      btnReglas.style.cssText = `
+        width: 100%;
+        height: 48px;
+        border: none;
+        border-radius: 18px;
+        background: #3c2d27;
+        color: #ffd6b7;
+        font-size: 20px;
+        font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+      `
+    }
     panelAcciones.appendChild(btnReglas)
   }
 
@@ -397,7 +520,7 @@ export class VistaInicial {
       background: ${fondo};
       color: ${color};
       font-size: 21px;
-      font-family: 'Comic Sans MS', cursive;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
       cursor: pointer;
       transition: transform 0.2s, opacity 0.2s;
       -webkit-tap-highlight-color: transparent;

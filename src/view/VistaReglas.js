@@ -27,12 +27,25 @@ export class VistaReglas extends VistaListaBase {
   crear() {
     super.crear()
 
+    const esMovil = window.innerWidth <= 768 || ('ontouchstart' in window && window.innerWidth < 1024)
+
     const buttonsRow = document.createElement('div')
-    buttonsRow.style.cssText = `
-      display: flex;
-      gap: 20px;
-      margin-top: 15px;
-    `
+    if (esMovil) {
+      buttonsRow.style.cssText = `
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 15px;
+        width: 100%;
+        align-items: center;
+      `
+    } else {
+      buttonsRow.style.cssText = `
+        display: flex;
+        gap: 20px;
+        margin-top: 15px;
+      `
+    }
     this.tarjetaEl.appendChild(buttonsRow)
 
     const btnCartas = this._crearBoton(
@@ -41,7 +54,12 @@ export class VistaReglas extends VistaListaBase {
       '#ffd6b7',
       () => this.onVerCartasCallback && this.onVerCartasCallback()
     )
-    btnCartas.style.width = '280px'
+    if (esMovil) {
+      btnCartas.style.width = '100%'
+      btnCartas.style.maxWidth = '320px'
+    } else {
+      btnCartas.style.width = '280px'
+    }
     buttonsRow.appendChild(btnCartas)
 
     const btnAccidentes = this._crearBoton(
@@ -50,7 +68,12 @@ export class VistaReglas extends VistaListaBase {
       '#ffd6b7',
       () => this.onVerAccidentesCallback && this.onVerAccidentesCallback()
     )
-    btnAccidentes.style.width = '280px'
+    if (esMovil) {
+      btnAccidentes.style.width = '100%'
+      btnAccidentes.style.maxWidth = '320px'
+    } else {
+      btnAccidentes.style.width = '280px'
+    }
     buttonsRow.appendChild(btnAccidentes)
   }
 

@@ -52,7 +52,7 @@ export class VistaAccidentes {
       align-items: center;
       background: rgba(12, 9, 8, 0.75);
       z-index: 100;
-      font-family: 'Comic Sans MS', cursive;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
       padding-top: ${cfg.paddingSuperior};
       box-sizing: border-box;
       overflow: hidden;
@@ -331,7 +331,7 @@ export class VistaAccidentes {
       font-size: clamp(28px, ${altoModal * 0.065}px, 44px);
       font-weight: bold;
       color: ${nivelColor};
-      font-family: 'Comic Sans MS', cursive;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
       margin: 14px 0 8px;
       text-align: center;
     `
@@ -342,7 +342,7 @@ export class VistaAccidentes {
     codigo.style.cssText = `
       font-size: clamp(14px, ${altoModal * 0.028}px, 20px);
       color: #aaa;
-      font-family: 'Comic Sans MS', cursive;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
     `
     contenido.appendChild(codigo)
 
@@ -351,7 +351,7 @@ export class VistaAccidentes {
     categoriasLabel.style.cssText = `
       font-size: clamp(13px, ${altoModal * 0.025}px, 18px);
       color: #999;
-      font-family: 'Comic Sans MS', cursive;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
       margin-top: 12px;
     `
     contenido.appendChild(categoriasLabel)
@@ -382,7 +382,7 @@ export class VistaAccidentes {
     descripcion.style.cssText = `
       font-size: clamp(15px, ${altoModal * 0.032}px, 22px);
       color: #ffe9d6;
-      font-family: 'Comic Sans MS', cursive;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
       text-align: center;
       margin: 16px 0 0;
       line-height: 1.6;
@@ -421,7 +421,7 @@ export class VistaAccidentes {
       background: ${fondo};
       color: ${color};
       font-size: ${esMovil ? '16px' : '21px'};
-      font-family: 'Comic Sans MS', cursive;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
       cursor: pointer;
       transition: transform 0.2s, opacity 0.2s;
       -webkit-tap-highlight-color: transparent;
@@ -519,7 +519,7 @@ export class VistaAccidentes {
       font-size: ${cfg.tamanoNombre}px;
       font-weight: bold;
       color: ${nivelColor};
-      font-family: 'Comic Sans MS', cursive;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
       margin: 4px 0;
       text-align: center;
       word-wrap: break-word;
@@ -552,7 +552,7 @@ export class VistaAccidentes {
     descripcion.style.cssText = `
       font-size: ${cfg.tamanoDesc}px;
       color: #ffe9d6;
-      font-family: 'Comic Sans MS', cursive;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
       text-align: center;
       margin: 0;
       word-wrap: break-word;

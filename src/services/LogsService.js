@@ -4,11 +4,8 @@ let smartFoxInstance = null
 
 const logsLocales = {
   USUARIO: [],
-  SESION: [],
-  ERROR: [],
-  SISTEMA: [],
-  LOBBY: [],
-  PARTIDA: []
+  METRICAS: [],
+  LOGS: []
 }
 
 export function initLogsService(sfs) {
@@ -149,6 +146,19 @@ export const EVENT_ACTIONS = {
   LOBBY_JOIN: 'join',
   LOBBY_LEAVE: 'leave',
   LOBBY_CLOSE: 'close',
+
+  PARTIDA_START: 'start',
+  PARTIDA_END: 'end',
+  PARTIDA_TURNO: 'turno',
+  PARTIDA_CARTA_JUGADA: 'carta_jugada',
+  PARTIDA_CARTA_INTERCAMBIADA: 'carta_intercambiada',
+  PARTIDA_ACCIDENTE_ACTIVADO: 'accidente_activado',
+  PARTIDA_ACTIVIDAD_GRUPAL: 'actividad_grupal',
+  PARTIDA_PERFIL_COMPLETADO: 'perfil_completado',
+
+  METRICA_CARTA_USO: 'carta_uso',
+  METRICA_TURNO_DURACION: 'turno_duracion',
+  METRICA_PARTIDA_DURACION: 'partida_duracion',
 
   ERROR: 'error'
 }

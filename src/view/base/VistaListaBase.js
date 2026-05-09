@@ -24,7 +24,7 @@ export class VistaListaBase {
       align-items: center;
       background: rgba(12, 9, 8, 0.64);
       z-index: 100;
-      font-family: 'Comic Sans MS', cursive;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
       padding: ${esMovil ? '12px' : '20px'};
       box-sizing: border-box;
     `
@@ -55,7 +55,7 @@ export class VistaListaBase {
     this.tituloEl.textContent = configuracion.titulo
     this.tituloEl.style.cssText = `
       color: #ffe4cf;
-      font-size: ${esMovil ? '24px' : '30px'};
+      font-size: ${esMovil ? '26px' : '32px'};
       margin: 0 0 ${esMovil ? '20px' : '30px'} 0;
       text-align: center;
     `
@@ -112,8 +112,8 @@ export class VistaListaBase {
     textoEl.textContent = texto
     textoEl.style.cssText = `
       color: #ffe2cc;
-      font-size: ${esMovil ? '16px' : '18px'};
-      font-family: 'Comic Sans MS', cursive;
+      font-size: ${esMovil ? '17px' : '19px'};
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
       line-height: 1.4;
     `
     bloque.appendChild(textoEl)
@@ -134,8 +134,8 @@ export class VistaListaBase {
       border-radius: 18px;
       background: ${fondo};
       color: ${color};
-      font-size: ${esMovil ? '18px' : '21px'};
-      font-family: 'Comic Sans MS', cursive;
+      font-size: ${esMovil ? '19px' : '22px'};
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
       cursor: pointer;
       transition: transform 0.2s, opacity 0.2s;
       -webkit-tap-highlight-color: transparent;

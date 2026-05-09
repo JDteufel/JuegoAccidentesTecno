@@ -38,6 +38,12 @@ export class Carta {
     this.estado = 'deshabilitada'
   }
 
+  potenciar() {
+    if (this.estaDeshabilitada()) return
+    this.horas = this.horas * 2
+    this.estado = 'potenciada'
+  }
+
   estaActiva() {
     return this.estado === 'activa'
   }

@@ -63,6 +63,9 @@ export class Accidente {
         } else if (carta.degradada) {
           carta.activar()
           resultado.positivas.push(carta)
+        } else if (carta.estaActiva() && !carta.degradada) {
+          carta.potenciar()
+          resultado.positivas.push(carta)
         }
       }
     }

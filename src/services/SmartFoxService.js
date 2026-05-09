@@ -1,5 +1,5 @@
 const DEFAULT_CONFIG = {
-  host: '127.0.0.1',
+  host: window.location.hostname || '127.0.0.1',
   port: 8080,
   zone: 'JuegoAccidentesTecno'
 }

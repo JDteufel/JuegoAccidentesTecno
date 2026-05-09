@@ -39,6 +39,11 @@ const vistaInicial = new VistaInicial(canvas)
 const TARGET_FPS = 60
 vistaInicial.render(TARGET_FPS)
 
+const esMovil = window.innerWidth <= 768 || ('ontouchstart' in window && window.innerWidth < 1024)
+if (esMovil) {
+  vistaInicial.engine.setHardwareScalingLevel(1 / window.devicePixelRatio)
+}
+
 const vistaInicialR = new VistaInicialR()
 vistaInicialR.crear()
 const vistaTutorial = new VistaTutorial()

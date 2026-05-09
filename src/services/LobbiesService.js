@@ -1,7 +1,7 @@
 import { logEvent } from './LogsService.js'
 const LOBBY_CODE_LENGTH = 6
 const LOBBY_CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
-const MAX_PLAYERS_PER_LOBBY = 16
+const MAX_PLAYERS_PER_LOBBY = 32
 class LobbiesService {
   constructor() {
     this.lobbiesByCode = {} 
@@ -37,7 +37,7 @@ class LobbiesService {
       status: 'waiting'
     }
     this.lobbyCodeBySender[senderName] = lobbyCode
-    logEvent('LOBBY', 'create', { lobbyCode, hostName })
+    logEvent('LOGS', 'create', { lobbyCode, hostName })
     return {
       ok: true,
       message: 'Lobby creado exitosamente',
@@ -90,7 +90,7 @@ class LobbiesService {
     })
     lobby.players.push(guestPlayer)
     this.lobbyCodeBySender[senderName] = lobby.code
-    logEvent('LOBBY', 'join', { lobbyCode: lobby.code, guestName })
+    logEvent('LOGS', 'join', { lobbyCode: lobby.code, guestName })
     return {
       ok: true,
       message: 'Unido al lobby exitosamente',
@@ -148,7 +148,7 @@ class LobbiesService {
       }
     }
     delete this.lobbyCodeBySender[senderName]
-    logEvent('LOBBY', 'leave', { lobbyCode: normalizedCode, playerName: jugadorRemovido.name })
+    logEvent('LOGS', 'leave', { lobbyCode: normalizedCode, playerName: jugadorRemovido.name })
     if (lobby.players.length === 0 || jugadorRemovido.role === 'host') {
       this._eliminarLobby(normalizedCode)
       return {

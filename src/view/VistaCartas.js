@@ -50,7 +50,7 @@ export class VistaCartas {
       align-items: center;
       background: rgba(12, 9, 8, 0.75);
       z-index: 100;
-      font-family: 'Comic Sans MS', cursive;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
       padding-top: ${cfg.paddingSuperior};
       box-sizing: border-box;
       overflow: hidden;
@@ -332,7 +332,7 @@ export class VistaCartas {
       font-size: clamp(24px, ${altoModal * 0.06}px, 42px);
       font-weight: bold;
       color: ${carta.color};
-      font-family: 'Comic Sans MS', cursive;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
       margin: 10px 0 6px;
       text-align: center;
     `
@@ -343,7 +343,7 @@ export class VistaCartas {
     horas.style.cssText = `
       font-size: clamp(14px, ${altoModal * 0.028}px, 22px);
       color: #aaa;
-      font-family: 'Comic Sans MS', cursive;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
     `
     contenido.appendChild(horas)
 
@@ -352,7 +352,7 @@ export class VistaCartas {
     descripcion.style.cssText = `
       font-size: clamp(15px, ${altoModal * 0.032}px, 24px);
       color: #d0d0d0;
-      font-family: 'Comic Sans MS', cursive;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
       text-align: center;
       margin: 14px 0;
       line-height: 1.6;
@@ -391,7 +391,7 @@ export class VistaCartas {
       background: ${fondo};
       color: ${color};
       font-size: ${esMovil ? '16px' : '21px'};
-      font-family: 'Comic Sans MS', cursive;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
       cursor: pointer;
       transition: transform 0.2s, opacity 0.2s;
       -webkit-tap-highlight-color: transparent;
@@ -487,7 +487,7 @@ export class VistaCartas {
       font-size: ${cfg.tamanoTextoCarta}px;
       font-weight: bold;
       color: ${carta.color};
-      font-family: 'Comic Sans MS', cursive;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
       margin: 4px 0;
       text-align: center;
       word-wrap: break-word;
@@ -499,7 +499,7 @@ export class VistaCartas {
     descripcion.style.cssText = `
       font-size: ${cfg.tamanoTextoCarta - 2}px;
       color: #d0d0d0;
-      font-family: 'Comic Sans MS', cursive;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
       text-align: center;
       margin: 0;
       word-wrap: break-word;

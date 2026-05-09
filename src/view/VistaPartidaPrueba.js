@@ -1405,6 +1405,28 @@ export class VistaPartidaPrueba {
       this.overlay.isVisible = true
       this.visible = true
 
+      const esMovil = window.innerWidth <= 768 || ('ontouchstart' in window && window.innerWidth < 1024)
+      const esPortrait = window.innerHeight > window.innerWidth
+
+      if (esMovil && esPortrait) {
+        this.hardwareScalingAnterior = this.engine.getHardwareScalingLevel()
+        this.engine.setHardwareScalingLevel(1 / window.devicePixelRatio)
+
+        const anchoReal = window.innerWidth
+        const altoReal = window.innerHeight
+
+        this.canvas.style.width = `${altoReal}px`
+        this.canvas.style.height = `${anchoReal}px`
+        this.canvas.style.transform = `rotate(90deg) translate(${(altoReal - anchoReal) / 2}px, ${(altoReal - anchoReal) / 2}px)`
+        this.canvas.style.transformOrigin = 'center center'
+        this.canvas.style.position = 'fixed'
+        this.canvas.style.top = '0'
+        this.canvas.style.left = '0'
+        this.canvas.style.zIndex = '1000'
+
+        this.engine.resize()
+      }
+
       this.actualizarCarruselAccidentes()
       this.actualizarHUDPerfil()
       this.actualizarPanelCartas()
@@ -1420,6 +1442,45 @@ export class VistaPartidaPrueba {
       }
       this.overlay.isVisible = false
       this.visible = false
+
+      const esMovil = window.innerWidth <= 768 || ('ontouchstart' in window && window.innerWidth < 1024)
+      const esPortrait = window.innerHeight > window.innerWidth
+
+      if (esMovil && esPortrait && this.hardwareScalingAnterior !== undefined) {
+        this.engine.setHardwareScalingLevel(this.hardwareScalingAnterior)
+
+        this.canvas.style.width = '100%'
+        this.canvas.style.height = '100%'
+        this.canvas.style.transform = ''
+        this.canvas.style.position = ''
+        this.canvas.style.top = ''
+        this.canvas.style.left = ''
+        this.canvas.style.zIndex = ''
+
+        this.engine.resize()
+        this.hardwareScalingAnterior = undefined
+      }
     }
+  }
+
+  onIntercambioCarta(callback) {
+    this.callbackIntercambioCarta = callback
+  }
+
+  onActivarActividadGrupal(callback) {
+    this.callbackActividadGrupal = callback
+  }
+
+  actualizarActividades(actividades) {
+    this.actividades = actividades
+  }
+
+  mostrarMensajeActividadGrupal(actividad) {
+    this.mostrarMensaje(`Actividad grupal: ${actividad.nombre} - ${actividad.descripcion}`, 4000)
+  }
+
+  mostrarLogFinal(logJSON) {
+    console.log('[VistaPartidaPrueba] Log completo de la partida:', logJSON)
+    this.mostrarMensaje('Partida finalizada. Revisa la consola para el log completo.', 6000)
   }
 }

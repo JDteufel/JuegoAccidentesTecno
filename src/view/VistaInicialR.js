@@ -18,7 +18,7 @@ export class VistaInicialR {
       align-items: center;
       background: rgba(12, 9, 8, 0.48);
       z-index: 100;
-      font-family: 'Comic Sans MS', cursive;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
     `
     document.body.appendChild(container)
     this.containerEl = container
@@ -118,7 +118,7 @@ export class VistaInicialR {
       background: ${fondo};
       color: ${color};
       font-size: 21px;
-      font-family: 'Comic Sans MS', cursive;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
       cursor: pointer;
       transition: transform 0.2s, opacity 0.2s;
       -webkit-tap-highlight-color: transparent;
