@@ -801,7 +801,7 @@ export class VistaPartida {
   crearPanelCartas() {
     const panelInferior = new GUI.Rectangle('panelCartas')
     panelInferior.width = '95%'
-    panelInferior.height = '240px'
+    panelInferior.height = '320px'
     panelInferior.bottom = '15px'
     panelInferior.background = 'rgba(28, 20, 18, 0.92)'
     panelInferior.cornerRadius = 15
@@ -837,7 +837,7 @@ export class VistaPartida {
 
     const containerCartas = new GUI.Rectangle('containerCartas')
     containerCartas.width = '97%'
-    containerCartas.height = '170px'
+    containerCartas.height = '260px'
     containerCartas.top = '28px'
     containerCartas.background = 'transparent'
     containerCartas.thickness = 0
@@ -866,20 +866,22 @@ export class VistaPartida {
 
   crearCartaManoVacia(indice) {
     const cartaPanel = new GUI.Rectangle(`carta_${indice}`)
-    cartaPanel.width = '98%'
-    cartaPanel.height = '90%'
+    cartaPanel.width = '120px'
+    cartaPanel.height = '168px'
     cartaPanel.background = 'rgba(33, 23, 19, 0.4)'
     cartaPanel.cornerRadius = 14
     cartaPanel.thickness = 2
     cartaPanel.color = '#4a3528'
+    cartaPanel.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
+    cartaPanel.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
     cartaPanel.isVisible = false
     return cartaPanel
   }
 
   crearCartaMano(carta, indice) {
     const cartaPanel = new GUI.Rectangle(`carta_${indice}`)
-    cartaPanel.width = '98%'
-    cartaPanel.height = '90%'
+    cartaPanel.width = '120px'
+    cartaPanel.height = '168px'
     cartaPanel.background = '#211713'
     cartaPanel.cornerRadius = 14
     cartaPanel.thickness = 2
@@ -888,92 +890,17 @@ export class VistaPartida {
     cartaPanel.shadowBlur = 8
     cartaPanel.shadowOffsetY = 3
     cartaPanel.isPointerBlocker = true
+    cartaPanel.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
+    cartaPanel.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
 
     const imagenSrc = carta.obtenerImagen ? carta.obtenerImagen() : null
     if (imagenSrc) {
       const imagen = new GUI.Image(`imagen_${indice}`, imagenSrc)
-      imagen.width = '42px'
-      imagen.height = '42px'
-      imagen.left = '4px'
-      imagen.top = '4px'
-      imagen.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
-      imagen.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP
-      imagen.stretch = GUI.Image.STRETCH_UNIFORM
+      imagen.width = '100%'
+      imagen.height = '100%'
+      imagen.stretch = GUI.Image.STRETCH_FILL
       cartaPanel.addControl(imagen)
     }
-
-    const bandaSuperior = new GUI.Rectangle(`cartaBanda_${indice}`)
-    bandaSuperior.width = '6px'
-    bandaSuperior.height = '85%'
-    bandaSuperior.thickness = 0
-    bandaSuperior.background = carta.color
-    bandaSuperior.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
-    cartaPanel.addControl(bandaSuperior)
-
-    const codigo = new GUI.TextBlock(`codigo_${indice}`, carta.codigo)
-    codigo.left = '-52px'
-    codigo.top = '2px'
-    codigo.width = '30px'
-    codigo.height = '20px'
-    codigo.color = '#fff0df'
-    codigo.fontSize = 13
-    codigo.fontFamily = 'Comic Sans MS'
-    codigo.fontWeight = 'bold'
-    codigo.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT
-    cartaPanel.addControl(codigo)
-
-    const categoria = new GUI.TextBlock(
-      `categoria_${indice}`,
-      carta.categorias.map(c => c.toUpperCase()).join(', ')
-    )
-    categoria.top = '-30px'
-    categoria.left = '50px'
-    categoria.width = '100px'
-    categoria.height = '16px'
-    categoria.color = '#fff4ea'
-    categoria.fontSize = 8
-    categoria.fontFamily = 'Comic Sans MS'
-    categoria.fontWeight = 'bold'
-    categoria.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
-    cartaPanel.addControl(categoria)
-
-    const nombre = new GUI.TextBlock(`nombre_${indice}`, carta.titulo)
-    nombre.top = '-10px'
-    nombre.left = '50px'
-    nombre.width = '100px'
-    nombre.height = '22px'
-    nombre.color = '#ffe0c2'
-    nombre.fontSize = 12
-    nombre.fontFamily = 'Comic Sans MS'
-    nombre.fontWeight = 'bold'
-    nombre.textWrapping = true
-    nombre.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
-    cartaPanel.addControl(nombre)
-
-    const descripcion = new GUI.TextBlock(`detalle_${indice}`, carta.detalle)
-    descripcion.top = '12px'
-    descripcion.left = '50px'
-    descripcion.width = '100px'
-    descripcion.height = '28px'
-    descripcion.color = '#e7cfbc'
-    descripcion.fontSize = 8
-    descripcion.fontFamily = 'Comic Sans MS'
-    descripcion.textWrapping = true
-    descripcion.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
-    cartaPanel.addControl(descripcion)
-
-    const horas = new GUI.TextBlock(`horas_${indice}`, `${carta.horas}h`)
-    horas.top = '38px'
-    horas.left = '50px'
-    horas.width = '40px'
-    horas.height = '16px'
-    horas.color = '#a88a6a'
-    horas.fontSize = 10
-    horas.fontFamily = 'Comic Sans MS'
-    horas.fontWeight = 'bold'
-    horas.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
-    cartaPanel.addControl(horas)
-
     cartaPanel.onPointerDownObservable.add((coords) => {
       if (carta.estaDeshabilitada()) return
       this.dragState = {
@@ -983,6 +910,7 @@ export class VistaPartida {
         inicioX: coords.x,
         moviendo: false
       }
+      cartaPanel.zIndex = 500
     })
 
     cartaPanel.onPointerUpObservable.add((coords) => {
@@ -993,6 +921,9 @@ export class VistaPartida {
           this.callbackJugarCarta(carta)
         }
       }
+      cartaPanel.top = '0px'
+      cartaPanel.alpha = 1
+      cartaPanel.zIndex = 100
       this.dragState = null
     })
 
@@ -1000,12 +931,12 @@ export class VistaPartida {
       if (!this.dragState || this.dragState.indice !== indice) return
       const deltaY = this.dragState.inicioY - coords.y
       const deltaX = Math.abs(this.dragState.inicioX - coords.x)
-      if (deltaY > 10 || deltaX > 10) {
+      if (deltaY > 15 || deltaX > 15) {
         this.dragState.moviendo = true
       }
       if (this.dragState.moviendo && deltaY > 0) {
         cartaPanel.top = `${-Math.min(deltaY, 80)}px`
-        cartaPanel.alpha = Math.max(0.5, 1 - deltaY / 200)
+        cartaPanel.alpha = Math.max(0.7, 1 - deltaY / 300)
       }
     })
 
@@ -1034,7 +965,6 @@ export class VistaPartida {
 
       if (i < cantidad && this.accidentes[i]) {
         const accidente = this.accidentes[i]
-        const color = this.obtenerColorAccidente(accidente)
         const nivelColor = accidente.nivel >= 3
           ? new BABYLON.Color3(0.8, 0.2, 0.15)
           : accidente.nivel === 2
@@ -1042,19 +972,29 @@ export class VistaPartida {
             : new BABYLON.Color3(0.85, 0.7, 0.2)
 
         const imagenSrc = accidente.obtenerImagen ? accidente.obtenerImagen() : null
-        if (imagenSrc && caraCarta && caraCarta.material) {
-          const textura = new BABYLON.Texture(imagenSrc, this.scene, true, false, BABYLON.Texture.NEAREST_SAMPLINGMODE)
+        console.log(`[Carrusel] Accidente ${i}: ${accidente.nombre}, imagenSrc:`, imagenSrc)
+
+        if (imagenSrc && caraCarta) {
+          const materialCaraCarta = new BABYLON.StandardMaterial(`matCaraCarruselAcc_${i}`, this.scene)
+          const textura = new BABYLON.Texture(imagenSrc, this.scene, true, false, BABYLON.Texture.BILINEAR_SAMPLINGMODE)
           textura.hasAlpha = true
-          caraCarta.material.diffuseTexture = textura
-          caraCarta.material.emissiveTexture = textura
-          caraCarta.material.diffuseColor = new BABYLON.Color3(1, 1, 1)
-          caraCarta.material.specularColor = new BABYLON.Color3(0.1, 0.08, 0.06)
-          caraCarta.material.useAlphaFromDiffuseTexture = true
-        } else if (caraCarta && caraCarta.material) {
-          caraCarta.material.diffuseColor = color
-          caraCarta.material.emissiveColor = color.scale(0.08)
-          caraCarta.material.diffuseTexture = null
-          caraCarta.material.emissiveTexture = null
+          textura.wAng = 0
+          materialCaraCarta.diffuseTexture = textura
+          materialCaraCarta.emissiveTexture = textura
+          materialCaraCarta.diffuseColor = new BABYLON.Color3(1, 1, 1)
+          materialCaraCarta.emissiveColor = new BABYLON.Color3(0.15, 0.1, 0.05)
+          materialCaraCarta.specularColor = new BABYLON.Color3(0.1, 0.08, 0.06)
+          materialCaraCarta.useAlphaFromDiffuseTexture = true
+          caraCarta.material = materialCaraCarta
+          console.log(`[Carrusel] Textura aplicada para accidente ${i}`)
+        } else if (caraCarta) {
+          const color = this.obtenerColorAccidente(accidente)
+          if (caraCarta.material) {
+            caraCarta.material.diffuseColor = color
+            caraCarta.material.emissiveColor = color.scale(0.08)
+            caraCarta.material.diffuseTexture = null
+            caraCarta.material.emissiveTexture = null
+          }
         }
 
         if (bandaCarta && bandaCarta.material) {
@@ -1298,10 +1238,10 @@ export class VistaPartida {
       const imagenSrc = accidente.obtenerImagen ? accidente.obtenerImagen() : null
       if (imagenSrc) {
         const imagen = new GUI.Image(`accidenteImg_${indice}`, imagenSrc)
-        imagen.width = '56px'
-        imagen.height = '56px'
+        imagen.width = '50px'
+        imagen.height = '70px'
         imagen.left = '8px'
-        imagen.stretch = GUI.Image.STRETCH_UNIFORM
+      imagen.stretch = GUI.Image.STRETCH_FILL
         imagen.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
         tarjeta.addControl(imagen)
       }
@@ -1312,7 +1252,7 @@ export class VistaPartida {
       texto.fontFamily = 'Comic Sans MS'
       texto.fontWeight = 'bold'
       texto.textWrapping = true
-      texto.left = '70px'
+      texto.left = '66px'
       texto.width = '155px'
       texto.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
       tarjeta.addControl(texto)
@@ -1322,7 +1262,7 @@ export class VistaPartida {
       nivelBadge.fontSize = 11
       nivelBadge.fontFamily = 'Comic Sans MS'
       nivelBadge.fontWeight = 'bold'
-      nivelBadge.left = '70px'
+      nivelBadge.left = '66px'
       nivelBadge.top = '28px'
       nivelBadge.width = '80px'
       nivelBadge.height = '18px'

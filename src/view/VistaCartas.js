@@ -1,5 +1,6 @@
 import { crearCartaDesdeNombre, obtenerNombresCartas } from '../model/cartas/index.js'
 import { GestorAjusteRatio } from './base/GestorAjusteRatio.js'
+import './estilos/EstiloVistaCartas.css'
 
 export class VistaCartas {
   constructor() {
@@ -42,45 +43,21 @@ export class VistaCartas {
 
     const container = document.createElement('div')
     container.id = 'vistaCartas'
-    container.style.cssText = `
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      background: rgba(12, 9, 8, 0.75);
-      z-index: 100;
-      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
-      padding-top: ${cfg.paddingSuperior};
-      box-sizing: border-box;
-      overflow: hidden;
-    `
+    container.className = 'cartas-overlay'
+    container.style.cssText = `position:absolute;top:0;left:0;width:100%;height:100%;display:none;flex-direction:column;align-items:center;padding-top:${cfg.paddingSuperior};`
     document.body.appendChild(container)
     this.containerEl = container
 
     const header = document.createElement('div')
-    header.style.cssText = `
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: ${cfg.headerGap};
-      margin-bottom: 8px;
-      flex-shrink: 0;
-      flex-wrap: wrap;
-      padding: 0 ${cfg.paddingLateral}px;
-      width: 100%;
-      box-sizing: border-box;
-    `
+    header.className = 'cartas-header'
+    header.style.gap = cfg.headerGap
+    header.style.padding = `0 ${cfg.paddingLateral}px`
     container.appendChild(header)
 
     const titulo = document.createElement('h1')
     titulo.textContent = 'Actividades y Aplicaciones'
-    titulo.style.cssText = `
-      color: #ffe6d1;
-      font-size: ${cfg.tamanoTitulo};
-      margin: 0;
-      text-align: center;
-    `
+    titulo.className = 'cartas-titulo'
+    titulo.style.fontSize = cfg.tamanoTitulo
     header.appendChild(titulo)
 
     const btnVolver = this._crearBoton('Volver a Reglas', '#362924', '#ffd8bc', () => {
@@ -89,26 +66,13 @@ export class VistaCartas {
     header.appendChild(btnVolver)
 
     const contenidoWrapper = document.createElement('div')
-    contenidoWrapper.style.cssText = `
-      flex: 1;
-      display: flex;
-      width: 100%;
-      min-height: 0;
-      overflow: hidden;
-    `
+    contenidoWrapper.className = 'cartas-contenido'
     container.appendChild(contenidoWrapper)
 
     const gridWrapper = document.createElement('div')
-    gridWrapper.style.cssText = `
-      flex: 1;
-      overflow-y: auto;
-      overflow-x: hidden;
-      padding: 5px ${cfg.paddingLateral}px 20px;
-      box-sizing: border-box;
-      -webkit-overflow-scrolling: touch;
-      touch-action: pan-y;
-      margin-right: ${cfg.sliderAncho}px;
-    `
+    gridWrapper.className = 'cartas-grid-wrapper vista-cartas-scroll'
+    gridWrapper.style.padding = `5px ${cfg.paddingLateral}px 20px`
+    gridWrapper.style.marginRight = `${cfg.sliderAncho}px`
     gridWrapper.addEventListener('wheel', (e) => {
       e.preventDefault()
       gridWrapper.scrollTop += e.deltaY
@@ -130,13 +94,9 @@ export class VistaCartas {
     const tamanoCSS = typeof cfg.columnas === 'string' && cfg.columnas.startsWith('repeat')
       ? cfg.columnas
       : `repeat(${cfg.columnas}, ${cfg.tamanoCarta}px)`
-    grid.style.cssText = `
-      display: grid;
-      grid-template-columns: ${tamanoCSS};
-      gap: ${cfg.gap}px;
-      justify-content: center;
-      padding-bottom: 20px;
-    `
+    grid.className = 'cartas-grid'
+    grid.style.gridTemplateColumns = tamanoCSS
+    grid.style.gap = `${cfg.gap}px`
     gridWrapper.appendChild(grid)
     this.gridEl = gridWrapper
 
@@ -149,31 +109,16 @@ export class VistaCartas {
     })
 
     const sliderBar = document.createElement('div')
-    sliderBar.style.cssText = `
-      width: ${cfg.sliderAncho}px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      padding: 10px 0;
-    `
+    sliderBar.className = 'cartas-slider-bar'
+    sliderBar.style.width = `${cfg.sliderAncho}px`
 
     const slider = document.createElement('input')
     slider.type = 'range'
     slider.min = '0'
     slider.max = '100'
     slider.value = '0'
-    slider.style.cssText = `
-      writing-mode: vertical-lr;
-      height: 95%;
-      width: ${cfg.sliderAncho - 8}px;
-      -webkit-appearance: none;
-      appearance: none;
-      background: rgba(168, 90, 42, 0.3);
-      border-radius: 4px;
-      outline: none;
-      cursor: pointer;
-    `
+    slider.className = 'cartas-slider'
+    slider.style.width = `${cfg.sliderAncho - 8}px`
     slider.addEventListener('input', () => {
       const maxScroll = gridWrapper.scrollHeight - gridWrapper.clientHeight
       gridWrapper.scrollTop = (slider.value / 100) * maxScroll
@@ -182,38 +127,6 @@ export class VistaCartas {
     sliderBar.appendChild(slider)
     contenidoWrapper.appendChild(sliderBar)
     this.sliderEl = slider
-
-    if (!document.getElementById('estilosVistaCartas')) {
-      const style = document.createElement('style')
-      style.id = 'estilosVistaCartas'
-      style.textContent = `
-        input[type="range"]::-webkit-slider-thumb {
-          -webkit-appearance: none;
-          appearance: none;
-          width: 26px;
-          height: 26px;
-          border-radius: 50%;
-          background: #a85a2a;
-          cursor: pointer;
-          border: 2px solid #ffd8bc;
-        }
-        input[type="range"]::-moz-range-thumb {
-          width: 26px;
-          height: 26px;
-          border-radius: 50%;
-          background: #a85a2a;
-          cursor: pointer;
-          border: 2px solid #ffd8bc;
-        }
-        .vista-cartas-scroll::-webkit-scrollbar {
-          width: 0;
-          height: 0;
-        }
-      `
-      document.head.appendChild(style)
-    }
-
-    gridWrapper.classList.add('vista-cartas-scroll')
 
     gridWrapper.addEventListener('scroll', () => {
       const maxScroll = gridWrapper.scrollHeight - gridWrapper.clientHeight
@@ -228,32 +141,11 @@ export class VistaCartas {
 
     const overlay = document.createElement('div')
     overlay.id = 'modalCarta'
-    overlay.style.cssText = `
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.7);
-      display: none;
-      z-index: 200;
-    `
+    overlay.className = 'cartas-modal-overlay'
 
     const contenido = document.createElement('div')
     contenido.id = 'modalCartaContenido'
-    contenido.style.cssText = `
-      position: fixed;
-      border-radius: 20px;
-      background: rgba(28, 28, 40, 0.98);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 30px;
-      box-sizing: border-box;
-      gap: 12px;
-      overflow-y: auto;
-      opacity: 0;
-      transform: scale(0.3);
-      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
-      -webkit-overflow-scrolling: touch;
-    `
+    contenido.className = 'cartas-modal-contenido'
 
     overlay.appendChild(contenido)
     document.body.appendChild(overlay)
@@ -423,22 +315,11 @@ export class VistaCartas {
 
   _crearCarta(carta, cfg) {
     const contenedor = document.createElement('div')
-    contenedor.style.cssText = `
-      width: ${cfg.tamanoCarta}px;
-      height: ${cfg.altoCarta}px;
-      border-radius: 15px;
-      border: 2px solid ${carta.color};
-      background: rgba(28,28,40,0.95);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 8px;
-      box-sizing: border-box;
-      gap: 3px;
-      cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      -webkit-tap-highlight-color: transparent;
-    `
+    contenedor.className = 'cartas-carta'
+    contenedor.style.width = `${cfg.tamanoCarta}px`
+    contenedor.style.height = `${cfg.altoCarta}px`
+    contenedor.style.borderColor = carta.color
+    contenedor.style.padding = '8px'
 
     if (GestorAjusteRatio.esLandscape() && !GestorAjusteRatio.esMovil()) {
       contenedor.addEventListener('mouseenter', () => {
@@ -460,54 +341,31 @@ export class VistaCartas {
       const imagen = document.createElement('img')
       imagen.src = imagenSrc
       imagen.alt = carta.titulo
-      imagen.style.cssText = `
-        width: 100%;
-        height: ${cfg.tamanoImagenCarta}px;
-        object-fit: contain;
-        border-radius: 8px;
-      `
+      imagen.className = 'cartas-carta-imagen'
+      imagen.style.height = `${cfg.tamanoImagenCarta}px`
       contenedor.appendChild(imagen)
     }
 
     const badge = document.createElement('span')
     badge.textContent = carta.categoria
-    badge.style.cssText = `
-      font-size: ${cfg.tamanoBadgeCarta}px;
-      font-weight: bold;
-      color: ${carta.color};
-      background: rgba(0,0,0,0.5);
-      padding: 4px 8px;
-      border-radius: 5px;
-    `
+    badge.className = 'cartas-carta-badge'
+    badge.style.fontSize = `${cfg.tamanoBadgeCarta}px`
+    badge.style.color = carta.color
     contenedor.appendChild(badge)
 
     const titulo = document.createElement('h3')
     titulo.textContent = carta.titulo
-    titulo.style.cssText = `
-      font-size: ${cfg.tamanoTextoCarta}px;
-      font-weight: bold;
-      color: ${carta.color};
-      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
-      margin: 4px 0;
-      text-align: center;
-      word-wrap: break-word;
-    `
+    titulo.className = 'cartas-carta-titulo'
+    titulo.style.fontSize = `${cfg.tamanoTextoCarta}px`
+    titulo.style.color = carta.color
+
     contenedor.appendChild(titulo)
 
     const descripcion = document.createElement('p')
     descripcion.textContent = carta.detalle
-    descripcion.style.cssText = `
-      font-size: ${cfg.tamanoTextoCarta - 2}px;
-      color: #d0d0d0;
-      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
-      text-align: center;
-      margin: 0;
-      word-wrap: break-word;
-      flex-grow: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    `
+    descripcion.className = 'cartas-carta-descripcion'
+    descripcion.style.fontSize = `${cfg.tamanoTextoCarta - 2}px`
+    descripcion.style.color = '#d0d0d0'
     contenedor.appendChild(descripcion)
 
     return contenedor

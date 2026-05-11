@@ -1,6 +1,6 @@
 import { Carta } from '../Carta.js'
 import { CATEGORIAS_CARTA } from '../constantes.js'
-import imagenCarta from '../../assets/cartas/carta5.svg'
+import imagenCarta from '../../assets/cartas/carta5.png'
 
 export class CartaObsidian extends Carta {
   static imagen = imagenCarta

@@ -1,0 +1,252 @@
+.accidentes-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(12, 9, 8, 0.75);
+  z-index: 100;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.accidentes-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.accidentes-titulo {
+  color: #ffe6d1;
+  margin: 0;
+  text-align: center;
+}
+
+.accidentes-contenido {
+  flex: 1;
+  display: flex;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.accidentes-grid-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+.accidentes-grid-wrapper::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.accidentes-grid {
+  display: grid;
+  justify-content: center;
+  padding-bottom: 20px;
+}
+
+.accidentes-slider-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 10px 0;
+}
+
+.accidentes-slider {
+  writing-mode: vertical-lr;
+  height: 95%;
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(168, 90, 42, 0.3);
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+}
+
+.accidentes-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #a85a2a;
+  cursor: pointer;
+  border: 2px solid #ffd8bc;
+}
+
+.accidentes-slider::-moz-range-thumb {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #a85a2a;
+  cursor: pointer;
+  border: 2px solid #ffd8bc;
+}
+
+.accidentes-boton {
+  border: none;
+  border-radius: 18px;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.accidentes-boton:hover {
+  opacity: 0.85;
+  transform: scale(1.05);
+}
+
+.accidentes-item {
+  border-radius: 15px;
+  border: 2px solid;
+  background: rgba(28, 20, 18, 0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  gap: 6px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.accidentes-item:hover {
+  transform: scale(1.05);
+}
+
+.accidentes-item-imagen {
+  width: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.accidentes-item-nivel {
+  font-weight: bold;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 4px 10px;
+  border-radius: 5px;
+}
+
+.accidentes-item-titulo {
+  font-weight: bold;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+  margin: 4px 0;
+  text-align: center;
+  word-wrap: break-word;
+}
+
+.accidentes-item-categorias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: center;
+}
+
+.accidentes-item-cat-badge {
+  color: #ffd8bc;
+  background: rgba(168, 90, 42, 0.4);
+  padding: 3px 6px;
+  border-radius: 4px;
+}
+
+.accidentes-item-descripcion {
+  color: #ffe9d6;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+  text-align: center;
+  margin: 0;
+  word-wrap: break-word;
+  line-height: 1.4;
+}
+
+.accidentes-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: none;
+  z-index: 200;
+}
+
+.accidentes-modal-contenido {
+  position: fixed;
+  border-radius: 20px;
+  background: rgba(28, 20, 18, 0.98);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  gap: 12px;
+  overflow-y: auto;
+  opacity: 0;
+  transform: scale(0.3);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+  -webkit-overflow-scrolling: touch;
+}
+
+.accidentes-modal-imagen {
+  width: 100%;
+  object-fit: contain;
+  border-radius: 14px;
+}
+
+.accidentes-modal-nivel {
+  font-weight: bold;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 8px 22px;
+  border-radius: 10px;
+}
+
+.accidentes-modal-titulo {
+  font-weight: bold;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+  margin: 14px 0 8px;
+  text-align: center;
+}
+
+.accidentes-modal-codigo {
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+}
+
+.accidentes-modal-categorias-label {
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+  margin-top: 12px;
+}
+
+.accidentes-modal-categorias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.accidentes-modal-cat-badge {
+  color: #ffd8bc;
+  background: rgba(168, 90, 42, 0.4);
+  padding: 7px 16px;
+  border-radius: 8px;
+}
+
+.accidentes-modal-descripcion {
+  color: #ffe9d6;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+  text-align: center;
+  margin: 16px 0 0;
+  line-height: 1.6;
+}

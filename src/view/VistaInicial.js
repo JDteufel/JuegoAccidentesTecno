@@ -1,5 +1,6 @@
 import * as BABYLON from '@babylonjs/core'
 import { GestorAjusteRatio } from './base/GestorAjusteRatio.js'
+import './estilos/EstiloVistaInicial.css'
 
 export class VistaInicial {
   constructor(canvas) {
@@ -7,11 +8,11 @@ export class VistaInicial {
     this.engine = new BABYLON.Engine(canvas, true)
     this.scene = null
     this.overlayEl = null
-    this.onTutorial = null
-    this.onRegistro = null
-    this.onInicioSesion = null
-    this.onJugar = null
-    this.onReglas = null
+    this._onTutorial = null
+    this._onRegistro = null
+    this._onInicioSesion = null
+    this._onJugar = null
+    this._onReglas = null
   }
 
   crearEscena() {
@@ -265,79 +266,38 @@ export class VistaInicial {
     const esMovil = window.innerWidth <= 768 || ('ontouchstart' in window && window.innerWidth < 1024)
     const overlay = document.createElement('div')
     overlay.id = 'pantallaMenuInicial'
-    overlay.style.cssText = `
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      display: none;
-      background: rgba(12, 9, 8, 0.48);
-      z-index: 100;
-      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
-    `
+    overlay.className = 'inicial-overlay'
+    overlay.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;display:none;'
     document.body.appendChild(overlay)
     this.overlayEl = overlay
 
     const barraSuperior = document.createElement('div')
+    barraSuperior.className = 'inicial-barra-superior'
     if (esMovil) {
-      barraSuperior.style.cssText = `
-        position: absolute;
-        top: 1%;
-        left: 50%;
-        transform: translateX(-50%);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 8px;
-        width: 88%;
-        max-width: 340px;
-        background: rgba(18, 14, 13, 0.72);
-        padding: 10px 16px;
-        border-radius: 14px;
-        box-sizing: border-box;
-      `
-    } else {
-      barraSuperior.style.cssText = `
-        position: absolute;
-        top: 6%;
-        right: 40px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        height: 92px;
-        background: rgba(18, 14, 13, 0.72);
-        padding: 0 20px;
-        border-radius: 18px;
-        box-sizing: border-box;
-      `
+      barraSuperior.style.position = 'absolute'
+      barraSuperior.style.top = '1%'
+      barraSuperior.style.left = '50%'
+      barraSuperior.style.right = 'auto'
+      barraSuperior.style.transform = 'translateX(-50%)'
+      barraSuperior.style.flexDirection = 'column'
+      barraSuperior.style.gap = '8px'
+      barraSuperior.style.width = '88%'
+      barraSuperior.style.maxWidth = '340px'
+      barraSuperior.style.height = 'auto'
+      barraSuperior.style.padding = '10px 16px'
+      barraSuperior.style.borderRadius = '14px'
     }
     overlay.appendChild(barraSuperior)
 
     const titulo = document.createElement('h1')
     titulo.textContent = 'Juego de Accidentes Tecnológicos'
+    titulo.className = 'inicial-titulo'
     if (esMovil) {
-      titulo.style.cssText = `
-        color: #ffe6d1;
-        font-size: 26px;
-        margin: 0;
-        position: absolute;
-        top: 20%;
-        left: 50%;
-        transform: translateX(-50%);
-        text-align: center;
-        width: 90%;
-        word-wrap: break-word;
-        line-height: 1.2;
-      `
-    } else {
-      titulo.style.cssText = `
-        color: #ffe6d1;
-        font-size: 42px;
-        margin: 0;
-        position: absolute;
-        top: 15%;
-        left: 50%;
-        transform: translateX(-50%);
-        text-align: center;
-      `
+      titulo.style.fontSize = '26px'
+      titulo.style.top = '20%'
+      titulo.style.width = '90%'
+      titulo.style.lineHeight = '1.2'
+      titulo.style.wordWrap = 'break-word'
     }
     overlay.appendChild(titulo)
 
@@ -345,20 +305,16 @@ export class VistaInicial {
       'Registrarse',
       '#2f2623',
       '#ffd6b5',
-      () => this.onRegistro && this.onRegistro()
+      () => this._onRegistro && this._onRegistro()
     )
     if (esMovil) {
-      btnRegistro.style.cssText += `
-        width: 100%;
-        height: 42px;
-        font-size: 17px;
-      `
+      btnRegistro.style.width = '100%'
+      btnRegistro.style.height = '42px'
+      btnRegistro.style.fontSize = '17px'
     } else {
-      btnRegistro.style.cssText += `
-        width: 200px;
-        height: 44px;
-        font-size: 18px;
-      `
+      btnRegistro.style.width = '200px'
+      btnRegistro.style.height = '44px'
+      btnRegistro.style.fontSize = '18px'
     }
     barraSuperior.appendChild(btnRegistro)
 
@@ -366,96 +322,52 @@ export class VistaInicial {
       'Iniciar Sesión',
       '#a84f16',
       '#fff1e3',
-      () => this.onInicioSesion && this.onInicioSesion()
+      () => this._onInicioSesion && this._onInicioSesion()
     )
     if (esMovil) {
-      btnInicioSesion.style.cssText += `
-        width: 100%;
-        height: 42px;
-        font-size: 17px;
-      `
+      btnInicioSesion.style.width = '100%'
+      btnInicioSesion.style.height = '42px'
+      btnInicioSesion.style.fontSize = '17px'
     } else {
-      btnInicioSesion.style.cssText += `
-        width: 220px;
-        height: 44px;
-        font-size: 18px;
-      `
+      btnInicioSesion.style.width = '220px'
+      btnInicioSesion.style.height = '44px'
+      btnInicioSesion.style.fontSize = '18px'
     }
     barraSuperior.appendChild(btnInicioSesion)
 
     const panelAcciones = document.createElement('div')
+    panelAcciones.className = 'inicial-panel-acciones'
     if (esMovil) {
-      panelAcciones.style.cssText = `
-        position: absolute;
-        top: 34%;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 88%;
-        max-width: 340px;
-        height: auto;
-        min-height: 260px;
-        border-radius: 22px;
-        border: 2px solid #8a4a20;
-        background: rgba(28, 20, 18, 0.92);
-        box-shadow: 0 16px 28px rgba(0,0,0,0.4);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 20px 16px;
-        box-sizing: border-box;
-      `
-    } else {
-      panelAcciones.style.cssText = `
-        position: absolute;
-        top: 35%;
-        left: 10%;
-        width: 320px;
-        height: 280px;
-        border-radius: 30px;
-        border: 2px solid #8a4a20;
-        background: rgba(28, 20, 18, 0.92);
-        box-shadow: 0 16px 28px rgba(0,0,0,0.4);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 25px;
-      `
+      panelAcciones.style.top = '34%'
+      panelAcciones.style.left = '50%'
+      panelAcciones.style.transform = 'translateX(-50%)'
+      panelAcciones.style.width = '88%'
+      panelAcciones.style.maxWidth = '340px'
+      panelAcciones.style.height = 'auto'
+      panelAcciones.style.minHeight = '260px'
+      panelAcciones.style.borderRadius = '22px'
+      panelAcciones.style.padding = '20px 16px'
     }
     overlay.appendChild(panelAcciones)
 
     const tituloPanel = document.createElement('h2')
     tituloPanel.textContent = 'Menú Principal'
-    tituloPanel.style.cssText = `
-      color: #ffd9bd;
-      font-size: ${esMovil ? '22px' : '26px'};
-      margin: 0 0 ${esMovil ? '16px' : '20px'} 0;
-      text-align: center;
-    `
+    tituloPanel.className = 'inicial-panel-titulo'
+    tituloPanel.style.fontSize = esMovil ? '22px' : '26px'
+    tituloPanel.style.marginBottom = esMovil ? '16px' : '20px'
     panelAcciones.appendChild(tituloPanel)
 
     const btnJugar = this._crearBoton(
       'Jugar',
       '#d66a1f',
       '#fff7ef',
-      () => this.onJugar && this.onJugar()
+      () => this._onJugar && this._onJugar()
     )
+    btnJugar.style.marginBottom = '10px'
     if (esMovil) {
-      btnJugar.style.cssText = `
-        width: 100%;
-        height: 48px;
-        border: none;
-        border-radius: 18px;
-        background: #d66a1f;
-        color: #fff7ef;
-        font-size: 20px;
-        font-family: 'Comic Neue', 'Comic Sans MS', cursive;
-        cursor: pointer;
-        margin-bottom: 10px;
-        -webkit-tap-highlight-color: transparent;
-        touch-action: manipulation;
-      `
-    } else {
-      btnJugar.style.marginBottom = '10px'
+      btnJugar.style.width = '100%'
+      btnJugar.style.height = '48px'
+      btnJugar.style.fontSize = '20px'
     }
     panelAcciones.appendChild(btnJugar)
 
@@ -463,25 +375,13 @@ export class VistaInicial {
       'Tutorial',
       '#3c2d27',
       '#ffd6b7',
-      () => this.onTutorial && this.onTutorial()
+      () => this._onTutorial && this._onTutorial()
     )
+    btnTutorial.style.marginBottom = '10px'
     if (esMovil) {
-      btnTutorial.style.cssText = `
-        width: 100%;
-        height: 48px;
-        border: none;
-        border-radius: 18px;
-        background: #3c2d27;
-        color: #ffd6b7;
-        font-size: 20px;
-        font-family: 'Comic Neue', 'Comic Sans MS', cursive;
-        cursor: pointer;
-        margin-bottom: 10px;
-        -webkit-tap-highlight-color: transparent;
-        touch-action: manipulation;
-      `
-    } else {
-      btnTutorial.style.marginBottom = '10px'
+      btnTutorial.style.width = '100%'
+      btnTutorial.style.height = '48px'
+      btnTutorial.style.fontSize = '20px'
     }
     panelAcciones.appendChild(btnTutorial)
 
@@ -489,22 +389,12 @@ export class VistaInicial {
       'Ver reglas',
       '#3c2d27',
       '#ffd6b7',
-      () => this.onReglas && this.onReglas()
+      () => this._onReglas && this._onReglas()
     )
     if (esMovil) {
-      btnReglas.style.cssText = `
-        width: 100%;
-        height: 48px;
-        border: none;
-        border-radius: 18px;
-        background: #3c2d27;
-        color: #ffd6b7;
-        font-size: 20px;
-        font-family: 'Comic Neue', 'Comic Sans MS', cursive;
-        cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
-        touch-action: manipulation;
-      `
+      btnReglas.style.width = '100%'
+      btnReglas.style.height = '48px'
+      btnReglas.style.fontSize = '20px'
     }
     panelAcciones.appendChild(btnReglas)
   }
@@ -512,20 +402,9 @@ export class VistaInicial {
   _crearBoton(texto, fondo, color, callback) {
     const btn = document.createElement('button')
     btn.textContent = texto
-    btn.style.cssText = `
-      width: 290px;
-      height: 52px;
-      border: none;
-      border-radius: 18px;
-      background: ${fondo};
-      color: ${color};
-      font-size: 21px;
-      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
-      cursor: pointer;
-      transition: transform 0.2s, opacity 0.2s;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-    `
+    btn.className = 'inicial-boton'
+    btn.style.background = fondo
+    btn.style.color = color
     const aplicarActivo = () => {
       btn.style.opacity = '0.85'
       btn.style.transform = 'scale(0.98)'
@@ -551,24 +430,24 @@ export class VistaInicial {
     if (this.overlayEl) this.overlayEl.style.display = 'none'
   }
 
-  setOnTutorial(callback) {
-    this.onTutorial = callback
+  onTutorial(callback) {
+    this._onTutorial = callback
   }
 
-  setOnRegistro(callback) {
-    this.onRegistro = callback
+  onRegistro(callback) {
+    this._onRegistro = callback
   }
 
-  setOnInicioSesion(callback) {
-    this.onInicioSesion = callback
+  onInicioSesion(callback) {
+    this._onInicioSesion = callback
   }
 
-  setOnJugar(callback) {
-    this.onJugar = callback
+  onJugar(callback) {
+    this._onJugar = callback
   }
 
-  setOnReglas(callback) {
-    this.onReglas = callback
+  onReglas(callback) {
+    this._onReglas = callback
   }
 
   render(targetFps = 60) {

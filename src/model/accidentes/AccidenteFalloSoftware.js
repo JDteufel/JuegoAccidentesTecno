@@ -1,6 +1,6 @@
 import { Accidente } from '../Accidente.js'
 import { CATEGORIAS_CARTA } from '../constantes.js'
-import imagenAccidente from '../../assets/accidentes/accidente5.svg'
+import imagenAccidente from '../../assets/accidentes/accidente5.png'
 
 export class AccidenteFalloSoftware extends Accidente {
   static imagen = imagenAccidente

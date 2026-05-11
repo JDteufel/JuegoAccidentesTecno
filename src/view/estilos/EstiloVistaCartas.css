@@ -1,0 +1,220 @@
+.cartas-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(12, 9, 8, 0.75);
+  z-index: 100;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.cartas-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.cartas-titulo {
+  color: #ffe6d1;
+  margin: 0;
+  text-align: center;
+}
+
+.cartas-contenido {
+  flex: 1;
+  display: flex;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.cartas-grid-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+.cartas-grid-wrapper::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.cartas-grid {
+  display: grid;
+  justify-content: center;
+  padding-bottom: 20px;
+}
+
+.cartas-slider-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 10px 0;
+}
+
+.cartas-slider {
+  writing-mode: vertical-lr;
+  height: 95%;
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(168, 90, 42, 0.3);
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+}
+
+.cartas-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #a85a2a;
+  cursor: pointer;
+  border: 2px solid #ffd8bc;
+}
+
+.cartas-slider::-moz-range-thumb {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #a85a2a;
+  cursor: pointer;
+  border: 2px solid #ffd8bc;
+}
+
+.cartas-boton {
+  border: none;
+  border-radius: 18px;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cartas-boton:hover {
+  opacity: 0.85;
+  transform: scale(1.05);
+}
+
+.cartas-carta {
+  border-radius: 15px;
+  border: 2px solid;
+  background: rgba(28, 28, 40, 0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  gap: 3px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cartas-carta:hover {
+  transform: scale(1.05);
+}
+
+.cartas-carta-imagen {
+  width: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.cartas-carta-badge {
+  font-weight: bold;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 4px 8px;
+  border-radius: 5px;
+}
+
+.cartas-carta-titulo {
+  font-weight: bold;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+  margin: 4px 0;
+  text-align: center;
+  word-wrap: break-word;
+}
+
+.cartas-carta-descripcion {
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+  text-align: center;
+  margin: 0;
+  word-wrap: break-word;
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cartas-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: none;
+  z-index: 200;
+}
+
+.cartas-modal-contenido {
+  position: fixed;
+  border-radius: 20px;
+  background: rgba(28, 28, 40, 0.98);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  gap: 12px;
+  overflow-y: auto;
+  opacity: 0;
+  transform: scale(0.3);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cartas-modal-imagen {
+  width: 100%;
+  object-fit: contain;
+  border-radius: 14px;
+}
+
+.cartas-modal-badge {
+  font-weight: bold;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 8px 20px;
+  border-radius: 10px;
+}
+
+.cartas-modal-titulo {
+  font-weight: bold;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+  margin: 10px 0 6px;
+  text-align: center;
+}
+
+.cartas-modal-horas {
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+}
+
+.cartas-modal-descripcion {
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+  text-align: center;
+  margin: 14px 0;
+  line-height: 1.6;
+}

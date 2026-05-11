@@ -1,6 +1,6 @@
 import { Carta } from '../Carta.js'
 import { CATEGORIAS_CARTA } from '../constantes.js'
-import imagenCarta from '../../assets/cartas/carta11.svg'
+import imagenCarta from '../../assets/cartas/carta11.png'
 
 export class CartaKubernetes extends Carta {
   static imagen = imagenCarta

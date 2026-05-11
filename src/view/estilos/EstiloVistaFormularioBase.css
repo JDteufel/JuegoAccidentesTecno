@@ -1,0 +1,114 @@
+.formulario-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  background: rgba(12, 9, 8, 0.64);
+  z-index: 100;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+  box-sizing: border-box;
+}
+
+.formulario-tarjeta {
+  width: 720px;
+  max-width: 92vw;
+  height: auto;
+  min-height: 400px;
+  max-height: 90vh;
+  border-radius: 28px;
+  border: 2px solid #8e4d22;
+  background: rgba(28, 21, 18, 0.95);
+  box-shadow: 0 14px 22px rgba(0, 0, 0, 0.4);
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow-y: auto;
+}
+
+.formulario-titulo {
+  color: #ffe4cf;
+  font-size: 32px;
+  margin: 0 0 30px 0;
+  text-align: center;
+}
+
+.formulario-campo-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  width: 76%;
+  max-width: 520px;
+}
+
+.formulario-input {
+  flex: 1;
+  height: 54px;
+  padding: 0 14px;
+  color: #fff2e8;
+  background: #2b211d;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  font-size: 20px;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+  outline: none;
+  transition: background 0.2s;
+  -webkit-appearance: none;
+}
+
+.formulario-input:focus {
+  background: #352821;
+}
+
+.formulario-toggle-btn {
+  width: 80px;
+  height: 54px;
+  color: #ffd8bc;
+  background: #4a3328;
+  border: 2px solid #8e4d22;
+  border-radius: 16px;
+  font-size: 16px;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+}
+
+.formulario-error {
+  color: #ff6b6b;
+  font-size: 16px;
+  min-height: 40px;
+  text-align: center;
+  visibility: hidden;
+  margin-top: 10px;
+}
+
+.formulario-boton {
+  width: 320px;
+  max-width: 320px;
+  height: 52px;
+  min-height: 48px;
+  border: none;
+  border-radius: 18px;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.formulario-boton:hover {
+  opacity: 0.85;
+  transform: scale(1.05);
+}
+
+.formulario-boton:active {
+  opacity: 0.85;
+  transform: scale(0.98);
+}

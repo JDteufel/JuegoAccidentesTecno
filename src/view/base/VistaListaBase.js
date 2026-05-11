@@ -1,4 +1,5 @@
 import { GestorAjusteRatio } from './GestorAjusteRatio.js'
+import '../estilos/EstiloVistaListaBase.css'
 
 export class VistaListaBase {
   constructor() {
@@ -16,49 +17,23 @@ export class VistaListaBase {
 
     const container = document.createElement('div')
     container.id = configuracion.nombreOverlay
-    container.style.cssText = `
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      display: none;
-      justify-content: center;
-      align-items: center;
-      background: rgba(12, 9, 8, 0.64);
-      z-index: 100;
-      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
-      padding: ${esMovil ? '12px' : '20px'};
-      box-sizing: border-box;
-    `
+    container.className = 'lista-overlay'
+    container.style.cssText = `position:absolute;top:0;left:0;width:100%;height:100%;display:none;justify-content:center;align-items:center;padding:${esMovil ? '12px' : '20px'};`
     document.body.appendChild(container)
     this.containerEl = container
 
     const tarjeta = document.createElement('div')
-    tarjeta.style.cssText = `
-      width: 720px;
-      max-width: 92vw;
-      height: auto;
-      max-height: 90vh;
-      border-radius: ${esMovil ? '18px' : '28px'};
-      border: 2px solid #8e4d22;
-      background: rgba(28, 21, 18, 0.95);
-      box-shadow: 0 14px 22px rgba(0,0,0,0.4);
-      padding: ${esMovil ? '24px 18px' : '40px'};
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: relative;
-      overflow-y: auto;
-    `
+    tarjeta.className = 'lista-tarjeta'
+    tarjeta.style.borderRadius = esMovil ? '18px' : '28px'
+    tarjeta.style.padding = esMovil ? '24px 18px' : '40px'
     container.appendChild(tarjeta)
     this.tarjetaEl = tarjeta
 
     this.tituloEl = document.createElement('h2')
     this.tituloEl.textContent = configuracion.titulo
-    this.tituloEl.style.cssText = `
-      color: #ffe4cf;
-      font-size: ${esMovil ? '26px' : '32px'};
-      margin: 0 0 ${esMovil ? '20px' : '30px'} 0;
-      text-align: center;
-    `
+    this.tituloEl.className = 'lista-titulo'
+    this.tituloEl.style.fontSize = esMovil ? '26px' : '32px'
+    this.tituloEl.style.marginBottom = esMovil ? '20px' : '30px'
     tarjeta.appendChild(this.tituloEl)
 
     this.itemsElements = []
@@ -73,14 +48,7 @@ export class VistaListaBase {
     })
 
     this.errorEl = document.createElement('div')
-    this.errorEl.style.cssText = `
-      color: #ff6b6b;
-      font-size: ${esMovil ? '14px' : '16px'};
-      min-height: 40px;
-      text-align: center;
-      visibility: hidden;
-      margin-top: 10px;
-    `
+    this.errorEl.className = 'lista-error'
     tarjeta.appendChild(this.errorEl)
 
     const btnVolver = this._crearBoton(
@@ -96,26 +64,15 @@ export class VistaListaBase {
   _crearItemInfo({ nombre, texto, alterno = false }) {
     const esMovil = GestorAjusteRatio.esMovil()
     const bloque = document.createElement('div')
-    bloque.style.cssText = `
-      width: ${esMovil ? '92%' : '78%'};
-      min-height: ${esMovil ? '48px' : '52px'};
-      border-radius: 14px;
-      background: ${alterno ? '#3a2a24' : '#2f221d'};
-      display: flex;
-      align-items: center;
-      padding: 0 ${esMovil ? '14px' : '18px'};
-      box-sizing: border-box;
-      margin-bottom: 8px;
-    `
+    bloque.className = alterno ? 'lista-item lista-item-alterno' : 'lista-item'
+    bloque.style.width = esMovil ? '92%' : '78%'
+    bloque.style.minHeight = esMovil ? '48px' : '52px'
+    bloque.style.padding = esMovil ? '0 14px' : '0 18px'
 
     const textoEl = document.createElement('span')
     textoEl.textContent = texto
-    textoEl.style.cssText = `
-      color: #ffe2cc;
-      font-size: ${esMovil ? '17px' : '19px'};
-      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
-      line-height: 1.4;
-    `
+    textoEl.className = 'lista-item-texto'
+    textoEl.style.fontSize = esMovil ? '17px' : '19px'
     bloque.appendChild(textoEl)
 
     return bloque
@@ -125,22 +82,11 @@ export class VistaListaBase {
     const esMovil = GestorAjusteRatio.esMovil()
     const btn = document.createElement('button')
     btn.textContent = texto
-    btn.style.cssText = `
-      width: ${esMovil ? '90%' : '320px'};
-      max-width: 320px;
-      height: 52px;
-      min-height: 48px;
-      border: none;
-      border-radius: 18px;
-      background: ${fondo};
-      color: ${color};
-      font-size: ${esMovil ? '19px' : '22px'};
-      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
-      cursor: pointer;
-      transition: transform 0.2s, opacity 0.2s;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-    `
+    btn.className = 'lista-boton'
+    btn.style.width = esMovil ? '90%' : '320px'
+    btn.style.background = fondo
+    btn.style.color = color
+    btn.style.fontSize = esMovil ? '19px' : '22px'
     this._agregarFeedbackBoton(btn)
     btn.addEventListener('click', callback)
     return btn

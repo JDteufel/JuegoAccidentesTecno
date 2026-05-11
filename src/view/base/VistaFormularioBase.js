@@ -1,4 +1,5 @@
 import { GestorAjusteRatio } from './GestorAjusteRatio.js'
+import '../estilos/EstiloVistaFormularioBase.css'
 
 export class VistaFormularioBase {
   constructor() {
@@ -17,50 +18,24 @@ export class VistaFormularioBase {
 
     const container = document.createElement('div')
     container.id = configuracion.nombreOverlay
-    container.style.cssText = `
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      display: none;
-      justify-content: center;
-      align-items: center;
-      background: rgba(12, 9, 8, 0.64);
-      z-index: 100;
-      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
-      padding: ${esMovil ? '12px' : '20px'};
-      box-sizing: border-box;
-    `
+    container.className = 'formulario-overlay'
+    container.style.cssText = `position:absolute;top:0;left:0;width:100%;height:100%;display:none;justify-content:center;align-items:center;padding:${esMovil ? '12px' : '20px'};`
     document.body.appendChild(container)
     this.containerEl = container
 
     const tarjeta = document.createElement('div')
-    tarjeta.style.cssText = `
-      width: 720px;
-      max-width: 92vw;
-      height: auto;
-      min-height: ${esMovil ? 'auto' : '400px'};
-      max-height: 90vh;
-      border-radius: ${esMovil ? '18px' : '28px'};
-      border: 2px solid #8e4d22;
-      background: rgba(28, 21, 18, 0.95);
-      box-shadow: 0 14px 22px rgba(0,0,0,0.4);
-      padding: ${esMovil ? '24px 18px' : '40px'};
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: relative;
-      overflow-y: auto;
-    `
+    tarjeta.className = 'formulario-tarjeta'
+    tarjeta.style.minHeight = esMovil ? 'auto' : '400px'
+    tarjeta.style.borderRadius = esMovil ? '18px' : '28px'
+    tarjeta.style.padding = esMovil ? '24px 18px' : '40px'
     container.appendChild(tarjeta)
     this.tarjetaEl = tarjeta
 
     const titulo = document.createElement('h2')
     titulo.textContent = configuracion.titulo
-    titulo.style.cssText = `
-      color: #ffe4cf;
-      font-size: ${esMovil ? '26px' : '32px'};
-      margin: 0 0 ${esMovil ? '20px' : '30px'} 0;
-      text-align: center;
-    `
+    titulo.className = 'formulario-titulo'
+    titulo.style.fontSize = esMovil ? '26px' : '32px'
+    titulo.style.marginBottom = esMovil ? '20px' : '30px'
     tarjeta.appendChild(titulo)
 
     this.campos = []
@@ -71,14 +46,7 @@ export class VistaFormularioBase {
     })
 
     this.errorEl = document.createElement('div')
-    this.errorEl.style.cssText = `
-      color: #ff6b6b;
-      font-size: ${esMovil ? '14px' : '16px'};
-      min-height: 40px;
-      text-align: center;
-      visibility: hidden;
-      margin-top: 10px;
-    `
+    this.errorEl.className = 'formulario-error'
     tarjeta.appendChild(this.errorEl)
 
     this.accionButton = this._crearBoton(
@@ -105,14 +73,8 @@ export class VistaFormularioBase {
   _crearCampoEntrada({ nombre, placeholder, isPassword = false, showPasswordButton = false }) {
     const esMovil = GestorAjusteRatio.esMovil()
     const wrapper = document.createElement('div')
-    wrapper.style.cssText = `
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 12px;
-      width: ${esMovil ? '90%' : '76%'};
-      max-width: 520px;
-    `
+    wrapper.className = 'formulario-campo-wrapper'
+    wrapper.style.width = esMovil ? '90%' : '76%'
 
     const input = document.createElement('input')
     input.type = isPassword ? 'password' : 'text'
@@ -121,20 +83,8 @@ export class VistaFormularioBase {
     input.autocorrect = 'off'
     input.autocapitalize = 'off'
     input.spellcheck = false
-    input.style.cssText = `
-      flex: 1;
-      height: ${esMovil ? '48px' : '54px'};
-      padding: 0 14px;
-      color: #fff2e8;
-      background: #2b211d;
-      border: 2px solid transparent;
-      border-radius: 16px;
-      font-size: 20px;
-      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
-      outline: none;
-      transition: background 0.2s;
-      -webkit-appearance: none;
-    `
+    input.className = 'formulario-input'
+    input.style.height = esMovil ? '48px' : '54px'
     input.addEventListener('focus', () => input.style.background = '#352821')
     input.addEventListener('blur', () => input.style.background = '#2b211d')
 
@@ -144,20 +94,9 @@ export class VistaFormularioBase {
     if (showPasswordButton) {
       toggleBtn = document.createElement('button')
       toggleBtn.textContent = 'Ver'
-      toggleBtn.style.cssText = `
-        width: ${esMovil ? '70px' : '80px'};
-        height: ${esMovil ? '48px' : '54px'};
-        color: #ffd8bc;
-        background: #4a3328;
-        border: 2px solid #8e4d22;
-        border-radius: 16px;
-        font-size: 16px;
-        font-family: 'Comic Neue', 'Comic Sans MS', cursive;
-        cursor: pointer;
-        transition: opacity 0.2s;
-        -webkit-tap-highlight-color: transparent;
-        flex-shrink: 0;
-      `
+      toggleBtn.className = 'formulario-toggle-btn'
+      toggleBtn.style.width = esMovil ? '70px' : '80px'
+      toggleBtn.style.height = esMovil ? '48px' : '54px'
       this._agregarFeedbackBoton(toggleBtn)
 
       let passwordVisible = false
@@ -183,22 +122,11 @@ export class VistaFormularioBase {
     const esMovil = GestorAjusteRatio.esMovil()
     const btn = document.createElement('button')
     btn.textContent = texto
-    btn.style.cssText = `
-      width: ${esMovil ? '90%' : '320px'};
-      max-width: 320px;
-      height: 52px;
-      min-height: 48px;
-      border: none;
-      border-radius: 18px;
-      background: ${fondo};
-      color: ${color};
-      font-size: ${esMovil ? '19px' : '22px'};
-      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
-      cursor: pointer;
-      transition: transform 0.2s, opacity 0.2s;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-    `
+    btn.className = 'formulario-boton'
+    btn.style.width = esMovil ? '90%' : '320px'
+    btn.style.background = fondo
+    btn.style.color = color
+    btn.style.fontSize = esMovil ? '19px' : '22px'
     this._agregarFeedbackBoton(btn)
     btn.addEventListener('click', callback)
     return btn

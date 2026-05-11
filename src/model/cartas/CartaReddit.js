@@ -1,6 +1,6 @@
 import { Carta } from '../Carta.js'
 import { CATEGORIAS_CARTA } from '../constantes.js'
-import imagenCarta from '../../assets/cartas/carta4.svg'
+import imagenCarta from '../../assets/cartas/carta4.png'
 
 export class CartaReddit extends Carta {
   static imagen = imagenCarta

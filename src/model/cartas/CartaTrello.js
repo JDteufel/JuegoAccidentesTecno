@@ -1,6 +1,6 @@
 import { Carta } from '../Carta.js'
 import { CATEGORIAS_CARTA } from '../constantes.js'
-import imagenCarta from '../../assets/cartas/carta19.svg'
+import imagenCarta from '../../assets/cartas/carta19.png'
 
 export class CartaTrello extends Carta {
   static imagen = imagenCarta

@@ -1,6 +1,6 @@
 import { Carta } from '../Carta.js'
 import { CATEGORIAS_CARTA } from '../constantes.js'
-import imagenCarta from '../../assets/cartas/carta24.svg'
+import imagenCarta from '../../assets/cartas/carta24.png'
 
 export class CartaSpotify extends Carta {
   static imagen = imagenCarta

@@ -1,6 +1,6 @@
 import { Carta } from '../Carta.js'
 import { CATEGORIAS_CARTA } from '../constantes.js'
-import imagenCarta from '../../assets/cartas/carta14.svg'
+import imagenCarta from '../../assets/cartas/carta14.png'
 
 export class CartaGoogleDrive extends Carta {
   static imagen = imagenCarta

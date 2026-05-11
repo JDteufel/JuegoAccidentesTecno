@@ -19,15 +19,15 @@ export class ControladorVistaInicialR {
   }
 
   init() {
-    this.vistaInicialR.setOnTutorial(() => {
+    this.vistaInicialR.onTutorial(() => {
       this.vistaTutorial.mostrar()
     })
 
-    this.vistaInicialR.setOnReglas(() => {
+    this.vistaInicialR.onReglas(() => {
       this.controladorEstadoApp.irAPantalla(PANTALLAS.REGLAS)
     })
 
-    this.vistaInicialR.setOnCrearJuego(async () => {
+    this.vistaInicialR.onCrearJuego(async () => {
       console.log('[ControladorVistaInicialR] Boton Crear juego presionado')
       const username = this.estadoApp.getUsername()
       console.log('[ControladorVistaInicialR] Username:', username)
@@ -68,7 +68,7 @@ export class ControladorVistaInicialR {
       }
     })
 
-    this.vistaInicialR.setOnCerrarSesion(() => {
+    this.vistaInicialR.onCerrarSesion(() => {
 
       if (this.unsubscribeLobbyUpdates) {
         this.unsubscribeLobbyUpdates()

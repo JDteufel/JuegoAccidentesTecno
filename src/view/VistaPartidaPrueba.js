@@ -671,7 +671,7 @@ export class VistaPartidaPrueba {
 
     const categoria = new GUI.TextBlock(`categoriaPrueba_${indice}`, carta.categorias.map(c => c.toUpperCase()).join(', '))
     categoria.top = '-22px'
-    categoria.left = '18px'
+    categoria.left = '68px'
     categoria.width = '96px'
     categoria.height = '18px'
     categoria.color = '#fff4ea'
@@ -681,27 +681,20 @@ export class VistaPartidaPrueba {
     categoria.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
     cartaPanel.addControl(categoria)
 
-    const ilustracion = new GUI.Rectangle(`ilustracionPrueba_${indice}`)
-    ilustracion.width = '34px'
-    ilustracion.height = '34px'
-    ilustracion.left = '2px'
-    ilustracion.top = '10px'
-    ilustracion.thickness = 2
-    ilustracion.cornerRadius = 8
-    ilustracion.color = '#8a5a37'
-    ilustracion.background = '#31211b'
-    cartaPanel.addControl(ilustracion)
-
-    const icono = new GUI.TextBlock(`iconoCartaPrueba_${indice}`, carta.codigo)
-    icono.color = '#f6d5b3'
-    icono.fontSize = 14
-    icono.fontFamily = 'Comic Sans MS'
-    icono.fontWeight = 'bold'
-    ilustracion.addControl(icono)
+    const imagenSrc = carta.obtenerImagen ? carta.obtenerImagen() : null
+    if (imagenSrc) {
+      const ilustracion = new GUI.Image(`ilustracionPrueba_${indice}`, imagenSrc)
+      ilustracion.width = '60px'
+      ilustracion.height = '84px'
+      ilustracion.left = '2px'
+      ilustracion.top = '10px'
+      ilustracion.stretch = GUI.Image.STRETCH_UNIFORM
+      cartaPanel.addControl(ilustracion)
+    }
 
     const nombre = new GUI.TextBlock(`nombrePrueba_${indice}`, carta.titulo)
     nombre.top = '2px'
-    nombre.left = '26px'
+    nombre.left = '68px'
     nombre.width = '96px'
     nombre.height = '24px'
     nombre.color = '#ffe0c2'
@@ -714,7 +707,7 @@ export class VistaPartidaPrueba {
 
     const descripcion = new GUI.TextBlock(`detallePrueba_${indice}`, carta.detalle)
     descripcion.top = '24px'
-    descripcion.left = '26px'
+    descripcion.left = '68px'
     descripcion.width = '96px'
     descripcion.height = '30px'
     descripcion.color = '#e7cfbc'
@@ -728,7 +721,7 @@ export class VistaPartidaPrueba {
     pieCarta.width = '104px'
     pieCarta.height = '8px'
     pieCarta.top = '30px'
-    pieCarta.left = '22px'
+    pieCarta.left = '64px'
     pieCarta.thickness = 0
     pieCarta.cornerRadius = 4
     pieCarta.background = carta.color

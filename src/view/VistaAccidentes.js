@@ -1,5 +1,6 @@
 import { seleccionarAccidentesAleatorios } from '../model/accidentes/index.js'
 import { GestorAjusteRatio } from './base/GestorAjusteRatio.js'
+import './estilos/EstiloVistaAccidentes.css'
 
 export class VistaAccidentes {
   constructor() {
@@ -44,45 +45,21 @@ export class VistaAccidentes {
 
     const container = document.createElement('div')
     container.id = 'vistaAccidentes'
-    container.style.cssText = `
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      background: rgba(12, 9, 8, 0.75);
-      z-index: 100;
-      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
-      padding-top: ${cfg.paddingSuperior};
-      box-sizing: border-box;
-      overflow: hidden;
-    `
+    container.className = 'accidentes-overlay'
+    container.style.cssText = `position:absolute;top:0;left:0;width:100%;height:100%;display:none;flex-direction:column;align-items:center;padding-top:${cfg.paddingSuperior};`
     document.body.appendChild(container)
     this.containerEl = container
 
     const header = document.createElement('div')
-    header.style.cssText = `
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: ${cfg.headerGap};
-      margin-bottom: 8px;
-      flex-shrink: 0;
-      flex-wrap: wrap;
-      padding: 0 ${cfg.paddingLateral}px;
-      width: 100%;
-      box-sizing: border-box;
-    `
+    header.className = 'accidentes-header'
+    header.style.gap = cfg.headerGap
+    header.style.padding = `0 ${cfg.paddingLateral}px`
     container.appendChild(header)
 
     const titulo = document.createElement('h1')
     titulo.textContent = 'Accidentes Tecnologicos'
-    titulo.style.cssText = `
-      color: #ffe6d1;
-      font-size: ${cfg.tamanoTitulo};
-      margin: 0;
-      text-align: center;
-    `
+    titulo.className = 'accidentes-titulo'
+    titulo.style.fontSize = cfg.tamanoTitulo
     header.appendChild(titulo)
 
     const btnVolver = this._crearBoton('Volver a Reglas', '#362924', '#ffd8bc', () => {
@@ -91,26 +68,13 @@ export class VistaAccidentes {
     header.appendChild(btnVolver)
 
     const contenidoWrapper = document.createElement('div')
-    contenidoWrapper.style.cssText = `
-      flex: 1;
-      display: flex;
-      width: 100%;
-      min-height: 0;
-      overflow: hidden;
-    `
+    contenidoWrapper.className = 'accidentes-contenido'
     container.appendChild(contenidoWrapper)
 
     const gridWrapper = document.createElement('div')
-    gridWrapper.style.cssText = `
-      flex: 1;
-      overflow-y: auto;
-      overflow-x: hidden;
-      padding: 5px ${cfg.paddingLateral}px 20px;
-      box-sizing: border-box;
-      -webkit-overflow-scrolling: touch;
-      touch-action: pan-y;
-      margin-right: ${cfg.sliderAncho}px;
-    `
+    gridWrapper.className = 'accidentes-grid-wrapper vista-accidentes-scroll'
+    gridWrapper.style.padding = `5px ${cfg.paddingLateral}px 20px`
+    gridWrapper.style.marginRight = `${cfg.sliderAncho}px`
     gridWrapper.addEventListener('wheel', (e) => {
       e.preventDefault()
       gridWrapper.scrollTop += e.deltaY
@@ -132,13 +96,9 @@ export class VistaAccidentes {
     const tamanoCSS = typeof cfg.columnas === 'string' && cfg.columnas.startsWith('repeat')
       ? cfg.columnas
       : `repeat(${cfg.columnas}, ${cfg.tamanoAccidente}px)`
-    grid.style.cssText = `
-      display: grid;
-      grid-template-columns: ${tamanoCSS};
-      gap: ${cfg.gap}px;
-      justify-content: center;
-      padding-bottom: 20px;
-    `
+    grid.className = 'accidentes-grid'
+    grid.style.gridTemplateColumns = tamanoCSS
+    grid.style.gap = `${cfg.gap}px`
     gridWrapper.appendChild(grid)
     this.gridEl = gridWrapper
 
@@ -148,31 +108,16 @@ export class VistaAccidentes {
     })
 
     const sliderBar = document.createElement('div')
-    sliderBar.style.cssText = `
-      width: ${cfg.sliderAncho}px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      padding: 10px 0;
-    `
+    sliderBar.className = 'accidentes-slider-bar'
+    sliderBar.style.width = `${cfg.sliderAncho}px`
 
     const slider = document.createElement('input')
     slider.type = 'range'
     slider.min = '0'
     slider.max = '100'
     slider.value = '0'
-    slider.style.cssText = `
-      writing-mode: vertical-lr;
-      height: 95%;
-      width: ${cfg.sliderAncho - 8}px;
-      -webkit-appearance: none;
-      appearance: none;
-      background: rgba(168, 90, 42, 0.3);
-      border-radius: 4px;
-      outline: none;
-      cursor: pointer;
-    `
+    slider.className = 'accidentes-slider'
+    slider.style.width = `${cfg.sliderAncho - 8}px`
     slider.addEventListener('input', () => {
       const maxScroll = gridWrapper.scrollHeight - gridWrapper.clientHeight
       gridWrapper.scrollTop = (slider.value / 100) * maxScroll
@@ -181,38 +126,6 @@ export class VistaAccidentes {
     sliderBar.appendChild(slider)
     contenidoWrapper.appendChild(sliderBar)
     this.sliderEl = slider
-
-    if (!document.getElementById('estilosVistaAccidentes')) {
-      const style = document.createElement('style')
-      style.id = 'estilosVistaAccidentes'
-      style.textContent = `
-        input[type="range"]::-webkit-slider-thumb {
-          -webkit-appearance: none;
-          appearance: none;
-          width: 26px;
-          height: 26px;
-          border-radius: 50%;
-          background: #a85a2a;
-          cursor: pointer;
-          border: 2px solid #ffd8bc;
-        }
-        input[type="range"]::-moz-range-thumb {
-          width: 26px;
-          height: 26px;
-          border-radius: 50%;
-          background: #a85a2a;
-          cursor: pointer;
-          border: 2px solid #ffd8bc;
-        }
-        .vista-accidentes-scroll::-webkit-scrollbar {
-          width: 0;
-          height: 0;
-        }
-      `
-      document.head.appendChild(style)
-    }
-
-    gridWrapper.classList.add('vista-accidentes-scroll')
 
     gridWrapper.addEventListener('scroll', () => {
       const maxScroll = gridWrapper.scrollHeight - gridWrapper.clientHeight
@@ -227,32 +140,11 @@ export class VistaAccidentes {
 
     const overlay = document.createElement('div')
     overlay.id = 'modalAccidente'
-    overlay.style.cssText = `
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.7);
-      display: none;
-      z-index: 200;
-    `
+    overlay.className = 'accidentes-modal-overlay'
 
     const contenido = document.createElement('div')
     contenido.id = 'modalAccidenteContenido'
-    contenido.style.cssText = `
-      position: fixed;
-      border-radius: 20px;
-      background: rgba(28, 20, 18, 0.98);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 30px;
-      box-sizing: border-box;
-      gap: 12px;
-      overflow-y: auto;
-      opacity: 0;
-      transform: scale(0.3);
-      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
-      -webkit-overflow-scrolling: touch;
-    `
+    contenido.className = 'accidentes-modal-contenido'
 
     overlay.appendChild(contenido)
     document.body.appendChild(overlay)
@@ -455,22 +347,11 @@ export class VistaAccidentes {
     const nivelColor = accidente.nivel >= 3 ? '#ff4444' : accidente.nivel === 2 ? '#ffaa00' : '#ffcc66'
 
     const contenedor = document.createElement('div')
-    contenedor.style.cssText = `
-      width: ${cfg.tamanoAccidente}px;
-      min-height: ${cfg.altoMin}px;
-      border-radius: 15px;
-      border: 2px solid ${nivelColor};
-      background: rgba(28,20,18,0.95);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 12px;
-      box-sizing: border-box;
-      gap: 6px;
-      cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      -webkit-tap-highlight-color: transparent;
-    `
+    contenedor.className = 'accidentes-item'
+    contenedor.style.width = `${cfg.tamanoAccidente}px`
+    contenedor.style.minHeight = `${cfg.altoMin}px`
+    contenedor.style.borderColor = nivelColor
+    contenedor.style.padding = '12px'
 
     if (GestorAjusteRatio.esLandscape() && !GestorAjusteRatio.esMovil()) {
       contenedor.addEventListener('mouseenter', () => {
@@ -492,72 +373,41 @@ export class VistaAccidentes {
       const imagen = document.createElement('img')
       imagen.src = imagenSrc
       imagen.alt = accidente.nombre
-      imagen.style.cssText = `
-        width: 100%;
-        height: ${cfg.tamanoImagen}px;
-        object-fit: contain;
-        border-radius: 8px;
-      `
+      imagen.className = 'accidentes-item-imagen'
+      imagen.style.height = `${cfg.tamanoImagen}px`
       contenedor.appendChild(imagen)
     }
 
     const nivelBadge = document.createElement('span')
     nivelBadge.textContent = `Nivel ${accidente.nivel}`
-    nivelBadge.style.cssText = `
-      font-size: ${cfg.tamanoNivel}px;
-      font-weight: bold;
-      color: ${nivelColor};
-      background: rgba(0,0,0,0.5);
-      padding: 4px 10px;
-      border-radius: 5px;
-    `
+    nivelBadge.className = 'accidentes-item-nivel'
+    nivelBadge.style.fontSize = `${cfg.tamanoNivel}px`
+    nivelBadge.style.color = nivelColor
     contenedor.appendChild(nivelBadge)
 
     const titulo = document.createElement('h3')
     titulo.textContent = accidente.nombre
-    titulo.style.cssText = `
-      font-size: ${cfg.tamanoNombre}px;
-      font-weight: bold;
-      color: ${nivelColor};
-      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
-      margin: 4px 0;
-      text-align: center;
-      word-wrap: break-word;
-    `
+    titulo.className = 'accidentes-item-titulo'
+    titulo.style.fontSize = `${cfg.tamanoNombre}px`
+    titulo.style.color = nivelColor
+
     contenedor.appendChild(titulo)
 
     const categorias = document.createElement('div')
-    categorias.style.cssText = `
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-      justify-content: center;
-    `
+    categorias.className = 'accidentes-item-categorias'
     accidente.categoriasAfectadas.forEach((cat) => {
       const catBadge = document.createElement('span')
       catBadge.textContent = cat
-      catBadge.style.cssText = `
-        font-size: ${cfg.tamanoCat}px;
-        color: #ffd8bc;
-        background: rgba(168, 90, 42, 0.4);
-        padding: 3px 6px;
-        border-radius: 4px;
-      `
+      catBadge.className = 'accidentes-item-cat-badge'
+      catBadge.style.fontSize = `${cfg.tamanoCat}px`
       categorias.appendChild(catBadge)
     })
     contenedor.appendChild(categorias)
 
     const descripcion = document.createElement('p')
     descripcion.textContent = accidente.descripcion
-    descripcion.style.cssText = `
-      font-size: ${cfg.tamanoDesc}px;
-      color: #ffe9d6;
-      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
-      text-align: center;
-      margin: 0;
-      word-wrap: break-word;
-      line-height: 1.4;
-    `
+    descripcion.className = 'accidentes-item-descripcion'
+    descripcion.style.fontSize = `${cfg.tamanoDesc}px`
     contenedor.appendChild(descripcion)
 
     return contenedor

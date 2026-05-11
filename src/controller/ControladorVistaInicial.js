@@ -12,23 +12,23 @@ export class ControladorVistaInicial {
   }
 
   init() {
-    this.vistaInicial.setOnTutorial(() => {
+    this.vistaInicial.onTutorial(() => {
       this.vistaTutorial.mostrar()
     })
 
-    this.vistaInicial.setOnRegistro(() => {
+    this.vistaInicial.onRegistro(() => {
       this.controladorEstadoApp.irAPantalla(PANTALLAS.REGISTRO)
     })
 
-    this.vistaInicial.setOnInicioSesion(() => {
+    this.vistaInicial.onInicioSesion(() => {
       this.controladorEstadoApp.irAPantalla(PANTALLAS.INICIO_SESION)
     })
 
-    this.vistaInicial.setOnJugar(() => {
+    this.vistaInicial.onJugar(() => {
       this.controladorEstadoApp.irAPantalla(PANTALLAS.UNIRSE_LOBBY)
     })
 
-    this.vistaInicial.setOnReglas(() => {
+    this.vistaInicial.onReglas(() => {
       this.controladorEstadoApp.irAPantalla(PANTALLAS.REGLAS)
     })
   }

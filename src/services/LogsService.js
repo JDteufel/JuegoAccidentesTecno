@@ -121,44 +121,38 @@ export function obtenerEstadisticas() {
   }
 }
 
-export const EVENT_TYPES = {
-  LOBBY: 'LOBBY',
-  PARTIDA: 'PARTIDA',
-  JUGADOR: 'JUGADOR',
-  CARTA: 'CARTA',
-  ACCIDENTE: 'ACCIDENTE',
-  SISTEMA: 'SISTEMA',
-  USUARIO: 'USUARIO',
-  SESION: 'SESION',
-  ERROR: 'ERROR'
+export const TiposEvento = {
+  Lobby: 'lobby',
+  Partida: 'partida',
+  Jugador: 'jugador',
+  Carta: 'carta',
+  Accidente: 'accidente',
+  Sistema: 'sistema',
+  Usuario: 'usuario',
+  Sesion: 'sesion',
+  Error: 'error'
 }
 
-export const EVENT_ACTIONS = {
-
-  USUARIO_REGISTRO: 'registro',
-  USUARIO_LOGIN: 'login',
-  USUARIO_LOGOUT: 'logout',
-
-  SESION_CONEXION: 'conexion',
-  SESION_DESCONEXION: 'desconexion',
-
-  LOBBY_CREATE: 'create',
-  LOBBY_JOIN: 'join',
-  LOBBY_LEAVE: 'leave',
-  LOBBY_CLOSE: 'close',
-
-  PARTIDA_START: 'start',
-  PARTIDA_END: 'end',
-  PARTIDA_TURNO: 'turno',
-  PARTIDA_CARTA_JUGADA: 'carta_jugada',
-  PARTIDA_CARTA_INTERCAMBIADA: 'carta_intercambiada',
-  PARTIDA_ACCIDENTE_ACTIVADO: 'accidente_activado',
-  PARTIDA_ACTIVIDAD_GRUPAL: 'actividad_grupal',
-  PARTIDA_PERFIL_COMPLETADO: 'perfil_completado',
-
-  METRICA_CARTA_USO: 'carta_uso',
-  METRICA_TURNO_DURACION: 'turno_duracion',
-  METRICA_PARTIDA_DURACION: 'partida_duracion',
-
-  ERROR: 'error'
+export const AccionesEvento = {
+  UsuarioRegistro: 'registro',
+  UsuarioInicioSesion: 'inicio_sesion',
+  UsuarioCierreSesion: 'cierre_sesion',
+  SesionConexion: 'conexion',
+  SesionDesconexion: 'desconexion',
+  LobbyCrear: 'crear',
+  LobbyUnir: 'unir',
+  LobbySalir: 'salir',
+  LobbyCerrar: 'cerrar',
+  PartidaInicio: 'inicio',
+  PartidaFin: 'fin',
+  PartidaTurno: 'turno',
+  PartidaCartaJugada: 'carta_jugada',
+  PartidaCartaIntercambiada: 'carta_intercambiada',
+  PartidaAccidenteActivado: 'accidente_activado',
+  PartidaActividadGrupal: 'actividad_grupal',
+  PartidaPerfilCompletado: 'perfil_completado',
+  MetricaCartaUso: 'carta_uso',
+  MetricaTurnoDuracion: 'turno_duracion',
+  MetricaPartidaDuracion: 'partida_duracion',
+  Error: 'error'
 }

@@ -4,7 +4,7 @@ export class ControladorVistaTutorial {
   }
 
   init() {
-    this.vistaTutorial.alCerrar(() => {
+    this.vistaTutorial.onCerrar(() => {
       this.vistaTutorial.ocultar()
     })
   }
