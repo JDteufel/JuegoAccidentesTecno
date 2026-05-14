@@ -4,7 +4,7 @@ export class PerfilEspecialistaRedes extends Perfil {
   constructor() {
     super({
       nombre: 'Especialista en Redes',
-      horasRequeridas: 6,
+      horasPorCategoria: { Trabajo: 4, Estudio: 2 },
       categoriasValidas: ['Trabajo', 'Estudio'],
       descripcion: 'Administra infraestructura de redes.'
     })

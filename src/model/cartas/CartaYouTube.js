@@ -22,7 +22,7 @@ export class CartaYouTube extends Carta {
   }
 
   aplicarHoras(perfil) {
-    if (!perfil.cartaEsValida(this.categoria)) return 0
+    if (!perfil.cartaEsValida(this.categorias)) return 0
     return super.aplicarHoras(perfil)
   }
 }

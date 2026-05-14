@@ -4,7 +4,7 @@ export class PerfilGerenteProyectosTI extends Perfil {
   constructor() {
     super({
       nombre: 'Gerente de Proyectos TI',
-      horasRequeridas: 6,
+      horasPorCategoria: { Trabajo: 3, Bienestar: 1, Estudio: 2 },
       categoriasValidas: ['Trabajo', 'Bienestar', 'Estudio'],
       descripcion: 'Lidera proyectos tecnologicos.'
     })

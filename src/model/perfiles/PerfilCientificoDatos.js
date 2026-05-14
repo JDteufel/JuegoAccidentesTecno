@@ -4,7 +4,7 @@ export class PerfilCientificoDatos extends Perfil {
   constructor() {
     super({
       nombre: 'Cientifico de Datos',
-      horasRequeridas: 8,
+      horasPorCategoria: { Trabajo: 5, Estudio: 3 },
       categoriasValidas: ['Trabajo', 'Estudio'],
       descripcion: 'Analiza datos y crea modelos predictivos.'
     })

@@ -4,7 +4,7 @@ export class PerfilArquitectoSoluciones extends Perfil {
   constructor() {
     super({
       nombre: 'Arquitecto de Soluciones',
-      horasRequeridas: 8,
+      horasPorCategoria: { Trabajo: 5, Estudio: 3 },
       categoriasValidas: ['Trabajo', 'Estudio'],
       descripcion: 'Disena arquitecturas tecnologicas.'
     })

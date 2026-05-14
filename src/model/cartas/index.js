@@ -38,6 +38,7 @@ export { CartaGitHub, CartaDiscord, CartaComodin, CartaVSCode, CartaDocker, Cart
 const FABRICA_CARTAS = {
   GitHub: CartaGitHub,
   Discord: CartaDiscord,
+  Comodin: CartaComodin,
   VSCode: CartaVSCode,
   Docker: CartaDocker,
   Kubernetes: CartaKubernetes,
@@ -74,6 +75,7 @@ const FABRICA_CARTAS = {
 const VARIANTES_HORAS = {
   GitHub: [1, 2, 3],
   Discord: [1, 2],
+  Comodin: [1, 2, 3],
   VSCode: [1, 2, 3],
   Docker: [1, 2, 3],
   Kubernetes: [2, 3],

@@ -4,7 +4,7 @@ export class PerfilAnalistaIA extends Perfil {
   constructor() {
     super({
       nombre: 'Analista de IA',
-      horasRequeridas: 8,
+      horasPorCategoria: { Trabajo: 5, Estudio: 3 },
       categoriasValidas: ['Trabajo', 'Estudio'],
       descripcion: 'Desarrolla modelos de inteligencia artificial.'
     })

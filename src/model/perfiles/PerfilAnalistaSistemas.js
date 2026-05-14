@@ -4,7 +4,7 @@ export class PerfilAnalistaSistemas extends Perfil {
   constructor() {
     super({
       nombre: 'Analista de Sistemas',
-      horasRequeridas: 6,
+      horasPorCategoria: { Trabajo: 4, Estudio: 2 },
       categoriasValidas: ['Trabajo', 'Estudio'],
       descripcion: 'Analiza y optimiza sistemas tecnologicos.'
     })

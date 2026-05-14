@@ -4,7 +4,7 @@ export class PerfilAdminBasesDatos extends Perfil {
   constructor() {
     super({
       nombre: 'Administrador de Bases de Datos',
-      horasRequeridas: 6,
+      horasPorCategoria: { Trabajo: 4, Estudio: 2 },
       categoriasValidas: ['Trabajo', 'Estudio'],
       descripcion: 'Administra y optimiza bases de datos.'
     })
