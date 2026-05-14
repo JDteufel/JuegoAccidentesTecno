@@ -59,7 +59,7 @@ export class ControladorVistaPartidaPrueba {
     })
   }
 
-  iniciarPartida() {
+  iniciarPartida(nombreJugador) {
     if (this.partidaIniciada) return
 
     this.accidentesSeleccionados = seleccionarAccidentesAleatorios(8)
@@ -82,6 +82,7 @@ export class ControladorVistaPartidaPrueba {
     this.vistaPartidaPrueba.actualizarPerfil(this.perfilAsignado)
     this.vistaPartidaPrueba.actualizarCartas(this.cartasMano)
     this.vistaPartidaPrueba.actualizarActividades(this.actividadesDisponibles)
+    this.vistaPartidaPrueba.configurarNombreJugador(nombreJugador || 'GameMaster')
     this.vistaPartidaPrueba.actualizarTurno(this.jugadorActual)
 
     logEvent('LOGS', 'start', {

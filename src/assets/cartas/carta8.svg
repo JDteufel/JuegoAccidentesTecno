@@ -10,14 +10,19 @@
   <text x="22" y="47" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="14" font-weight="bold">1</text>
   <rect x="15" y="65" width="170" height="110" rx="6" ry="6" fill="#3a3a4a"/>
   <text x="100" y="130" text-anchor="middle" fill="#e60023" font-family="monospace, sans-serif" font-size="40" font-weight="bold">PT</text>
-  <text x="100" y="195" text-anchor="middle" fill="#cccccc" font-family="Arial, sans-serif" font-size="9">Descubre ideas visuales y guarda inspiracion.</text>
-  <rect x="15" y="215" width="80" height="18" rx="9" ry="9" fill="#e74c3c"/>
-  <text x="55" y="227" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="8" font-weight="bold">Entretenimiento</text>
-  <rect x="100" y="215" width="50" height="18" rx="9" ry="9" fill="#3498db"/>
-  <text x="125" y="227" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="8" font-weight="bold">Estudio</text>
-  <rect x="10" y="240" width="180" height="28" fill="#1a1a2e"/>
-  <circle cx="30" cy="254" r="7" fill="none" stroke="#ffffff" stroke-width="1.5"/>
-  <line x1="30" y1="250" x2="30" y2="254" stroke="#ffffff" stroke-width="1.5"/>
-  <line x1="30" y1="254" x2="33" y2="257" stroke="#ffffff" stroke-width="1.5"/>
-  <text x="105" y="258" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="12" font-weight="bold">1 hora</text>
+  <text x="100" y="188" text-anchor="middle" fill="#cccccc" font-family="Arial, sans-serif" font-size="9">Descubre ideas visuales y guarda</text>
+  <text x="100" y="202" text-anchor="middle" fill="#cccccc" font-family="Arial, sans-serif" font-size="9">inspiracion.</text>
+  <g>
+    <rect x="22" y="218" width="95" height="18" rx="9" ry="9" fill="#e74c3c"/>
+    <text x="70" y="230" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="8" font-weight="bold">Entretenimiento</text>
+  </g>
+  <g>
+    <rect x="127" y="218" width="50" height="18" rx="9" ry="9" fill="#3498db"/>
+    <text x="152" y="230" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="8" font-weight="bold">Estudio</text>
+  </g>
+  <rect x="10" y="244" width="180" height="28" fill="#1a1a2e"/>
+  <circle cx="30" cy="258" r="7" fill="none" stroke="#ffffff" stroke-width="1.5"/>
+  <line x1="30" y1="254" x2="30" y2="258" stroke="#ffffff" stroke-width="1.5"/>
+  <line x1="30" y1="258" x2="33" y2="261" stroke="#ffffff" stroke-width="1.5"/>
+  <text x="105" y="262" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="12" font-weight="bold">1 hora</text>
 </svg>

@@ -15,7 +15,9 @@ export class VistaPartida {
     this.sceneAnterior = null
     this.centroTablero = new BABYLON.Vector3(-3.7, 0.2, 0)
     this.carruselAccidentes = null
+    this.panelAccidentesVisible = false
 
+    this.nombreJugador = 'Jugador'
     this.accidentes = []
     this.perfil = null
     this.cartas = []
@@ -427,6 +429,39 @@ export class VistaPartida {
     materialSelloCarrusel.alpha = 0.92
     selloCarrusel.material = materialSelloCarrusel
 
+    const textoNombre = BABYLON.MeshBuilder.CreatePlane(
+      'textoNombreJugador',
+      {
+        width: 1.2,
+        height: 0.35,
+        sideOrientation: BABYLON.Mesh.DOUBLESIDE
+      },
+      this.scene
+    )
+    textoNombre.rotation.x = Math.PI / 2
+    textoNombre.parent = this.carruselAccidentes
+    textoNombre.position = new BABYLON.Vector3(0, 0.41, 0)
+
+    const materialTextoNombre = new BABYLON.StandardMaterial(
+      'matTextoNombreJugador',
+      this.scene
+    )
+    materialTextoNombre.diffuseColor = new BABYLON.Color3(1, 1, 1)
+    materialTextoNombre.emissiveColor = new BABYLON.Color3(1, 1, 1)
+    materialTextoNombre.alpha = 1
+    textoNombre.material = materialTextoNombre
+
+    const texturaNombre = new BABYLON.DynamicTexture(
+      'texturaNombreJugador',
+      { width: 512, height: 128 },
+      this.scene
+    )
+    texturaNombre.drawText(this.nombreJugador, null, 48, '#ffe2c8', 'rgba(0,0,0,0)', true)
+    materialTextoNombre.diffuseTexture = texturaNombre
+    materialTextoNombre.emissiveTexture = texturaNombre
+    materialTextoNombre.useAlphaFromDiffuseTexture = true
+    this.texturaNombreJugador = texturaNombre
+
     const radioMarcadores = 1.8
     for (let i = 0; i < 8; i++) {
       const angulo = (Math.PI * 2 * i) / 8
@@ -446,6 +481,7 @@ export class VistaPartida {
     }
 
     this.configurarAnimacionCarrusel()
+    this.configurarClickCarrusel()
   }
 
   crearCartaCarruselAccidente(indice, contenedor) {
@@ -474,13 +510,15 @@ export class VistaPartida {
       `caraCartaCarrusel_${indice}`,
       {
         width: 0.94,
-        height: 1.32
+        height: 1.32,
+        sideOrientation: BABYLON.Mesh.DOUBLESIDE
       },
       this.scene
     )
     caraCarta.parent = contenedor
     caraCarta.rotation.y = Math.PI
-    caraCarta.position = new BABYLON.Vector3(0, 0.75, -0.043)
+    caraCarta.rotation.z = Math.PI
+    caraCarta.position = new BABYLON.Vector3(0, 0.75, 0.043)
 
     const materialCaraCarta = new BABYLON.StandardMaterial(
       `matCaraCartaCarrusel_${indice}`,
@@ -499,37 +537,19 @@ export class VistaPartida {
     materialCaraCarta.emissiveColor = colorCarta.scale(0.05)
     caraCarta.material = materialCaraCarta
 
-    const bandaCarta = BABYLON.MeshBuilder.CreatePlane(
-      `bandaCartaCarrusel_${indice}`,
-      {
-        width: 0.94,
-        height: 0.26
-      },
-      this.scene
-    )
-    bandaCarta.parent = contenedor
-    bandaCarta.rotation.y = Math.PI
-    bandaCarta.position = new BABYLON.Vector3(0, 1.18, -0.044)
-
-    const materialBandaCarta = new BABYLON.StandardMaterial(
-      `matBandaCartaCarrusel_${indice}`,
-      this.scene
-    )
-    materialBandaCarta.diffuseColor = new BABYLON.Color3(0.84, 0.66, 0.3)
-    materialBandaCarta.emissiveColor = new BABYLON.Color3(0.03, 0.02, 0.006)
-    bandaCarta.material = materialBandaCarta
-
     const textoCarta = BABYLON.MeshBuilder.CreatePlane(
       `textoCartaCarrusel_${indice}`,
       {
         width: 0.84,
-        height: 0.22
+        height: 0.22,
+        sideOrientation: BABYLON.Mesh.DOUBLESIDE
       },
       this.scene
     )
     textoCarta.parent = contenedor
     textoCarta.rotation.y = Math.PI
-    textoCarta.position = new BABYLON.Vector3(0, 0.32, -0.044)
+    textoCarta.rotation.z = Math.PI
+    textoCarta.position = new BABYLON.Vector3(0, 0.32, 0.044)
 
     const materialTextoCarta = new BABYLON.StandardMaterial(
       `matTextoCartaCarrusel_${indice}`,
@@ -547,6 +567,133 @@ export class VistaPartida {
     codigoTexto.drawText('---', null, 40, '#ffe2c8', 'rgba(0,0,0,0)', true)
     materialTextoCarta.diffuseTexture = codigoTexto
     materialTextoCarta.useAlphaFromDiffuseTexture = false
+  }
+
+  configurarClickCarrusel() {
+    if (!this.carruselAccidentes) return
+
+    this.scene.onPointerObservable.add((pointerInfo) => {
+      if (pointerInfo.type !== BABYLON.PointerEventTypes.POINTERDOWN) return
+
+      if (this.panelAccidentesVisible) {
+        this.ocultarPanelAccidentes()
+        return
+      }
+
+      const pickInfo = pointerInfo.pickInfo
+      if (!pickInfo || !pickInfo.hit) return
+
+      const mesh = pickInfo.pickedMesh
+      if (!mesh) return
+
+      const nombre = mesh.name || ''
+      const esCarrusel = nombre.includes('Carrusel') || nombre.includes('carrusel')
+
+      if (esCarrusel) {
+        this.mostrarPanelAccidentes()
+      }
+    })
+  }
+
+  mostrarPanelAccidentes() {
+    if (!this.accidentes || this.accidentes.length === 0) return
+
+    this.panelAccidentesVisible = true
+
+    const fondo = new GUI.Rectangle('fondoPanelAccidentes')
+    fondo.name = 'fondoPanelAccidentes'
+    fondo.width = 1
+    fondo.height = 1
+    fondo.thickness = 0
+    fondo.background = 'rgba(0, 0, 0, 0.7)'
+    fondo.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
+    fondo.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
+    fondo.zIndex = 2000
+    this.overlay.addControl(fondo)
+
+    const panel = new GUI.Rectangle('panelAccidentes')
+    panel.width = '1200px'
+    panel.height = '640px'
+    panel.thickness = 3
+    panel.cornerRadius = 20
+    panel.color = '#8e4d22'
+    panel.background = 'rgba(28, 20, 16, 0.97)'
+    panel.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
+    panel.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
+    panel.zIndex = 2001
+    fondo.addControl(panel)
+
+    panel.onPointerDownObservable.add(() => {
+      return
+    })
+
+    const titulo = new GUI.TextBlock('tituloPanelAccidentes', 'Accidentes en Mesa')
+    titulo.top = '-300px'
+    titulo.height = '50px'
+    titulo.color = '#ffe2c8'
+    titulo.fontSize = 28
+    titulo.fontFamily = 'Comic Sans MS'
+    titulo.fontWeight = 'bold'
+    panel.addControl(titulo)
+
+    const gridAccidentes = new GUI.Grid('gridPanelAccidentes')
+    gridAccidentes.width = '1160px'
+    gridAccidentes.height = '540px'
+    gridAccidentes.top = '0px'
+    gridAccidentes.paddingLeft = '8px'
+    gridAccidentes.paddingRight = '8px'
+    gridAccidentes.paddingTop = '4px'
+    gridAccidentes.paddingBottom = '4px'
+    for (let i = 0; i < 2; i++) {
+      gridAccidentes.addRowDefinition(270)
+    }
+    for (let i = 0; i < 4; i++) {
+      gridAccidentes.addColumnDefinition(0.25)
+    }
+    panel.addControl(gridAccidentes)
+
+    this.accidentes.slice(0, 8).forEach((accidente, indice) => {
+      const fila = Math.floor(indice / 4)
+      const columna = indice % 4
+
+      const nivelColor = accidente.nivel >= 3 ? '#cc3333' : accidente.nivel === 2 ? '#e67e22' : '#e6a817'
+
+      const imagenSrc = accidente.obtenerImagen ? accidente.obtenerImagen() : null
+      if (imagenSrc) {
+        const imagen = new GUI.Image(`accidenteImgPanel_${indice}`, imagenSrc)
+        imagen.width = '270px'
+        imagen.height = '270px'
+        imagen.stretch = GUI.Image.STRETCH_UNIFORM
+        imagen.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
+        imagen.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
+        imagen.thickness = 2
+        imagen.color = nivelColor
+        gridAccidentes.addControl(imagen, fila, columna)
+      }
+    })
+
+    const botonCerrar = GUI.Button.CreateSimpleButton('btnCerrarAccidentes', 'Cerrar')
+    botonCerrar.width = '120px'
+    botonCerrar.height = '40px'
+    botonCerrar.top = '295px'
+    botonCerrar.background = '#5a3321'
+    botonCerrar.color = '#ffd8bc'
+    botonCerrar.cornerRadius = 12
+    botonCerrar.fontSize = 14
+    botonCerrar.fontFamily = 'Comic Sans MS'
+    botonCerrar.onPointerUpObservable.add(() => {
+      fondo.dispose()
+    })
+    panel.addControl(botonCerrar)
+  }
+
+  ocultarPanelAccidentes() {
+    this.panelAccidentesVisible = false
+
+    const fondo = this.overlay.getControlByName('fondoPanelAccidentes')
+    if (fondo) {
+      fondo.dispose()
+    }
   }
 
   configurarAnimacionCarrusel() {
@@ -669,6 +816,7 @@ export class VistaPartida {
     this.overlay.height = 1
     this.overlay.thickness = 0
     this.overlay.background = 'transparent'
+    this.overlay.isPointerBlocker = false
     this.guiTexture.addControl(this.overlay)
 
     this.crearEncabezadoPartida()
@@ -801,7 +949,7 @@ export class VistaPartida {
   crearPanelCartas() {
     const panelInferior = new GUI.Rectangle('panelCartas')
     panelInferior.width = '95%'
-    panelInferior.height = '320px'
+    panelInferior.height = '280px'
     panelInferior.bottom = '15px'
     panelInferior.background = 'rgba(28, 20, 18, 0.92)'
     panelInferior.cornerRadius = 15
@@ -837,7 +985,7 @@ export class VistaPartida {
 
     const containerCartas = new GUI.Rectangle('containerCartas')
     containerCartas.width = '97%'
-    containerCartas.height = '260px'
+    containerCartas.height = '210px'
     containerCartas.top = '28px'
     containerCartas.background = 'transparent'
     containerCartas.thickness = 0
@@ -866,41 +1014,28 @@ export class VistaPartida {
 
   crearCartaManoVacia(indice) {
     const cartaPanel = new GUI.Rectangle(`carta_${indice}`)
-    cartaPanel.width = '120px'
-    cartaPanel.height = '168px'
+    cartaPanel.width = '96%'
+    cartaPanel.height = '92%'
     cartaPanel.background = 'rgba(33, 23, 19, 0.4)'
     cartaPanel.cornerRadius = 14
     cartaPanel.thickness = 2
     cartaPanel.color = '#4a3528'
-    cartaPanel.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
-    cartaPanel.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
     cartaPanel.isVisible = false
     return cartaPanel
   }
 
   crearCartaMano(carta, indice) {
-    const cartaPanel = new GUI.Rectangle(`carta_${indice}`)
-    cartaPanel.width = '120px'
-    cartaPanel.height = '168px'
-    cartaPanel.background = '#211713'
-    cartaPanel.cornerRadius = 14
-    cartaPanel.thickness = 2
-    cartaPanel.color = '#d3a06a'
-    cartaPanel.shadowColor = '#00000055'
-    cartaPanel.shadowBlur = 8
-    cartaPanel.shadowOffsetY = 3
-    cartaPanel.isPointerBlocker = true
-    cartaPanel.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
-    cartaPanel.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
-
     const imagenSrc = carta.obtenerImagen ? carta.obtenerImagen() : null
-    if (imagenSrc) {
-      const imagen = new GUI.Image(`imagen_${indice}`, imagenSrc)
-      imagen.width = '100%'
-      imagen.height = '100%'
-      imagen.stretch = GUI.Image.STRETCH_FILL
-      cartaPanel.addControl(imagen)
+    const cartaPanel = new GUI.Image(`carta_${indice}`, imagenSrc)
+    cartaPanel.width = '96%'
+    cartaPanel.height = '92%'
+    cartaPanel.stretch = GUI.Image.STRETCH_UNIFORM
+    cartaPanel.isPointerBlocker = true
+
+    if (carta.estaDeshabilitada()) {
+      cartaPanel.alpha = 0.5
     }
+
     cartaPanel.onPointerDownObservable.add((coords) => {
       if (carta.estaDeshabilitada()) return
       this.dragState = {
@@ -910,7 +1045,6 @@ export class VistaPartida {
         inicioX: coords.x,
         moviendo: false
       }
-      cartaPanel.zIndex = 500
     })
 
     cartaPanel.onPointerUpObservable.add((coords) => {
@@ -921,9 +1055,6 @@ export class VistaPartida {
           this.callbackJugarCarta(carta)
         }
       }
-      cartaPanel.top = '0px'
-      cartaPanel.alpha = 1
-      cartaPanel.zIndex = 100
       this.dragState = null
     })
 
@@ -931,12 +1062,12 @@ export class VistaPartida {
       if (!this.dragState || this.dragState.indice !== indice) return
       const deltaY = this.dragState.inicioY - coords.y
       const deltaX = Math.abs(this.dragState.inicioX - coords.x)
-      if (deltaY > 15 || deltaX > 15) {
+      if (deltaY > 10 || deltaX > 10) {
         this.dragState.moviendo = true
       }
       if (this.dragState.moviendo && deltaY > 0) {
         cartaPanel.top = `${-Math.min(deltaY, 80)}px`
-        cartaPanel.alpha = Math.max(0.7, 1 - deltaY / 300)
+        cartaPanel.alpha = Math.max(0.5, 1 - deltaY / 200)
       }
     })
 
@@ -960,46 +1091,27 @@ export class VistaPartida {
     const cantidad = Math.min(this.accidentes.length, 8)
     for (let i = 0; i < 8; i++) {
       const caraCarta = this.scene.getMeshByName(`caraCartaCarrusel_${i}`)
-      const bandaCarta = this.scene.getMeshByName(`bandaCartaCarrusel_${i}`)
       const textoCarta = this.scene.getMeshByName(`textoCartaCarrusel_${i}`)
 
       if (i < cantidad && this.accidentes[i]) {
         const accidente = this.accidentes[i]
-        const nivelColor = accidente.nivel >= 3
-          ? new BABYLON.Color3(0.8, 0.2, 0.15)
-          : accidente.nivel === 2
-            ? new BABYLON.Color3(0.85, 0.5, 0.15)
-            : new BABYLON.Color3(0.85, 0.7, 0.2)
+        const color = this.obtenerColorAccidente(accidente)
 
         const imagenSrc = accidente.obtenerImagen ? accidente.obtenerImagen() : null
-        console.log(`[Carrusel] Accidente ${i}: ${accidente.nombre}, imagenSrc:`, imagenSrc)
-
-        if (imagenSrc && caraCarta) {
-          const materialCaraCarta = new BABYLON.StandardMaterial(`matCaraCarruselAcc_${i}`, this.scene)
-          const textura = new BABYLON.Texture(imagenSrc, this.scene, true, false, BABYLON.Texture.BILINEAR_SAMPLINGMODE)
+        if (imagenSrc && caraCarta && caraCarta.material) {
+          const textura = new BABYLON.Texture(imagenSrc, this.scene, true, false, BABYLON.Texture.TRILINEAR_SAMPLINGMODE)
           textura.hasAlpha = true
-          textura.wAng = 0
-          materialCaraCarta.diffuseTexture = textura
-          materialCaraCarta.emissiveTexture = textura
-          materialCaraCarta.diffuseColor = new BABYLON.Color3(1, 1, 1)
-          materialCaraCarta.emissiveColor = new BABYLON.Color3(0.15, 0.1, 0.05)
-          materialCaraCarta.specularColor = new BABYLON.Color3(0.1, 0.08, 0.06)
-          materialCaraCarta.useAlphaFromDiffuseTexture = true
-          caraCarta.material = materialCaraCarta
-          console.log(`[Carrusel] Textura aplicada para accidente ${i}`)
-        } else if (caraCarta) {
-          const color = this.obtenerColorAccidente(accidente)
-          if (caraCarta.material) {
-            caraCarta.material.diffuseColor = color
-            caraCarta.material.emissiveColor = color.scale(0.08)
-            caraCarta.material.diffuseTexture = null
-            caraCarta.material.emissiveTexture = null
-          }
-        }
-
-        if (bandaCarta && bandaCarta.material) {
-          bandaCarta.material.diffuseColor = nivelColor
-          bandaCarta.material.emissiveColor = nivelColor.scale(0.15)
+          textura.uScale = -1
+          caraCarta.material.diffuseTexture = textura
+          caraCarta.material.emissiveTexture = textura
+          caraCarta.material.diffuseColor = new BABYLON.Color3(1, 1, 1)
+          caraCarta.material.specularColor = new BABYLON.Color3(0.1, 0.08, 0.06)
+          caraCarta.material.useAlphaFromDiffuseTexture = true
+        } else if (caraCarta && caraCarta.material) {
+          caraCarta.material.diffuseColor = color
+          caraCarta.material.emissiveColor = color.scale(0.08)
+          caraCarta.material.diffuseTexture = null
+          caraCarta.material.emissiveTexture = null
         }
 
         if (textoCarta && textoCarta.material && textoCarta.material.diffuseTexture) {
@@ -1093,15 +1205,19 @@ export class VistaPartida {
       if (i < this.cartas.length) {
         const carta = this.cartas[i]
         const cartaPanel = this.crearCartaMano(carta, i)
-        cartaPanel.isEnabled = !carta.estaDeshabilitada()
-        cartaPanel.color = carta.estaDeshabilitada() ? '#666666' : '#d3a06a'
-        cartaPanel.alpha = carta.estaDeshabilitada() ? 0.5 : 1
         gridMano.addControl(cartaPanel, 0, i)
       } else {
         const cartaVacia = this.crearCartaManoVacia(i)
         cartaVacia.isVisible = true
         gridMano.addControl(cartaVacia, 0, i)
       }
+    }
+  }
+
+  configurarNombreJugador(nombre) {
+    this.nombreJugador = nombre
+    if (this.texturaNombreJugador) {
+      this.texturaNombreJugador.drawText(nombre, null, 48, '#ffe2c8', 'rgba(0,0,0,0)', true)
     }
   }
 
@@ -1184,122 +1300,68 @@ export class VistaPartida {
       return
     }
 
-    const panelAccidentes = new GUI.Rectangle('panelAccidentesInicio')
-    panelAccidentes.width = '600px'
-    panelAccidentes.height = '500px'
-    panelAccidentes.thickness = 3
-    panelAccidentes.cornerRadius = 20
-    panelAccidentes.color = '#8e4d22'
-    panelAccidentes.background = 'rgba(28, 20, 16, 0.95)'
-    panelAccidentes.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
-    panelAccidentes.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
-    panelAccidentes.zIndex = 1000
-    this.overlay.addControl(panelAccidentes)
+    const panelInicio = new GUI.Rectangle('panelInicio')
+    panelInicio.width = '1600px'
+    panelInicio.height = '820px'
+    panelInicio.thickness = 3
+    panelInicio.cornerRadius = 20
+    panelInicio.color = '#8e4d22'
+    panelInicio.background = 'rgba(28, 20, 16, 0.95)'
+    panelInicio.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
+    panelInicio.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
+    panelInicio.zIndex = 1000
+    this.overlay.addControl(panelInicio)
 
     const tituloAcc = new GUI.TextBlock('tituloAccidentes', 'Accidentes en Mesa')
-    tituloAcc.top = '-200px'
+    tituloAcc.top = '-380px'
+    tituloAcc.left = '-200px'
     tituloAcc.height = '50px'
     tituloAcc.color = '#ffe2c8'
-    tituloAcc.fontSize = 26
+    tituloAcc.fontSize = 28
     tituloAcc.fontFamily = 'Comic Sans MS'
     tituloAcc.fontWeight = 'bold'
-    panelAccidentes.addControl(tituloAcc)
+    panelInicio.addControl(tituloAcc)
 
     const gridAccidentes = new GUI.Grid('gridAccidentesInicio')
-    gridAccidentes.width = '540px'
-    gridAccidentes.height = '340px'
-    gridAccidentes.top = '20px'
-    for (let i = 0; i < 4; i++) {
-      gridAccidentes.addRowDefinition(80)
-    }
+    gridAccidentes.width = '1160px'
+    gridAccidentes.height = '680px'
+    gridAccidentes.top = '0px'
+    gridAccidentes.left = '-220px'
+    gridAccidentes.paddingLeft = '8px'
+    gridAccidentes.paddingRight = '8px'
+    gridAccidentes.paddingTop = '4px'
+    gridAccidentes.paddingBottom = '4px'
     for (let i = 0; i < 2; i++) {
-      gridAccidentes.addColumnDefinition(0.5)
+      gridAccidentes.addRowDefinition(340)
     }
-    panelAccidentes.addControl(gridAccidentes)
+    for (let i = 0; i < 4; i++) {
+      gridAccidentes.addColumnDefinition(0.25)
+    }
+    panelInicio.addControl(gridAccidentes)
 
     const accidentesMostrar = this.accidentes && this.accidentes.length > 0
       ? this.accidentes.slice(0, 8)
       : []
 
     accidentesMostrar.forEach((accidente, indice) => {
-      const fila = Math.floor(indice / 2)
-      const columna = indice % 2
+      const fila = Math.floor(indice / 4)
+      const columna = indice % 4
 
       const nivelColor = accidente.nivel >= 3 ? '#cc3333' : accidente.nivel === 2 ? '#e67e22' : '#e6a817'
 
-      const tarjeta = new GUI.Rectangle(`accidenteInicio_${indice}`)
-      tarjeta.width = '240px'
-      tarjeta.height = '70px'
-      tarjeta.thickness = 2
-      tarjeta.cornerRadius = 10
-      tarjeta.color = nivelColor
-      tarjeta.background = '#2d1e16'
-
       const imagenSrc = accidente.obtenerImagen ? accidente.obtenerImagen() : null
       if (imagenSrc) {
-        const imagen = new GUI.Image(`accidenteImg_${indice}`, imagenSrc)
-        imagen.width = '50px'
-        imagen.height = '70px'
-        imagen.left = '8px'
-      imagen.stretch = GUI.Image.STRETCH_FILL
-        imagen.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
-        tarjeta.addControl(imagen)
+        const imagen = new GUI.Image(`accidenteImgInicio_${indice}`, imagenSrc)
+        imagen.width = '270px'
+        imagen.height = '330px'
+        imagen.stretch = GUI.Image.STRETCH_UNIFORM
+        imagen.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
+        imagen.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
+        imagen.thickness = 2
+        imagen.color = nivelColor
+        gridAccidentes.addControl(imagen, fila, columna)
       }
-
-      const texto = new GUI.TextBlock(`accidenteTexto_${indice}`, `${accidente.codigo}: ${accidente.nombre}`)
-      texto.color = '#ffe0c2'
-      texto.fontSize = 13
-      texto.fontFamily = 'Comic Sans MS'
-      texto.fontWeight = 'bold'
-      texto.textWrapping = true
-      texto.left = '66px'
-      texto.width = '155px'
-      texto.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
-      tarjeta.addControl(texto)
-
-      const nivelBadge = new GUI.TextBlock(`accidenteNivel_${indice}`, `Nivel ${accidente.nivel}`)
-      nivelBadge.color = nivelColor
-      nivelBadge.fontSize = 11
-      nivelBadge.fontFamily = 'Comic Sans MS'
-      nivelBadge.fontWeight = 'bold'
-      nivelBadge.left = '66px'
-      nivelBadge.top = '28px'
-      nivelBadge.width = '80px'
-      nivelBadge.height = '18px'
-      nivelBadge.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
-      tarjeta.addControl(nivelBadge)
-
-      gridAccidentes.addControl(tarjeta, fila, columna)
     })
-
-    const botonOmitir = GUI.Button.CreateSimpleButton('btnOmitirAccidentes', 'Omitir')
-    botonOmitir.width = '120px'
-    botonOmitir.height = '40px'
-    botonOmitir.top = '180px'
-    botonOmitir.background = '#5a3321'
-    botonOmitir.color = '#ffd8bc'
-    botonOmitir.cornerRadius = 12
-    botonOmitir.fontSize = 14
-    botonOmitir.fontFamily = 'Comic Sans MS'
-    botonOmitir.onPointerUpObservable.add(() => {
-      panelAccidentes.dispose()
-      this.mostrarPanelPerfilDirecto()
-    })
-    panelAccidentes.addControl(botonOmitir)
-
-    console.log('[VistaPartida] Panel accidentes creado y agregado')
-
-    setTimeout(() => {
-      console.log('[VistaPartida] Cerrando panel accidentes')
-      if (panelAccidentes && panelAccidentes.isVisible) {
-        panelAccidentes.isVisible = false
-        this.mostrarPanelPerfilDirecto()
-      }
-    }, 5000)
-  }
-
-  mostrarPanelPerfilDirecto() {
-    console.log('[VistaPartida] mostrarPanelPerfilDirecto - Iniciando')
 
     const perfilReal = this.perfil || {
       nombre: 'Sin asignar',
@@ -1308,88 +1370,83 @@ export class VistaPartida {
       descripcion: 'Perfil no disponible'
     }
 
-    const panelPerfil = new GUI.Rectangle('panelPerfilInicio')
-    panelPerfil.width = '500px'
-    panelPerfil.height = '400px'
-    panelPerfil.thickness = 3
-    panelPerfil.cornerRadius = 20
-    panelPerfil.color = '#d66a1f'
-    panelPerfil.background = 'rgba(28, 20, 16, 0.95)'
-    panelPerfil.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
-    panelPerfil.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
-    panelPerfil.zIndex = 1000
-    this.overlay.addControl(panelPerfil)
-
-    const tituloPerf = new GUI.TextBlock('tituloPerfil', 'Tu Perfil Asignado')
-    tituloPerf.top = '-150px'
-    tituloPerf.height = '50px'
-    tituloPerf.color = '#ffe2c8'
-    tituloPerf.fontSize = 26
-    tituloPerf.fontFamily = 'Comic Sans MS'
-    tituloPerf.fontWeight = 'bold'
-    panelPerfil.addControl(tituloPerf)
+    const tituloPerfil = new GUI.TextBlock('tituloPerfil', 'Tu Perfil Asignado')
+    tituloPerfil.top = '-380px'
+    tituloPerfil.left = '560px'
+    tituloPerfil.height = '50px'
+    tituloPerfil.color = '#ffe2c8'
+    tituloPerfil.fontSize = 28
+    tituloPerfil.fontFamily = 'Comic Sans MS'
+    tituloPerfil.fontWeight = 'bold'
+    panelInicio.addControl(tituloPerfil)
 
     const nombrePerf = new GUI.TextBlock('nombrePerfil', perfilReal.nombre)
-    nombrePerf.top = '-70px'
+    nombrePerf.top = '-240px'
+    nombrePerf.left = '560px'
     nombrePerf.height = '40px'
     nombrePerf.color = '#d66a1f'
     nombrePerf.fontSize = 22
     nombrePerf.fontFamily = 'Comic Sans MS'
     nombrePerf.fontWeight = 'bold'
-    panelPerfil.addControl(nombrePerf)
+    panelInicio.addControl(nombrePerf)
 
     const horasPerf = new GUI.TextBlock('horasPerfil', `Horas requeridas: ${perfilReal.horasRequeridas}`)
-    horasPerf.top = '-20px'
+    horasPerf.top = '-190px'
+    horasPerf.left = '560px'
     horasPerf.height = '30px'
     horasPerf.color = '#cf8a34'
     horasPerf.fontSize = 18
     horasPerf.fontFamily = 'Comic Sans MS'
-    panelPerfil.addControl(horasPerf)
+    panelInicio.addControl(horasPerf)
 
     const descPerf = new GUI.TextBlock('descPerfil', perfilReal.descripcion)
-    descPerf.top = '30px'
-    descPerf.height = '50px'
+    descPerf.top = '-90px'
+    descPerf.left = '560px'
+    descPerf.height = '120px'
+    descPerf.width = '400px'
     descPerf.color = '#f4cbaa'
-    descPerf.fontSize = 15
+    descPerf.fontSize = 22
     descPerf.fontFamily = 'Comic Sans MS'
     descPerf.textWrapping = true
-    panelPerfil.addControl(descPerf)
+    panelInicio.addControl(descPerf)
 
     const catsTexto = perfilReal.categoriasValidas && perfilReal.categoriasValidas.length > 0
       ? `Categorias: ${perfilReal.categoriasValidas.join(', ')}`
       : 'Sin categorias asignadas'
     const catsPerf = new GUI.TextBlock('catsPerfil', catsTexto)
-    catsPerf.top = '100px'
+    catsPerf.top = '10px'
+    catsPerf.left = '560px'
     catsPerf.height = '30px'
+    catsPerf.width = '400px'
     catsPerf.color = '#e7cfbc'
     catsPerf.fontSize = 14
     catsPerf.fontFamily = 'Comic Sans MS'
     catsPerf.textWrapping = true
-    panelPerfil.addControl(catsPerf)
+    panelInicio.addControl(catsPerf)
 
-    const botonComenzar = GUI.Button.CreateSimpleButton('btnComenzarPartida', 'Comenzar Partida')
-    botonComenzar.width = '180px'
-    botonComenzar.height = '44px'
-    botonComenzar.top = '150px'
-    botonComenzar.background = '#d66a1f'
-    botonComenzar.color = '#fff7ef'
-    botonComenzar.cornerRadius = 14
-    botonComenzar.fontSize = 16
-    botonComenzar.fontFamily = 'Comic Sans MS'
-    botonComenzar.fontWeight = 'bold'
-    botonComenzar.onPointerUpObservable.add(() => {
-      panelPerfil.dispose()
+    const botonCerrar = GUI.Button.CreateSimpleButton('btnCerrarInicio', 'Cerrar')
+    botonCerrar.width = '180px'
+    botonCerrar.height = '44px'
+    botonCerrar.top = '370px'
+    botonCerrar.background = '#d66a1f'
+    botonCerrar.color = '#fff7ef'
+    botonCerrar.cornerRadius = 14
+    botonCerrar.fontSize = 16
+    botonCerrar.fontFamily = 'Comic Sans MS'
+    botonCerrar.fontWeight = 'bold'
+    botonCerrar.onPointerUpObservable.add(() => {
+      panelInicio.dispose()
     })
-    panelPerfil.addControl(botonComenzar)
+    panelInicio.addControl(botonCerrar)
 
-    console.log('[VistaPartida] Panel perfil creado y agregado')
+    console.log('[VistaPartida] Panel inicio creado y agregado')
 
     setTimeout(() => {
-      console.log('[VistaPartida] Cerrando panel perfil')
-      if (panelPerfil && panelPerfil.isVisible) {
-        panelPerfil.isVisible = false
+      console.log('[VistaPartida] Cerrando panel inicio')
+      if (panelInicio && panelInicio.isVisible) {
+        panelInicio.dispose()
       }
-    }, 8000)
+    }, 13000)
   }
 
   obtenerImagenCarta(carta) {

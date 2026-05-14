@@ -51,7 +51,7 @@ export class ControladorVistaPartida {
     })
   }
 
-  iniciarPartida() {
+  iniciarPartida(nombreJugador) {
     this.accidentesSeleccionados = seleccionarAccidentesAleatorios(8)
     this.accidentesActivosOrden = []
 
@@ -77,6 +77,7 @@ export class ControladorVistaPartida {
     this.vistaPartida.configurarPerfil(this.perfilAsignado)
     this.vistaPartida.configurarCartas(this.cartasMano)
     this.vistaPartida.configurarActividades(this.actividadesDisponibles)
+    this.vistaPartida.configurarNombreJugador(nombreJugador || 'Jugador')
     this.vistaPartida.jugadorActual = this.jugadorActual
     this.vistaPartida.totalJugadores = this.totalJugadores
     this.vistaPartida.actualizarEstadoTurno(this.jugadorActual, this.totalJugadores)

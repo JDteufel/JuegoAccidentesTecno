@@ -91,13 +91,13 @@ export class ControladorEstadoApp {
         break
       case PANTALLAS.PARTIDA:
         if (this.controladorPartida) {
-          this.controladorPartida.iniciarPartida()
+          this.controladorPartida.iniciarPartida(this.estadoApp.lobbyPlayerName || 'Jugador')
         }
         this.vistas.vistaPartida.mostrar()
         break
       case PANTALLAS.PARTIDA_PRUEBA:
         if (this.controladorPartidaPrueba) {
-          this.controladorPartidaPrueba.iniciarPartida()
+          this.controladorPartidaPrueba.iniciarPartida('GameMaster')
         }
         this.vistas.vistaPartidaPrueba.mostrar()
         break
