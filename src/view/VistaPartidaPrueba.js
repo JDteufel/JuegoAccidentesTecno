@@ -38,6 +38,9 @@ export class VistaPartidaPrueba {
       offsetX: 0,
       offsetY: 0
     }
+
+    this.zonaDropIntercambio = null
+    this.zonaDropTablero = null
   }
 
   crear() {
@@ -921,49 +924,83 @@ export class VistaPartidaPrueba {
   }
 
   crearPanelCartas() {
-    const panelInferior = new GUI.Rectangle('panelCartasPrueba')
-    panelInferior.width = '95%'
-    panelInferior.height = '280px'
-    panelInferior.bottom = '15px'
-    panelInferior.background = 'rgba(28, 20, 18, 0.92)'
-    panelInferior.cornerRadius = 15
-    panelInferior.thickness = 3
-    panelInferior.color = '#a85a2a'
-    panelInferior.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
-    panelInferior.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_BOTTOM
-    panelInferior.zIndex = 100
-    this.overlay.addControl(panelInferior)
+    const panelContenedor = new GUI.Rectangle('panelContenedorCartasPrueba')
+    panelContenedor.width = '95%'
+    panelContenedor.height = '255px'
+    panelContenedor.bottom = '15px'
+    panelContenedor.left = '130px'
+    panelContenedor.background = 'transparent'
+    panelContenedor.thickness = 0
+    panelContenedor.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
+    panelContenedor.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_BOTTOM
+    panelContenedor.zIndex = 100
+    this.overlay.addControl(panelContenedor)
 
-    const textoInstruccion = new GUI.TextBlock('textoInstruccionCartasPrueba', 'Arrastra una carta hacia arriba para jugarla')
-    textoInstruccion.top = '4px'
-    textoInstruccion.height = '22px'
-    textoInstruccion.color = '#a88a6a'
-    textoInstruccion.fontSize = 12
-    textoInstruccion.fontFamily = 'Comic Sans MS'
-    panelInferior.addControl(textoInstruccion)
+    const contenedorIntercambio = new GUI.Rectangle('contenedorZonaIntercambioPrueba')
+    contenedorIntercambio.width = '160px'
+    contenedorIntercambio.height = '100%'
+    contenedorIntercambio.left = '8px'
+    contenedorIntercambio.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
+    contenedorIntercambio.background = 'rgba(28, 20, 18, 0.92)'
+    contenedorIntercambio.cornerRadius = 15
+    contenedorIntercambio.thickness = 3
+    contenedorIntercambio.color = '#a85a2a'
+    contenedorIntercambio.shadowColor = '#00000066'
+    contenedorIntercambio.shadowBlur = 20
+    contenedorIntercambio.shadowOffsetY = 8
+    contenedorIntercambio.isPointerBlocker = false
+    panelContenedor.addControl(contenedorIntercambio)
 
-    const botonIntercambiar = GUI.Button.CreateSimpleButton('btnIntercambiarPrueba', 'Intercambiar')
-    botonIntercambiar.width = '130px'
-    botonIntercambiar.height = '26px'
-    botonIntercambiar.right = '15px'
-    botonIntercambiar.top = '2px'
-    botonIntercambiar.background = '#5a3321'
-    botonIntercambiar.color = '#ffd8bc'
-    botonIntercambiar.cornerRadius = 8
-    botonIntercambiar.fontSize = 12
-    botonIntercambiar.fontFamily = 'Comic Sans MS'
-    botonIntercambiar.onPointerUpObservable.add(() => {
-      this.mostrarModalIntercambio()
-    })
-    panelInferior.addControl(botonIntercambiar)
+    const zonaIntercambio = new GUI.Grid('gridZonaIntercambioPrueba')
+    zonaIntercambio.width = '100%'
+    zonaIntercambio.height = '100%'
+    zonaIntercambio.background = 'transparent'
+    zonaIntercambio.cornerRadius = 0
+    zonaIntercambio.thickness = 0
+    zonaIntercambio.color = 'transparent'
+    zonaIntercambio.isPointerBlocker = false
+    for (let i = 0; i < 2; i++) {
+      zonaIntercambio.addRowDefinition(0.5)
+    }
+    zonaIntercambio.addColumnDefinition(1)
+    contenedorIntercambio.addControl(zonaIntercambio)
+
+    const iconoZona = new GUI.TextBlock('iconoZonaIntercambioPrueba', '⇄')
+    iconoZona.color = '#a88a6a'
+    iconoZona.fontSize = 32
+    iconoZona.fontFamily = 'Comic Sans MS'
+    iconoZona.fontWeight = 'bold'
+    zonaIntercambio.addControl(iconoZona, 0, 0)
+
+    const textoZona = new GUI.TextBlock('textoZonaIntercambioPrueba', 'Soltar para intercambiar')
+    textoZona.color = '#a88a6a'
+    textoZona.fontSize = 11
+    textoZona.fontFamily = 'Comic Sans MS'
+    textoZona.textWrapping = true
+    zonaIntercambio.addControl(textoZona, 1, 0)
+
+    this.zonaDropIntercambio = zonaIntercambio
+
+    const panelCartas = new GUI.Rectangle('panelCartasPrueba')
+    panelCartas.width = '1200px'
+    panelCartas.height = '100%'
+    panelCartas.left = '170px'
+    panelCartas.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
+    panelCartas.background = 'rgba(28, 20, 18, 0.92)'
+    panelCartas.cornerRadius = 15
+    panelCartas.thickness = 3
+    panelCartas.color = '#a85a2a'
+    panelCartas.isPointerBlocker = false
+    panelContenedor.addControl(panelCartas)
 
     const containerCartas = new GUI.Rectangle('containerCartasPrueba')
     containerCartas.width = '97%'
-    containerCartas.height = '210px'
-    containerCartas.top = '28px'
+    containerCartas.height = '230px'
+    containerCartas.top = '10px'
     containerCartas.background = 'transparent'
     containerCartas.thickness = 0
-    panelInferior.addControl(containerCartas)
+    containerCartas.paddingRight = '40px'
+    panelCartas.addControl(containerCartas)
 
     const gridMano = new GUI.Grid('gridManoCartasPrueba')
     gridMano.width = '100%'
@@ -972,15 +1009,15 @@ export class VistaPartidaPrueba {
     gridMano.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
     gridMano.paddingLeft = '8px'
     gridMano.paddingRight = '8px'
-    for (let columna = 0; columna < 5; columna++) {
-      gridMano.addColumnDefinition(1 / 5)
+    for (let columna = 0; columna < 8; columna++) {
+      gridMano.addColumnDefinition(1 / 8)
     }
     for (let fila = 0; fila < 1; fila++) {
       gridMano.addRowDefinition(1)
     }
     containerCartas.addControl(gridMano)
 
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 8; i++) {
       const cartaVacia = this.crearCartaManoVaciaPrueba(i)
       gridMano.addControl(cartaVacia, 0, i)
     }
@@ -1664,7 +1701,7 @@ export class VistaPartidaPrueba {
       gridMano.removeControl(gridMano.children[0])
     }
 
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 8; i++) {
       if (i < cartas.length) {
         const carta = cartas[i]
         const cartaPanel = this.crearCartaManoGUI(carta, i)
