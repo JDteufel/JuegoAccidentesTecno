@@ -34,6 +34,10 @@ export class ControladorVistaPartida {
       this.jugarCarta(carta)
     })
 
+    this.vistaPartida.onReiniciar(() => {
+      this.reiniciarPartida()
+    })
+
     this.vistaPartida.onFinTurno(() => {
       this.finTurno()
     })
@@ -104,8 +108,9 @@ export class ControladorVistaPartida {
     if (horasAplicadas > 0) {
       this.cartasJugadas.push(carta)
       carta.deshabilitar()
-      this.vistaPartida.actualizarPanelCartas()
+      this.vistaPartida.eliminarCartaDeMano(carta)
       this.vistaPartida.actualizarProgresoPerfil()
+      this.vistaPartida.agregarCartaJugadaATabler(carta, this.jugadorActual)
 
       logEvent('METRICAS', 'carta_jugada', {
         carta: carta.titulo,
@@ -114,11 +119,11 @@ export class ControladorVistaPartida {
         turno: this.jugadorActual
       })
 
+      this.vistaPartida.mostrarMensajeFlotante(`Carta ${carta.titulo} jugada. +${horasAplicadas}h`)
+
       if (this.perfilAsignado.completado) {
         this.verificarVictoria()
       }
-    } else {
-      this.vistaPartida.actualizarPanelCartas()
     }
   }
 
@@ -277,6 +282,26 @@ export class ControladorVistaPartida {
       this.finalizarPartida()
       this.vistaPartida.mostrarMensajeFinal('Perfil completado! Has terminado tu trabajo.')
     }
+  }
+
+  reiniciarPartida() {
+    this.accidentesSeleccionados.forEach(a => a.activo = false)
+    this.accidentesSeleccionados = []
+    this.accidentesActivosOrden = []
+    this.perfilAsignado = null
+    this.cartasMano = []
+    this.cartasJugadas = []
+    this.actividadesDisponibles = []
+    this.jugadorActual = 1
+    this.turnoActivo = false
+    this.accidenteActivo = false
+    this.partidaIniciada = false
+    this.metricasUsoCartas = {}
+    this.turnoInicio = null
+
+    this.vistaPartida.limpiarTableroCartas()
+    this.iniciarPartida()
+    this.vistaPartida.mostrarMensajeFlotante('Partida reiniciada')
   }
 
   finalizarPartida() {

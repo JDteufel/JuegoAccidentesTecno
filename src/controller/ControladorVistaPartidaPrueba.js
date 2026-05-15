@@ -116,12 +116,11 @@ export class ControladorVistaPartidaPrueba {
       this.cartasJugadas.push(carta)
       carta.deshabilitar()
 
-      this.vistaPartidaPrueba.animarCartaJugada(indiceCarta, () => {
-        this.vistaPartidaPrueba.actualizarCartas(this.cartasMano)
-      })
+      this.vistaPartidaPrueba.eliminarCartaDeMano(carta)
 
       this.vistaPartidaPrueba.actualizarPerfil(this.perfilAsignado)
       this.vistaPartidaPrueba.actualizarProgresoPerfil()
+      this.vistaPartidaPrueba.agregarCartaJugadaATabler(carta, this.jugadorActual)
 
       logEvent('METRICAS', 'carta_jugada', {
         carta: carta.titulo,
@@ -358,6 +357,7 @@ export class ControladorVistaPartidaPrueba {
     this.metricasUsoCartas = {}
     this.turnoInicio = null
 
+    this.vistaPartidaPrueba.limpiarTableroCartas()
     this.iniciarPartida()
     this.vistaPartidaPrueba.mostrarMensaje('Partida reiniciada con nuevos elementos.')
   }

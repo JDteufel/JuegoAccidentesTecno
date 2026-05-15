@@ -10,6 +10,7 @@ export class VistaPartida {
     this.scene = null
     this.guiTexture = null
     this.callbackVolver = null
+    this.callbackReiniciar = null
     this.visible = false
     this.overlay = null
     this.sceneAnterior = null
@@ -27,6 +28,8 @@ export class VistaPartida {
     this.totalJugadores = 4
     this.zonaDropIntercambio = null
     this.zonaDropTablero = null
+    this.cartasJugadasMeshes = []
+    this.ranurasCartasJugadas = []
   }
 
   crear() {
@@ -42,14 +45,15 @@ export class VistaPartida {
       'cameraPartida',
       0,
       1.08,
-      18,
+      22,
       this.centroTablero,
       this.scene
     )
     this.cameraPartida = camera
     camera.inputs.clear()
-    camera.lowerRadiusLimit = 17
-    camera.upperRadiusLimit = 19
+    camera.lowerRadiusLimit = 20
+    camera.upperRadiusLimit = 24
+    camera.beta = 1.15
     camera.fov = 0.6
     this.scene.ambientColor = new BABYLON.Color3(0.18, 0.12, 0.08)
 
@@ -148,8 +152,8 @@ export class VistaPartida {
     const tablero = BABYLON.MeshBuilder.CreateBox(
       'tableroCentral',
       {
-        width: 12.4,
-        depth: 12.4,
+        width: 14.4,
+        depth: 14.4,
         height: 0.34
       },
       this.scene
@@ -166,8 +170,8 @@ export class VistaPartida {
     const tapete = BABYLON.MeshBuilder.CreateGround(
       'tapeteJuego',
       {
-        width: 11.3,
-        height: 11.3,
+        width: 13.3,
+        height: 13.3,
         subdivisions: 2
       },
       this.scene
@@ -184,8 +188,8 @@ export class VistaPartida {
     const marcoInterior = BABYLON.MeshBuilder.CreateBox(
       'marcoInteriorTablero',
       {
-        width: 11.65,
-        depth: 11.65,
+        width: 13.65,
+        depth: 13.65,
         height: 0.08
       },
       this.scene
@@ -289,59 +293,8 @@ export class VistaPartida {
       color: new BABYLON.Color3(0.2, 0.16, 0.11)
     })
 
-    this.crearZonaTablero({
-      nombre: 'zonaCentroSuperior',
-      width: 4.1,
-      height: 1.7,
-      position: this.centroTablero.add(new BABYLON.Vector3(0, 0.12, -2.15)),
-      color: new BABYLON.Color3(0.25, 0.23, 0.16)
-    })
-
-    this.crearZonaTablero({
-      nombre: 'zonaCentroInferior',
-      width: 4.1,
-      height: 1.7,
-      position: this.centroTablero.add(new BABYLON.Vector3(0, 0.12, 2.15)),
-      color: new BABYLON.Color3(0.25, 0.23, 0.16)
-    })
-
-    this.crearBandejaTablero({
-      nombre: 'bandejaJugadorNorte',
-      width: 5.8,
-      depth: 1.14,
-      position: this.centroTablero.add(new BABYLON.Vector3(0, 0.38, -4.25)),
-      colorBase: new BABYLON.Color3(0.31, 0.23, 0.16),
-      colorAcento: new BABYLON.Color3(0.79, 0.56, 0.24)
-    })
-
-    this.crearBandejaTablero({
-      nombre: 'bandejaJugadorSur',
-      width: 5.8,
-      depth: 1.14,
-      position: this.centroTablero.add(new BABYLON.Vector3(0, 0.38, 4.25)),
-      colorBase: new BABYLON.Color3(0.28, 0.21, 0.15),
-      colorAcento: new BABYLON.Color3(0.78, 0.52, 0.22)
-    })
-
-    this.crearBandejaTablero({
-      nombre: 'bandejaJugadorOeste',
-      width: 1.14,
-      depth: 5.8,
-      position: this.centroTablero.add(new BABYLON.Vector3(-4.25, 0.38, 0)),
-      colorBase: new BABYLON.Color3(0.24, 0.19, 0.14),
-      colorAcento: new BABYLON.Color3(0.67, 0.47, 0.22)
-    })
-
-    this.crearBandejaTablero({
-      nombre: 'bandejaJugadorEste',
-      width: 1.14,
-      depth: 5.8,
-      position: this.centroTablero.add(new BABYLON.Vector3(4.25, 0.38, 0)),
-      colorBase: new BABYLON.Color3(0.24, 0.19, 0.14),
-      colorAcento: new BABYLON.Color3(0.67, 0.47, 0.22)
-    })
-
     this.crearCarruselAccidente()
+    this.crearZonaCartasJugadas()
   }
 
   crearZonaTablero({ nombre, width, height, position, color }) {
@@ -380,6 +333,145 @@ export class VistaPartida {
     materialLinea.emissiveColor = color.scale(0.1)
     materialLinea.specularColor = new BABYLON.Color3(0.04, 0.03, 0.02)
     linea.material = materialLinea
+  }
+
+  crearZonaCartasJugadas() {
+    this.ranurasCartasJugadas = {
+      frente: [],
+      atras: [],
+      derecha: [],
+      izquierda: []
+    }
+
+    const columnas = 4
+    const filas = 2
+    const espaciadoColumna = 1.2
+    const espaciadoFila = 1.6
+    const distancia = 4.5
+
+    const zonas = [
+      { nombre: 'frente',    centro: this.centroTablero.clone().add(new BABYLON.Vector3(distancia, 0.45, 0)),     rotacionY: -Math.PI / 2, ejeColumna: 'z' },
+      { nombre: 'atras',     centro: this.centroTablero.clone().add(new BABYLON.Vector3(-distancia, 0.45, 0)),    rotacionY: Math.PI / 2,  ejeColumna: 'z' },
+      { nombre: 'derecha',   centro: this.centroTablero.clone().add(new BABYLON.Vector3(0, 0.45, -distancia)),    rotacionY: 0,            ejeColumna: 'x' },
+      { nombre: 'izquierda', centro: this.centroTablero.clone().add(new BABYLON.Vector3(0, 0.45, distancia)),     rotacionY: Math.PI,      ejeColumna: 'x' }
+    ]
+
+    zonas.forEach(zona => {
+      let indice = 0
+      for (let f = 0; f < filas; f++) {
+        for (let c = 0; c < columnas; c++) {
+          const offsetFila = (f - (filas - 1) / 2) * espaciadoFila
+          const offsetColumna = (c - (columnas - 1) / 2) * espaciadoColumna
+
+          const posicion = zona.centro.clone()
+          if (zona.ejeColumna === 'z') {
+            posicion.x += offsetFila
+            posicion.z += offsetColumna
+          } else {
+            posicion.z += offsetFila
+            posicion.x += offsetColumna
+          }
+
+          const contenedor = new BABYLON.TransformNode(`contenedorCartaJugada_${zona.nombre}_${indice}`, this.scene)
+          contenedor.position = posicion
+          contenedor.rotation.y = zona.rotacionY
+
+          const baseTabla = BABYLON.MeshBuilder.CreateBox(`baseTablaJugada_${zona.nombre}_${indice}`, {
+            width: 1.12,
+            height: 0.06,
+            depth: 1.46
+          }, this.scene)
+          baseTabla.parent = contenedor
+          baseTabla.position.y = -0.02
+
+          const materialBase = new BABYLON.StandardMaterial(`matBaseTablaJugada_${zona.nombre}_${indice}`, this.scene)
+          materialBase.diffuseColor = new BABYLON.Color3(0.05, 0.05, 0.05)
+          materialBase.specularColor = new BABYLON.Color3(0.02, 0.02, 0.02)
+          materialBase.emissiveColor = new BABYLON.Color3(0.005, 0.005, 0.005)
+          baseTabla.material = materialBase
+
+          const caraTabla = BABYLON.MeshBuilder.CreatePlane(`caraTablaJugada_${zona.nombre}_${indice}`, {
+            width: 0.94,
+            height: 1.32,
+            sideOrientation: BABYLON.Mesh.DOUBLESIDE
+          }, this.scene)
+          caraTabla.parent = contenedor
+          caraTabla.rotation.x = -Math.PI / 2
+          caraTabla.position = new BABYLON.Vector3(0, 0.045, 0)
+
+          const materialCara = new BABYLON.StandardMaterial(`matCaraTablaJugada_${zona.nombre}_${indice}`, this.scene)
+          materialCara.diffuseColor = new BABYLON.Color3(0.15, 0.1, 0.07)
+          materialCara.specularColor = new BABYLON.Color3(0.08, 0.06, 0.04)
+          materialCara.emissiveColor = new BABYLON.Color3(0.015, 0.01, 0.006)
+          caraTabla.material = materialCara
+
+          this.ranurasCartasJugadas[zona.nombre].push({
+            contenedor,
+            baseTabla,
+            caraTabla,
+            materialCara,
+            ocupada: false
+          })
+
+          indice++
+        }
+      }
+    })
+  }
+
+  agregarCartaJugadaATabler(carta, jugador) {
+    console.log('agregarCartaJugadaATabler:', carta.titulo, 'jugador:', jugador)
+
+    if (!this.scene || !this.ranurasCartasJugadas) {
+      console.log('No hay scene o ranurasCartasJugadas')
+      return
+    }
+
+    const ranuras = this.ranurasCartasJugadas.frente
+    if (!ranuras) {
+      console.log('No hay ranuras frente')
+      return
+    }
+
+    const ranuraLibre = ranuras.find(r => !r.ocupada)
+    if (!ranuraLibre) {
+      console.log('No hay ranura libre')
+      return
+    }
+
+    ranuraLibre.ocupada = true
+
+    const imagenSrc = carta.obtenerImagen ? carta.obtenerImagen() : null
+    if (imagenSrc) {
+      const textura = new BABYLON.Texture(imagenSrc, this.scene, true, false, BABYLON.Texture.TRILINEAR_SAMPLINGMODE)
+      textura.hasAlpha = true
+      ranuraLibre.materialCara.diffuseTexture = textura
+      ranuraLibre.materialCara.emissiveTexture = textura
+      ranuraLibre.materialCara.diffuseColor = new BABYLON.Color3(1, 1, 1)
+      ranuraLibre.materialCara.specularColor = new BABYLON.Color3(0.1, 0.08, 0.06)
+      ranuraLibre.materialCara.useAlphaFromDiffuseTexture = true
+    }
+
+    this.cartasJugadasMeshes.push(ranuraLibre.caraTabla)
+    console.log('Carta agregada al tablero correctamente')
+  }
+
+  limpiarTableroCartas() {
+    if (!this.ranurasCartasJugadas) return
+
+    for (const direccion of Object.keys(this.ranurasCartasJugadas)) {
+      const ranuras = this.ranurasCartasJugadas[direccion]
+      for (const ranura of ranuras) {
+        ranura.ocupada = false
+        ranura.materialCara.diffuseTexture = null
+        ranura.materialCara.emissiveTexture = null
+        ranura.materialCara.diffuseColor = new BABYLON.Color3(0.15, 0.1, 0.07)
+        ranura.materialCara.specularColor = new BABYLON.Color3(0.08, 0.06, 0.04)
+        ranura.materialCara.emissiveColor = new BABYLON.Color3(0.015, 0.01, 0.006)
+      }
+    }
+
+    this.cartasJugadasMeshes = []
   }
 
   crearCarruselAccidente() {
@@ -823,6 +915,7 @@ export class VistaPartida {
 
     this.crearEncabezadoPartida()
     this.crearBotonVolver()
+    this.crearBotonReiniciar()
     this.crearPanelCartas()
   }
 
@@ -948,6 +1041,30 @@ export class VistaPartida {
     this.overlay.addControl(botonVolver)
   }
 
+  crearBotonReiniciar() {
+    const botonReiniciar = GUI.Button.CreateSimpleButton('btnReiniciarPartida', 'Reiniciar')
+    botonReiniciar.width = '150px'
+    botonReiniciar.height = '48px'
+    botonReiniciar.right = '20px'
+    botonReiniciar.top = '20px'
+    botonReiniciar.background = '#5a3321'
+    botonReiniciar.color = '#ffd8bc'
+    botonReiniciar.cornerRadius = 16
+    botonReiniciar.thickness = 2
+    botonReiniciar.borderColor = '#8e4d22'
+    botonReiniciar.fontSize = 18
+    botonReiniciar.fontWeight = 'bold'
+    botonReiniciar.fontFamily = 'Comic Sans MS'
+    botonReiniciar.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT
+    botonReiniciar.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP
+
+    botonReiniciar.onPointerUpObservable.add(() => {
+      this.callbackReiniciar && this.callbackReiniciar()
+    })
+
+    this.overlay.addControl(botonReiniciar)
+  }
+
   crearPanelCartas() {
     const panelContenedor = new GUI.Rectangle('panelContenedorCartas')
     panelContenedor.width = '95%'
@@ -1060,9 +1177,32 @@ export class VistaPartida {
     return cartaPanel
   }
 
+  eliminarCartaDeMano(carta) {
+    const gridMano = this.guiTexture.getControlByName('gridManoCartas')
+    if (!gridMano) return
+
+    const nombreBuscado = `carta_${carta.codigo}`
+
+    const buscarYEliminar = (control) => {
+      if (control.name === nombreBuscado) {
+        gridMano.removeControl(control)
+        control.dispose()
+        return true
+      }
+      if (control.children) {
+        for (const hijo of control.children) {
+          if (buscarYEliminar(hijo)) return true
+        }
+      }
+      return false
+    }
+
+    buscarYEliminar(gridMano)
+  }
+
   crearCartaMano(carta, indice) {
     const imagenSrc = carta.obtenerImagen ? carta.obtenerImagen() : null
-    const cartaPanel = new GUI.Image(`carta_${indice}`, imagenSrc)
+    const cartaPanel = new GUI.Image(`carta_${carta.codigo}`, imagenSrc)
     cartaPanel.width = '96%'
     cartaPanel.height = '92%'
     cartaPanel.stretch = GUI.Image.STRETCH_UNIFORM
@@ -1074,6 +1214,7 @@ export class VistaPartida {
 
     cartaPanel.onPointerDownObservable.add((coords) => {
       if (carta.estaDeshabilitada()) return
+      if (this.dragState) return
       this.dragState = {
         indice,
         carta,
@@ -1087,9 +1228,14 @@ export class VistaPartida {
       if (!this.dragState || this.dragState.indice !== indice) return
       const deltaY = this.dragState.inicioY - coords.y
       if (this.dragState.moviendo && deltaY > 60) {
+        cartaPanel.top = '0px'
+        cartaPanel.alpha = carta.estaDeshabilitada() ? 0.5 : 1
         if (this.callbackJugarCarta) {
           this.callbackJugarCarta(carta)
         }
+      } else {
+        cartaPanel.top = '0px'
+        cartaPanel.alpha = carta.estaDeshabilitada() ? 0.5 : 1
       }
       this.dragState = null
     })
@@ -1237,9 +1383,11 @@ export class VistaPartida {
       gridMano.removeControl(gridMano.children[0])
     }
 
+    const cartasActivas = this.cartas.filter(c => !c.estaDeshabilitada())
+
     for (let i = 0; i < 8; i++) {
-      if (i < this.cartas.length) {
-        const carta = this.cartas[i]
+      if (i < cartasActivas.length) {
+        const carta = cartasActivas[i]
         const cartaPanel = this.crearCartaMano(carta, i)
         gridMano.addControl(cartaPanel, 0, i)
       } else {
@@ -1769,6 +1917,10 @@ export class VistaPartida {
 
   onJugarCarta(callback) {
     this.callbackJugarCarta = callback
+  }
+
+  onReiniciar(callback) {
+    this.callbackReiniciar = callback
   }
 
   onFinTurno(callback) {
