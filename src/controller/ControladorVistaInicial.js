@@ -31,5 +31,9 @@ export class ControladorVistaInicial {
     this.vistaInicial.onReglas(() => {
       this.controladorEstadoApp.irAPantalla(PANTALLAS.REGLAS)
     })
+
+    this.vistaInicial.onConfiguracion(() => {
+      this.controladorEstadoApp.irAPantalla(PANTALLAS.CONFIGURACION)
+    })
   }
 }

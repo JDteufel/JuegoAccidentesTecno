@@ -1,4 +1,5 @@
 import { GestorAjusteRatio } from './GestorAjusteRatio.js'
+import temaService from '../../services/TemaService.js'
 import '../estilos/EstiloVistaFormularioBase.css'
 
 export class VistaFormularioBase {
@@ -51,8 +52,7 @@ export class VistaFormularioBase {
 
     this.accionButton = this._crearBoton(
       configuracion.textoBotonAccion,
-      '#d66a1f',
-      '#fff7ef',
+      'primary',
       () => this.onAccionCallback && this.onAccionCallback()
     )
     this.accionButton.style.marginTop = '15px'
@@ -60,8 +60,7 @@ export class VistaFormularioBase {
 
     const btnVolver = this._crearBoton(
       'Volver al Menú',
-      '#362924',
-      '#ffd8bc',
+      'dark',
       () => this.onVolverCallback && this.onVolverCallback()
     )
     btnVolver.style.marginTop = '10px'
@@ -85,8 +84,9 @@ export class VistaFormularioBase {
     input.spellcheck = false
     input.className = 'formulario-input'
     input.style.height = esMovil ? '48px' : '54px'
-    input.addEventListener('focus', () => input.style.background = '#352821')
-    input.addEventListener('blur', () => input.style.background = '#2b211d')
+    const colores = temaService.obtenerColoresTema(temaService.obtenerTemaActual())
+    input.addEventListener('focus', () => input.style.background = colores.inputFocused)
+    input.addEventListener('blur', () => input.style.background = colores.inputBg)
 
     wrapper.appendChild(input)
 
@@ -118,14 +118,29 @@ export class VistaFormularioBase {
     }
   }
 
-  _crearBoton(texto, fondo, color, callback) {
+  _crearBoton(texto, temaClave, callback) {
     const esMovil = GestorAjusteRatio.esMovil()
+    const colores = temaService.obtenerColoresTema(temaService.obtenerTemaActual())
+    let fondo, colorTexto
+    if (temaClave === 'primary') {
+      fondo = colores.primary
+      colorTexto = colores.primaryText
+    } else if (temaClave === 'secondary') {
+      fondo = colores.secondary
+      colorTexto = colores.secondaryText
+    } else if (temaClave === 'dark') {
+      fondo = colores.darkAlt
+      colorTexto = colores.darkAltText
+    } else {
+      fondo = colores.darkAlt
+      colorTexto = colores.darkAltText
+    }
     const btn = document.createElement('button')
     btn.textContent = texto
     btn.className = 'formulario-boton'
     btn.style.width = esMovil ? '90%' : '320px'
     btn.style.background = fondo
-    btn.style.color = color
+    btn.style.color = colorTexto
     btn.style.fontSize = esMovil ? '19px' : '22px'
     this._agregarFeedbackBoton(btn)
     btn.addEventListener('click', callback)
@@ -223,5 +238,37 @@ export class VistaFormularioBase {
     if (this.campos.length > 0) {
       setTimeout(() => this.campos[0].control.focus(), 50)
     }
+  }
+
+  aplicarTema(temaId) {
+    const colores = temaService.obtenerColoresTema(temaId)
+
+    if (this.accionButton) {
+      this.accionButton.style.background = colores.primary
+      this.accionButton.style.color = colores.primaryText
+    }
+
+    const botones = this.containerEl?.querySelectorAll('.formulario-boton')
+    if (botones) {
+      botones.forEach(btn => {
+        if (btn.textContent === 'Volver al Menú') {
+          btn.style.background = colores.darkAlt
+          btn.style.color = colores.darkAltText
+        }
+      })
+    }
+
+    this.campos.forEach(campo => {
+      if (campo.control && campo.control.input) {
+        const input = campo.control.input
+        input.style.background = colores.inputBg
+        const focusHandler = () => input.style.background = colores.inputFocused
+        const blurHandler = () => input.style.background = colores.inputBg
+        input.removeEventListener('focus', focusHandler)
+        input.removeEventListener('blur', blurHandler)
+        input.addEventListener('focus', focusHandler)
+        input.addEventListener('blur', blurHandler)
+      }
+    })
   }
 }

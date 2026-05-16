@@ -1,4 +1,5 @@
 import { GestorAjusteRatio } from './GestorAjusteRatio.js'
+import temaService from '../../services/TemaService.js'
 import '../estilos/EstiloVistaListaBase.css'
 
 export class VistaListaBase {
@@ -53,8 +54,7 @@ export class VistaListaBase {
 
     const btnVolver = this._crearBoton(
       'Volver al Menú',
-      '#362924',
-      '#ffd8bc',
+      'dark',
       () => this.onVolverCallback && this.onVolverCallback()
     )
     btnVolver.style.marginTop = '20px'
@@ -78,14 +78,29 @@ export class VistaListaBase {
     return bloque
   }
 
-  _crearBoton(texto, fondo, color, callback) {
+  _crearBoton(texto, temaClave, callback) {
     const esMovil = GestorAjusteRatio.esMovil()
+    const colores = temaService.obtenerColoresTema(temaService.obtenerTemaActual())
+    let fondo, colorTexto
+    if (temaClave === 'primary') {
+      fondo = colores.primary
+      colorTexto = colores.primaryText
+    } else if (temaClave === 'secondary') {
+      fondo = colores.secondary
+      colorTexto = colores.secondaryText
+    } else if (temaClave === 'dark') {
+      fondo = colores.darkAlt
+      colorTexto = colores.darkAltText
+    } else {
+      fondo = colores.darkAlt
+      colorTexto = colores.darkAltText
+    }
     const btn = document.createElement('button')
     btn.textContent = texto
     btn.className = 'lista-boton'
     btn.style.width = esMovil ? '90%' : '320px'
     btn.style.background = fondo
-    btn.style.color = color
+    btn.style.color = colorTexto
     btn.style.fontSize = esMovil ? '19px' : '22px'
     this._agregarFeedbackBoton(btn)
     btn.addEventListener('click', callback)
@@ -152,5 +167,23 @@ export class VistaListaBase {
 
   ocultar() {
     if (this.containerEl) this.containerEl.style.display = 'none'
+  }
+
+  aplicarTema(temaId) {
+    const colores = temaService.obtenerColoresTema(temaId)
+
+    const botones = this.containerEl?.querySelectorAll('.lista-boton')
+    if (botones) {
+      botones.forEach(btn => {
+        const texto = btn.textContent
+        if (texto === 'Volver al Menú' || texto === 'Volver a Reglas') {
+          btn.style.background = colores.darkAlt
+          btn.style.color = colores.darkAltText
+        } else if (texto === 'Ver Cartas' || texto === 'Ver Accidentes') {
+          btn.style.background = colores.darkAlt
+          btn.style.color = colores.darkAltText
+        }
+      })
+    }
   }
 }

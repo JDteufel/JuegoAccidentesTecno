@@ -6,7 +6,7 @@
   height: 100%;
   justify-content: center;
   align-items: center;
-  background: rgba(12, 9, 8, 0.64);
+  background: var(--overlay-bg);
   z-index: 100;
 }
 
@@ -18,7 +18,7 @@
 }
 
 .tutorial-video {
-  border: 2px solid #8e4d22;
+  border: 2px solid var(--border-alt);
   border-radius: 10px;
   display: block;
 }
@@ -29,10 +29,10 @@
   right: -20px;
   width: 44px;
   height: 44px;
-  border: 2px solid rgba(255, 216, 188, 0.85);
+  border: 2px solid var(--dark-alt-text);
   border-radius: 50%;
-  background: rgba(54, 41, 36, 0.9);
-  color: #ffd8bc;
+  background: var(--dark-alt);
+  color: var(--dark-alt-text);
   font-size: 20px;
   font-weight: 700;
   font-family: 'Comic Neue', 'Comic Sans MS', cursive;

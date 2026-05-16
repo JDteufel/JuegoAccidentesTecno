@@ -50,8 +50,7 @@ export class VistaReglas extends VistaListaBase {
 
     const btnCartas = this._crearBoton(
       'Ver Cartas',
-      '#3c2d27',
-      '#ffd6b7',
+      'dark',
       () => this.onVerCartasCallback && this.onVerCartasCallback()
     )
     if (esMovil) {
@@ -64,8 +63,7 @@ export class VistaReglas extends VistaListaBase {
 
     const btnAccidentes = this._crearBoton(
       'Ver Accidentes',
-      '#3c2d27',
-      '#ffd6b7',
+      'dark',
       () => this.onVerAccidentesCallback && this.onVerAccidentesCallback()
     )
     if (esMovil) {

@@ -6,7 +6,7 @@
   height: 100%;
   flex-direction: column;
   align-items: center;
-  background: rgba(12, 9, 8, 0.75);
+  background: var(--overlay-full-bg);
   z-index: 100;
   font-family: 'Comic Neue', 'Comic Sans MS', cursive;
   box-sizing: border-box;
@@ -25,7 +25,7 @@
 }
 
 .accidentes-titulo {
-  color: #ffe6d1;
+  color: var(--text-primary);
   margin: 0;
   text-align: center;
 }
@@ -71,7 +71,7 @@
   height: 95%;
   -webkit-appearance: none;
   appearance: none;
-  background: rgba(168, 90, 42, 0.3);
+  background: var(--slider-track-bg);
   border-radius: 4px;
   outline: none;
   cursor: pointer;
@@ -83,18 +83,18 @@
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  background: #a85a2a;
+  background: var(--border-color);
   cursor: pointer;
-  border: 2px solid #ffd8bc;
+  border: 2px solid var(--dark-alt-text);
 }
 
 .accidentes-slider::-moz-range-thumb {
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  background: #a85a2a;
+  background: var(--border-color);
   cursor: pointer;
-  border: 2px solid #ffd8bc;
+  border: 2px solid var(--dark-alt-text);
 }
 
 .accidentes-boton {
@@ -114,7 +114,7 @@
 .accidentes-item {
   border-radius: 15px;
   border: 2px solid;
-  background: rgba(28, 20, 18, 0.95);
+  background: var(--card-bg-solid);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -137,7 +137,7 @@
 
 .accidentes-item-nivel {
   font-weight: bold;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--badge-bg-overlay);
   padding: 4px 10px;
   border-radius: 5px;
 }

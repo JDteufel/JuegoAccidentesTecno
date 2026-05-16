@@ -1,5 +1,6 @@
 import { PANTALLAS, TIPOS_JUGADOR } from '../model/EstadoApp.js'
 import usuariosService from '../services/UsuariosService.js'
+import temaService from '../services/TemaService.js'
 
 export class ControladorVistaRegistro {
   constructor(vistaRegistro, estadoApp, controladorEstadoApp) {
@@ -29,6 +30,8 @@ export class ControladorVistaRegistro {
         if (result.ok) {
           this.estadoApp.setUsuario(result.user.username)
           this.estadoApp.setTipoJugador(TIPOS_JUGADOR.GAMEMASTER)
+          await temaService.cargarTemaInicial(result.user.username)
+          this.controladorEstadoApp.aplicarTemaActual()
           this.controladorEstadoApp.irAPantalla(PANTALLAS.INICIAL_GAMEMASTER)
         } else {
           this.vistaRegistro.limpiarCampos()

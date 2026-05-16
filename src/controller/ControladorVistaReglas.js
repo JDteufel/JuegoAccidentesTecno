@@ -8,7 +8,10 @@ export class ControladorVistaReglas {
 
   init() {
     this.vistaReglas.onVolver(() => {
-      this.controladorEstadoApp.irAPantalla(PANTALLAS.INICIAL_PUBLICA)
+      const destino = this.controladorEstadoApp.estadoApp.getUsername()
+        ? PANTALLAS.INICIAL_GAMEMASTER
+        : PANTALLAS.INICIAL_PUBLICA
+      this.controladorEstadoApp.irAPantalla(destino)
     })
 
     this.vistaReglas.onVerCartas(() => {

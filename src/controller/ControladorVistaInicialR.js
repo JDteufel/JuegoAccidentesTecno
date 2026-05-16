@@ -76,6 +76,10 @@ export class ControladorVistaInicialR {
       }
       this.controladorEstadoApp.cerrarSesion()
     })
+
+    this.vistaInicialR.onConfiguracion(() => {
+      this.controladorEstadoApp.irAPantalla(PANTALLAS.CONFIGURACION)
+    })
   }
 
   generarCodigoLobby() {

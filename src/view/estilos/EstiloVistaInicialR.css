@@ -6,7 +6,7 @@
   height: 100%;
   justify-content: center;
   align-items: center;
-  background: rgba(12, 9, 8, 0.48);
+  background: var(--overlay-bg-light);
   z-index: 100;
   font-family: 'Comic Neue', 'Comic Sans MS', cursive;
 }
@@ -18,9 +18,9 @@
   width: 320px;
   height: 280px;
   border-radius: 30px;
-  border: 2px solid #8a4a20;
-  background: rgba(28, 20, 18, 0.92);
-  box-shadow: 0 16px 28px rgba(0, 0, 0, 0.4);
+  border: 2px solid var(--border-color);
+  background: var(--card-bg);
+  box-shadow: 0 16px 28px var(--shadow-color);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -28,7 +28,7 @@
 }
 
 .inicialr-titulo {
-  color: #ffd9bd;
+  color: var(--text-secondary);
   font-size: 24px;
   margin: 0 0 20px 0;
   text-align: center;
@@ -42,7 +42,7 @@
   align-items: center;
   gap: 12px;
   height: 92px;
-  background: rgba(18, 14, 13, 0.72);
+  background: var(--topbar-bg);
   padding: 0 20px;
   border-radius: 18px;
   box-sizing: border-box;
@@ -69,4 +69,31 @@
 .inicialr-boton:active {
   opacity: 0.85;
   transform: scale(0.98);
+}
+
+.inicialr-boton-config {
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s, opacity 0.2s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.inicialr-boton-config:hover {
+  opacity: 0.7;
+  transform: rotate(90deg) scale(0.95);
+}
+
+.inicialr-boton-config:active {
+  opacity: 0.7;
+  transform: rotate(90deg) scale(0.95);
 }

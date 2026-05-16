@@ -1,4 +1,5 @@
 import './estilos/EstiloVistaInicialR.css'
+import temaService from '../services/TemaService.js'
 
 export class VistaInicialR {
   constructor() {
@@ -6,6 +7,7 @@ export class VistaInicialR {
     this._onTutorial = null
     this._onReglas = null
     this._onCerrarSesion = null
+    this._onConfiguracion = null
     this.containerEl = null
   }
 
@@ -28,8 +30,7 @@ export class VistaInicialR {
 
     const btnCrearJuego = this._crearBoton(
       'Crear juego',
-      '#d66a1f',
-      '#fff7ef',
+      'primary',
       () => this._onCrearJuego && this._onCrearJuego()
     )
     btnCrearJuego.style.marginBottom = '10px'
@@ -37,8 +38,7 @@ export class VistaInicialR {
 
     const btnTutorial = this._crearBoton(
       'Tutorial',
-      '#3c2d27',
-      '#ffd6b7',
+      'dark',
       () => this._onTutorial && this._onTutorial()
     )
     btnTutorial.style.marginBottom = '10px'
@@ -46,8 +46,7 @@ export class VistaInicialR {
 
     const btnReglas = this._crearBoton(
       'Ver reglas',
-      '#3c2d27',
-      '#ffd6b7',
+      'dark',
       () => this._onReglas && this._onReglas()
     )
     panelAcciones.appendChild(btnReglas)
@@ -56,10 +55,14 @@ export class VistaInicialR {
     barraSuperior.className = 'inicialr-barra-superior'
     container.appendChild(barraSuperior)
 
+    const btnConfig = this._crearBotonConfig(
+      () => this._onConfiguracion && this._onConfiguracion()
+    )
+    barraSuperior.appendChild(btnConfig)
+
     const btnCerrarSesion = this._crearBoton(
       'Cerrar Sesión',
-      '#a84f16',
-      '#fff1e3',
+      'danger',
       () => this._onCerrarSesion && this._onCerrarSesion()
     )
     btnCerrarSesion.style.width = '220px'
@@ -68,12 +71,27 @@ export class VistaInicialR {
     barraSuperior.appendChild(btnCerrarSesion)
   }
 
-  _crearBoton(texto, fondo, color, callback) {
+  _crearBoton(texto, temaClave, callback) {
+    const colores = temaService.obtenerColoresTema(temaService.obtenerTemaActual())
+    let fondo, colorTexto
+    if (temaClave === 'primary') {
+      fondo = colores.primary
+      colorTexto = colores.primaryText
+    } else if (temaClave === 'secondary') {
+      fondo = colores.secondary
+      colorTexto = colores.secondaryText
+    } else if (temaClave === 'danger') {
+      fondo = colores.danger || '#a84f16'
+      colorTexto = colores.dangerText || '#fff1e3'
+    } else {
+      fondo = colores.darkAlt
+      colorTexto = colores.darkAltText
+    }
     const btn = document.createElement('button')
     btn.textContent = texto
     btn.className = 'inicialr-boton'
     btn.style.background = fondo
-    btn.style.color = color
+    btn.style.color = colorTexto
     const aplicarActivo = () => {
       btn.style.opacity = '0.85'
       btn.style.transform = 'scale(0.98)'
@@ -81,6 +99,40 @@ export class VistaInicialR {
     const removerActivo = () => {
       btn.style.opacity = '1'
       btn.style.transform = 'scale(1)'
+    }
+    btn.addEventListener('mouseenter', aplicarActivo)
+    btn.addEventListener('mouseleave', removerActivo)
+    btn.addEventListener('touchstart', aplicarActivo, { passive: true })
+    btn.addEventListener('touchend', removerActivo, { passive: true })
+    btn.addEventListener('touchcancel', removerActivo, { passive: true })
+    btn.addEventListener('click', callback)
+    return btn
+  }
+
+  _crearBotonConfig(callback) {
+    const colores = temaService.obtenerColoresTema(temaService.obtenerTemaActual())
+    const btn = document.createElement('button')
+    btn.innerHTML = '&#9881;'
+    btn.className = 'inicialr-boton-config'
+    btn.style.width = '44px'
+    btn.style.height = '44px'
+    btn.style.background = 'transparent'
+    btn.style.color = colores.textPrimary
+    btn.style.fontSize = '24px'
+    btn.style.border = 'none'
+    btn.style.borderRadius = '12px'
+    btn.style.cursor = 'pointer'
+    btn.style.display = 'flex'
+    btn.style.alignItems = 'center'
+    btn.style.justifyContent = 'center'
+    btn.style.transition = 'transform 0.3s, opacity 0.2s'
+    const aplicarActivo = () => {
+      btn.style.opacity = '0.7'
+      btn.style.transform = 'rotate(90deg) scale(0.95)'
+    }
+    const removerActivo = () => {
+      btn.style.opacity = '1'
+      btn.style.transform = 'rotate(0deg) scale(1)'
     }
     btn.addEventListener('mouseenter', aplicarActivo)
     btn.addEventListener('mouseleave', removerActivo)
@@ -107,11 +159,61 @@ export class VistaInicialR {
     this._onCerrarSesion = callback
   }
 
+  onConfiguracion(callback) {
+    this._onConfiguracion = callback
+  }
+
   mostrar() {
     if (this.containerEl) this.containerEl.style.display = 'flex'
   }
 
   ocultar() {
     if (this.containerEl) this.containerEl.style.display = 'none'
+  }
+
+  aplicarTema(temaId) {
+    const colores = temaService.obtenerColoresTema(temaId)
+
+    if (this.containerEl) {
+      this.containerEl.style.background = colores.overlay
+    }
+
+    const panelAcciones = this.containerEl?.querySelector('.inicialr-panel-acciones')
+    if (panelAcciones) {
+      panelAcciones.style.background = colores.cardBg
+      panelAcciones.style.borderColor = colores.border
+    }
+
+    const barraSuperior = this.containerEl?.querySelector('.inicialr-barra-superior')
+    if (barraSuperior) {
+      barraSuperior.style.background = colores.topbar
+    }
+
+    const titulo = this.containerEl?.querySelector('.inicialr-titulo')
+    if (titulo) {
+      titulo.style.color = colores.textSecondary
+    }
+
+    const botones = this.containerEl?.querySelectorAll('.inicialr-boton')
+    if (botones) {
+      botones.forEach(btn => {
+        const texto = btn.textContent
+        if (texto === 'Crear juego') {
+          btn.style.background = colores.primary
+          btn.style.color = colores.primaryText
+        } else if (texto === 'Cerrar Sesión') {
+          btn.style.background = colores.danger || '#a84f16'
+          btn.style.color = colores.dangerText || '#fff1e3'
+        } else if (texto === 'Tutorial' || texto === 'Ver reglas') {
+          btn.style.background = colores.darkAlt
+          btn.style.color = colores.darkAltText
+        }
+      })
+    }
+
+    const btnConfig = this.containerEl?.querySelector('.inicialr-boton-config')
+    if (btnConfig) {
+      btnConfig.style.color = colores.textPrimary
+    }
   }
 }

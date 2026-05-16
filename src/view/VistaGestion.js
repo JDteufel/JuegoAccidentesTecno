@@ -1,4 +1,5 @@
 import './estilos/VistaGestion.css'
+import temaService from '../services/TemaService.js'
 
 export class VistaGestion {
   constructor() {
@@ -572,10 +573,12 @@ export class VistaGestion {
     const salaData = this.salaSlots[numero]
     if (!salaData || !salaData.btnIniciar) return
 
+    const colores = temaService.obtenerColoresTema(temaService.obtenerTemaActual())
+
     switch (estado) {
       case 'disponible':
         salaData.btnIniciar.textContent = 'Iniciar'
-        salaData.btnIniciar.style.background = '#8e4d22'
+        salaData.btnIniciar.style.background = colores.borderAlt
         salaData.btnIniciar.style.opacity = salaData.activa ? '1' : '0.4'
         salaData.btnIniciar.disabled = !salaData.activa
         salaData.btnIniciar.style.pointerEvents = salaData.activa ? 'auto' : 'none'
@@ -583,7 +586,7 @@ export class VistaGestion {
         break
       case 'jugadoresListos':
         salaData.btnIniciar.textContent = 'Jugadores Listos'
-        salaData.btnIniciar.style.background = '#d66a1f'
+        salaData.btnIniciar.style.background = colores.primary
         salaData.btnIniciar.style.opacity = '1'
         salaData.btnIniciar.disabled = false
         salaData.btnIniciar.style.pointerEvents = 'auto'
@@ -591,7 +594,7 @@ export class VistaGestion {
         break
       case 'iniciando':
         salaData.btnIniciar.textContent = 'Iniciando...'
-        salaData.btnIniciar.style.background = '#8e4d22'
+        salaData.btnIniciar.style.background = colores.borderAlt
         salaData.btnIniciar.style.opacity = '0.6'
         salaData.btnIniciar.disabled = true
         salaData.btnIniciar.style.pointerEvents = 'none'
@@ -599,7 +602,7 @@ export class VistaGestion {
         break
       case 'iniciada':
         salaData.btnIniciar.textContent = 'Partida Iniciada!'
-        salaData.btnIniciar.style.background = '#4ade80'
+        salaData.btnIniciar.style.background = colores.badgeWork
         salaData.btnIniciar.style.opacity = '1'
         salaData.btnIniciar.disabled = true
         salaData.btnIniciar.style.pointerEvents = 'none'
@@ -613,5 +616,17 @@ export class VistaGestion {
       this.errorEl.textContent = mensaje
       this.errorEl.classList.add('exito', 'visible')
     }
+  }
+
+  aplicarTema(temaId) {
+    const colores = temaService.obtenerColoresTema(temaId)
+    const root = document.documentElement
+    root.style.setProperty('--gestion-bg', colores.cardBg)
+    root.style.setProperty('--gestion-border', colores.border)
+    root.style.setProperty('--gestion-text', colores.textPrimary)
+    root.style.setProperty('--gestion-primary', colores.primary)
+    root.style.setProperty('--gestion-dark', colores.dark)
+    root.style.setProperty('--gestion-item-even', colores.itemEven)
+    root.style.setProperty('--gestion-item-odd', colores.itemOdd)
   }
 }

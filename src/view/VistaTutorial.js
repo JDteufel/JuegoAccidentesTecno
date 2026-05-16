@@ -1,5 +1,6 @@
 import videoTutorial from '../assets/VideoTutorial.mp4'
 import { GestorAjusteRatio } from './base/GestorAjusteRatio.js'
+import temaService from '../services/TemaService.js'
 import './estilos/EstiloVistaTutorial.css'
 
 export class VistaTutorial {
@@ -84,5 +85,17 @@ export class VistaTutorial {
   onCerrar(callback) {
     if (!this.botonCerrar) return
     this.botonCerrar.addEventListener('click', callback)
+  }
+
+  aplicarTema(temaId) {
+    const colores = temaService.obtenerColoresTema(temaId)
+    if (this.botonCerrar) {
+      this.botonCerrar.style.background = colores.darkAlt
+      this.botonCerrar.style.color = colores.darkAltText
+      this.botonCerrar.style.borderColor = colores.darkAltText + 'cc'
+    }
+    if (this.videoEl) {
+      this.videoEl.style.borderColor = colores.borderAlt
+    }
   }
 }

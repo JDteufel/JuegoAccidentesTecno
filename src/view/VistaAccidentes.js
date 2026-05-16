@@ -1,5 +1,6 @@
 import { seleccionarAccidentesAleatorios } from '../model/accidentes/index.js'
 import { GestorAjusteRatio } from './base/GestorAjusteRatio.js'
+import temaService from '../services/TemaService.js'
 import './estilos/EstiloVistaAccidentes.css'
 
 export class VistaAccidentes {
@@ -62,7 +63,7 @@ export class VistaAccidentes {
     titulo.style.fontSize = cfg.tamanoTitulo
     header.appendChild(titulo)
 
-    const btnVolver = this._crearBoton('Volver a Reglas', '#362924', '#ffd8bc', () => {
+    const btnVolver = this._crearBoton('Volver a Reglas', 'dark', () => {
       this.callbackVolver && this.callbackVolver()
     }, GestorAjusteRatio.esMovil())
     header.appendChild(btnVolver)
@@ -248,6 +249,8 @@ export class VistaAccidentes {
     `
     contenido.appendChild(categoriasLabel)
 
+    const colores = temaService.obtenerColoresTema(temaService.obtenerTemaActual())
+
     const categorias = document.createElement('div')
     categorias.style.cssText = `
       display: flex;
@@ -260,8 +263,8 @@ export class VistaAccidentes {
       catBadge.textContent = cat
       catBadge.style.cssText = `
         font-size: clamp(12px, ${altoModal * 0.024}px, 18px);
-        color: #ffd8bc;
-        background: rgba(168, 90, 42, 0.4);
+        color: ${colores.darkAltText};
+        background: ${colores.badgeBg || 'rgba(168, 90, 42, 0.4)'};
         padding: 7px 16px;
         border-radius: 8px;
       `
@@ -273,7 +276,7 @@ export class VistaAccidentes {
     descripcion.textContent = accidente.descripcion
     descripcion.style.cssText = `
       font-size: clamp(15px, ${altoModal * 0.032}px, 22px);
-      color: #ffe9d6;
+      color: ${colores.textBody};
       font-family: 'Comic Neue', 'Comic Sans MS', cursive;
       text-align: center;
       margin: 16px 0 0;
@@ -301,7 +304,22 @@ export class VistaAccidentes {
     }, 350)
   }
 
-  _crearBoton(texto, fondo, color, callback, esMovil = false) {
+  _crearBoton(texto, temaClave, callback, esMovil = false) {
+    const colores = temaService.obtenerColoresTema(temaService.obtenerTemaActual())
+    let fondo, colorTexto
+    if (temaClave === 'primary') {
+      fondo = colores.primary
+      colorTexto = colores.primaryText
+    } else if (temaClave === 'secondary') {
+      fondo = colores.secondary
+      colorTexto = colores.secondaryText
+    } else if (temaClave === 'dark') {
+      fondo = colores.darkAlt
+      colorTexto = colores.darkAltText
+    } else {
+      fondo = colores.darkAlt
+      colorTexto = colores.darkAltText
+    }
     const btn = document.createElement('button')
     btn.textContent = texto
     const tamanoMinimo = esMovil ? '44px' : '36px'
@@ -311,7 +329,7 @@ export class VistaAccidentes {
       border: none;
       border-radius: 18px;
       background: ${fondo};
-      color: ${color};
+      color: ${colorTexto};
       font-size: ${esMovil ? '16px' : '21px'};
       font-family: 'Comic Neue', 'Comic Sans MS', cursive;
       cursor: pointer;
@@ -433,5 +451,18 @@ export class VistaAccidentes {
     if (this.containerEl) this.containerEl.style.display = 'none'
     this.visible = false
     this.cerrarModal()
+  }
+
+  aplicarTema(temaId) {
+    const colores = temaService.obtenerColoresTema(temaId)
+    const botones = this.containerEl?.querySelectorAll('.accidentes-boton')
+    if (botones) {
+      botones.forEach(btn => {
+        if (btn.textContent === 'Volver') {
+          btn.style.background = colores.darkAlt
+          btn.style.color = colores.darkAltText
+        }
+      })
+    }
   }
 }

@@ -1,5 +1,6 @@
 import { crearCartaDesdeNombre, obtenerNombresCartas } from '../model/cartas/index.js'
 import { GestorAjusteRatio } from './base/GestorAjusteRatio.js'
+import temaService from '../services/TemaService.js'
 import './estilos/EstiloVistaCartas.css'
 
 export class VistaCartas {
@@ -60,7 +61,7 @@ export class VistaCartas {
     titulo.style.fontSize = cfg.tamanoTitulo
     header.appendChild(titulo)
 
-    const btnVolver = this._crearBoton('Volver a Reglas', '#362924', '#ffd8bc', () => {
+    const btnVolver = this._crearBoton('Volver a Reglas', 'dark', () => {
       this.callbackVolver && this.callbackVolver()
     }, GestorAjusteRatio.esMovil())
     header.appendChild(btnVolver)
@@ -271,7 +272,22 @@ export class VistaCartas {
     }, 350)
   }
 
-  _crearBoton(texto, fondo, color, callback, esMovil = false) {
+  _crearBoton(texto, temaClave, callback, esMovil = false) {
+    const colores = temaService.obtenerColoresTema(temaService.obtenerTemaActual())
+    let fondo, colorTexto
+    if (temaClave === 'primary') {
+      fondo = colores.primary
+      colorTexto = colores.primaryText
+    } else if (temaClave === 'secondary') {
+      fondo = colores.secondary
+      colorTexto = colores.secondaryText
+    } else if (temaClave === 'dark') {
+      fondo = colores.darkAlt
+      colorTexto = colores.darkAltText
+    } else {
+      fondo = colores.darkAlt
+      colorTexto = colores.darkAltText
+    }
     const btn = document.createElement('button')
     btn.textContent = texto
     const tamanoMinimo = esMovil ? '44px' : '36px'
@@ -281,7 +297,7 @@ export class VistaCartas {
       border: none;
       border-radius: 18px;
       background: ${fondo};
-      color: ${color};
+      color: ${colorTexto};
       font-size: ${esMovil ? '16px' : '21px'};
       font-family: 'Comic Neue', 'Comic Sans MS', cursive;
       cursor: pointer;
@@ -391,5 +407,18 @@ export class VistaCartas {
     if (this.containerEl) this.containerEl.style.display = 'none'
     this.visible = false
     this.cerrarModal()
+  }
+
+  aplicarTema(temaId) {
+    const colores = temaService.obtenerColoresTema(temaId)
+    const botones = this.containerEl?.querySelectorAll('.cartas-boton')
+    if (botones) {
+      botones.forEach(btn => {
+        if (btn.textContent === 'Volver') {
+          btn.style.background = colores.darkAlt
+          btn.style.color = colores.darkAltText
+        }
+      })
+    }
   }
 }

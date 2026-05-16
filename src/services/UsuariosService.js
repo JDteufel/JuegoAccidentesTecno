@@ -1,9 +1,11 @@
 import mongoDBService from './MongoDBService.js'
+import temaService from './TemaService.js'
+
 class UsuariosService {
   constructor() {
-    this.usuariosRegistrados = {} 
+    this.usuariosRegistrados = {}
   }
-  async registrar(username, password) {
+  async registrar(username, password, tema = 'clasico') {
     if (!username || username.length < 3) {
       return {
         ok: false,
@@ -17,7 +19,7 @@ class UsuariosService {
       }
     }
     try {
-      const result = await mongoDBService.registerUser(username, password)
+      const result = await mongoDBService.registerUser(username, password, tema)
       if (result.error) {
         return {
           ok: false,
@@ -34,6 +36,7 @@ class UsuariosService {
       this.usuariosRegistrados[normalizedUsername] = {
         username: username,
         password: password,
+        tema: result.tema || tema,
         createdAt: new Date().toISOString()
       }
       await mongoDBService.logEvent('USUARIO', 'register', {
@@ -44,6 +47,7 @@ class UsuariosService {
         message: 'Gamemaster registrado exitosamente',
         user: {
           username: username,
+          tema: result.tema || tema,
           createdAt: this.usuariosRegistrados[normalizedUsername].createdAt
         }
       }
@@ -79,6 +83,7 @@ class UsuariosService {
       this.usuariosRegistrados[normalizedUsername] = {
         username: result.username,
         password: password,
+        tema: result.tema || 'clasico',
         createdAt: new Date().toISOString()
       }
       await mongoDBService.logEvent('USUARIO', 'login_success', {
@@ -89,6 +94,7 @@ class UsuariosService {
         message: 'Login exitoso',
         user: {
           username: result.username,
+          tema: result.tema || 'clasico',
           createdAt: this.usuariosRegistrados[normalizedUsername].createdAt
         }
       }
@@ -98,6 +104,26 @@ class UsuariosService {
         message: `Error al iniciar sesión: ${error.message}`
       }
     }
+  }
+  async actualizarTema(username, tema) {
+    try {
+      const result = await mongoDBService.actualizarTemaUsuario(username, tema)
+      if (!result.ok) {
+        return { ok: false, message: result.message || 'Error al actualizar tema' }
+      }
+      const normalizedUsername = username.toLowerCase()
+      if (this.usuariosRegistrados[normalizedUsername]) {
+        this.usuariosRegistrados[normalizedUsername].tema = tema
+      }
+      return { ok: true, tema: result.tema }
+    } catch (error) {
+      return { ok: false, message: `Error al actualizar tema: ${error.message}` }
+    }
+  }
+  obtenerTemaUsuario(username) {
+    const normalizedUsername = username.toLowerCase()
+    const user = this.usuariosRegistrados[normalizedUsername]
+    return user ? (user.tema || 'clasico') : null
   }
   obtenerUsuario(username) {
     const normalizedUsername = username.toLowerCase()
@@ -119,6 +145,7 @@ class UsuariosService {
           this.usuariosRegistrados[normalized] = {
             username: user.username,
             password: user.password,
+            tema: user.tema || 'clasico',
             createdAt: user.createdAt
           }
         })

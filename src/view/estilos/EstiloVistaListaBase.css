@@ -6,7 +6,7 @@
   height: 100%;
   justify-content: center;
   align-items: center;
-  background: rgba(12, 9, 8, 0.64);
+  background: var(--overlay-bg);
   z-index: 100;
   font-family: 'Comic Neue', 'Comic Sans MS', cursive;
   box-sizing: border-box;
@@ -18,9 +18,9 @@
   height: auto;
   max-height: 90vh;
   border-radius: 28px;
-  border: 2px solid #8e4d22;
-  background: rgba(28, 21, 18, 0.95);
-  box-shadow: 0 14px 22px rgba(0, 0, 0, 0.4);
+  border: 2px solid var(--border-alt);
+  background: var(--card-bg-solid);
+  box-shadow: 0 14px 22px var(--shadow-color);
   padding: 40px;
   display: flex;
   flex-direction: column;
@@ -30,7 +30,7 @@
 }
 
 .lista-titulo {
-  color: #ffe4cf;
+  color: var(--text-primary);
   font-size: 32px;
   margin: 0 0 30px 0;
   text-align: center;
@@ -40,7 +40,7 @@
   width: 78%;
   min-height: 52px;
   border-radius: 14px;
-  background: #2f221d;
+  background: var(--item-even);
   display: flex;
   align-items: center;
   padding: 0 18px;
@@ -49,18 +49,18 @@
 }
 
 .lista-item-alterno {
-  background: #3a2a24;
+  background: var(--item-odd);
 }
 
 .lista-item-texto {
-  color: #ffe2cc;
+  color: var(--text-primary);
   font-size: 19px;
   font-family: 'Comic Neue', 'Comic Sans MS', cursive;
   line-height: 1.4;
 }
 
 .lista-error {
-  color: #ff6b6b;
+  color: var(--error-color);
   font-size: 16px;
   min-height: 40px;
   text-align: center;

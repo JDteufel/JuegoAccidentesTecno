@@ -12,7 +12,8 @@ export const PANTALLAS = {
   CARTAS: 'cartas',
   ACCIDENTES: 'accidentes',
   PARTIDA: 'partida',
-  PARTIDA_PRUEBA: 'partida_prueba'
+  PARTIDA_PRUEBA: 'partida_prueba',
+  CONFIGURACION: 'configuracion'
 }
 
 export const TIPOS_JUGADOR = {

@@ -1,6 +1,7 @@
 import * as BABYLON from '@babylonjs/core'
 import * as GUI from '@babylonjs/gui'
 import { GestorAjusteRatio } from './base/GestorAjusteRatio.js'
+import temaService from '../services/TemaService.js'
 
 export class VistaPartida {
   constructor(canvas, engine, sceneInicial) {
@@ -38,6 +39,42 @@ export class VistaPartida {
 
     this.crearEscena3D()
     this.crearHUD()
+  }
+
+  _obtenerColores() {
+    return temaService.obtenerColoresTema(temaService.obtenerTemaActual())
+  }
+
+  _coloresDefecto() {
+    return {
+      hudPanelBg: 'rgba(23, 17, 14, 0.88)',
+      hudBorderColor: '#8e4d22',
+      hudTextColor: '#ffe2c8',
+      hudSubtextColor: '#f4cbaa',
+      hudEstadoBg: ['#2d221d', '#5a2e1d', '#2d221d', '#3a2a1d'],
+      hudProgresoBg: '#1a1210',
+      hudProgresoColor: '#d66a1f',
+      hudBotonVolverBg: '#362924',
+      hudBotonReiniciarBg: '#5a3321',
+      hudBotonTextColor: '#ffd8bc',
+      hudCartaBg: 'rgba(28, 20, 18, 0.92)',
+      hudCartaBorder: '#a85a2a',
+      hudCartaVaciaBg: 'rgba(33, 23, 19, 0.4)',
+      hudCartaVaciaBorder: '#4a3528',
+      hudZonaIntercambioIcono: '#a88a6a',
+      nombreJugadorColor: '#ffe2c8',
+      panelAccidentesBorder: '#8e4d22',
+      panelAccidentesBg: 'rgba(28, 20, 16, 0.97)',
+      panelInicioBorder: '#8e4d22',
+      panelInicioBg: 'rgba(28, 20, 16, 0.95)',
+      primary: '#d66a1f',
+      primaryText: '#fff7ef',
+      badgeWork: '#90ee90',
+      badgeBg: 'rgba(168, 90, 42, 0.4)',
+      borderAlt: '#8e4d22',
+      textBody: '#f4cbaa',
+      topbar: 'rgba(18, 14, 13, 0.72)'
+    }
   }
 
   crearEscena3D() {
@@ -475,6 +512,7 @@ export class VistaPartida {
   }
 
   crearCarruselAccidente() {
+    const colores = this._coloresDefecto()
     this.carruselAccidentes = new BABYLON.TransformNode(
       'carruselAccidentes',
       this.scene
@@ -550,7 +588,7 @@ export class VistaPartida {
       { width: 512, height: 128 },
       this.scene
     )
-    texturaNombre.drawText(this.nombreJugador, null, 48, '#ffe2c8', 'rgba(0,0,0,0)', true)
+    texturaNombre.drawText(this.nombreJugador, null, 48, colores.nombreJugadorColor, 'rgba(0,0,0,0)', true)
     materialTextoNombre.diffuseTexture = texturaNombre
     materialTextoNombre.emissiveTexture = texturaNombre
     materialTextoNombre.useAlphaFromDiffuseTexture = true
@@ -579,6 +617,7 @@ export class VistaPartida {
   }
 
   crearCartaCarruselAccidente(indice, contenedor) {
+    const colores = this._coloresDefecto()
     const baseCarta = BABYLON.MeshBuilder.CreateBox(
       `baseCartaCarrusel_${indice}`,
       {
@@ -658,7 +697,7 @@ export class VistaPartida {
       { width: 256, height: 64 },
       this.scene
     )
-    codigoTexto.drawText('---', null, 40, '#ffe2c8', 'rgba(0,0,0,0)', true)
+    codigoTexto.drawText('---', null, 40, colores.nombreJugadorColor, 'rgba(0,0,0,0)', true)
     materialTextoCarta.diffuseTexture = codigoTexto
     materialTextoCarta.useAlphaFromDiffuseTexture = false
   }
@@ -692,6 +731,7 @@ export class VistaPartida {
   mostrarPanelAccidentes() {
     if (!this.accidentes || this.accidentes.length === 0) return
 
+    const colores = this._obtenerColores()
     this.panelAccidentesVisible = true
 
     const fondo = new GUI.Rectangle('fondoPanelAccidentes')
@@ -710,8 +750,8 @@ export class VistaPartida {
     panel.height = '640px'
     panel.thickness = 3
     panel.cornerRadius = 20
-    panel.color = '#8e4d22'
-    panel.background = 'rgba(28, 20, 16, 0.97)'
+    panel.color = colores.panelAccidentesBorder
+    panel.background = colores.panelAccidentesBg
     panel.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
     panel.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
     panel.zIndex = 2001
@@ -724,7 +764,7 @@ export class VistaPartida {
     const titulo = new GUI.TextBlock('tituloPanelAccidentes', 'Accidentes en Mesa')
     titulo.top = '-300px'
     titulo.height = '50px'
-    titulo.color = '#ffe2c8'
+    titulo.color = colores.hudTextColor
     titulo.fontSize = 28
     titulo.fontFamily = 'Comic Sans MS'
     titulo.fontWeight = 'bold'
@@ -770,8 +810,8 @@ export class VistaPartida {
     botonCerrar.width = '120px'
     botonCerrar.height = '40px'
     botonCerrar.top = '295px'
-    botonCerrar.background = '#5a3321'
-    botonCerrar.color = '#ffd8bc'
+    botonCerrar.background = colores.hudBotonVolverBg
+    botonCerrar.color = colores.hudBotonTextColor
     botonCerrar.cornerRadius = 12
     botonCerrar.fontSize = 14
     botonCerrar.fontFamily = 'Comic Sans MS'
@@ -920,14 +960,15 @@ export class VistaPartida {
   }
 
   crearEncabezadoPartida() {
+    const colores = this._obtenerColores()
     const panelEncabezado = new GUI.Rectangle('panelEncabezadoPartida')
     panelEncabezado.width = '860px'
     panelEncabezado.height = '124px'
     panelEncabezado.top = '18px'
     panelEncabezado.thickness = 2
     panelEncabezado.cornerRadius = 24
-    panelEncabezado.color = '#8e4d22'
-    panelEncabezado.background = 'rgba(23, 17, 14, 0.88)'
+    panelEncabezado.color = colores.hudBorderColor
+    panelEncabezado.background = colores.hudPanelBg
     panelEncabezado.shadowColor = '#00000066'
     panelEncabezado.shadowBlur = 20
     panelEncabezado.shadowOffsetY = 8
@@ -938,7 +979,7 @@ export class VistaPartida {
     const titulo = new GUI.TextBlock('tituloPartida', 'Esperando inicio de partida...')
     titulo.top = '-28px'
     titulo.height = '34px'
-    titulo.color = '#ffe2c8'
+    titulo.color = colores.hudTextColor
     titulo.fontSize = 28
     titulo.fontFamily = 'Comic Sans MS'
     titulo.fontWeight = 'bold'
@@ -950,7 +991,7 @@ export class VistaPartida {
     )
     subtitulo.top = '2px'
     subtitulo.height = '28px'
-    subtitulo.color = '#f4cbaa'
+    subtitulo.color = colores.hudSubtextColor
     subtitulo.fontSize = 16
     subtitulo.fontFamily = 'Comic Sans MS'
     panelEncabezado.addControl(subtitulo)
@@ -977,10 +1018,10 @@ export class VistaPartida {
       bloque.height = '32px'
       bloque.thickness = 0
       bloque.cornerRadius = 12
-      bloque.background = indice === 1 ? '#5a2e1d' : indice === 3 ? '#3a2a1d' : '#2d221d'
+      bloque.background = colores.hudEstadoBg[indice] || colores.hudEstadoBg[0]
 
       const textoEstado = new GUI.TextBlock(`estadoTexto_${indice}`, texto)
-      textoEstado.color = '#ffe8d3'
+      textoEstado.color = colores.hudTextColor
       textoEstado.fontSize = 14
       textoEstado.fontFamily = 'Comic Sans MS'
       bloque.addControl(textoEstado)
@@ -994,8 +1035,8 @@ export class VistaPartida {
     barraContenedor.top = '76px'
     barraContenedor.thickness = 1
     barraContenedor.cornerRadius = 9
-    barraContenedor.color = '#5a3a28'
-    barraContenedor.background = '#1a1210'
+    barraContenedor.color = colores.hudBorderColor
+    barraContenedor.background = colores.hudProgresoBg
     panelEncabezado.addControl(barraContenedor)
 
     const barra = new GUI.Rectangle('barraProgreso')
@@ -1003,14 +1044,14 @@ export class VistaPartida {
     barra.height = '100%'
     barra.thickness = 0
     barra.cornerRadius = 9
-    barra.background = '#d66a1f'
+    barra.background = colores.hudProgresoColor
     barra.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
     barraContenedor.addControl(barra)
 
     const textoProgreso = new GUI.TextBlock('textoProgreso', '0/0 horas')
     textoProgreso.width = '100%'
     textoProgreso.height = '100%'
-    textoProgreso.color = '#ffe2c8'
+    textoProgreso.color = colores.hudTextColor
     textoProgreso.fontSize = 11
     textoProgreso.fontFamily = 'Comic Sans MS'
     textoProgreso.fontWeight = 'bold'
@@ -1018,16 +1059,17 @@ export class VistaPartida {
   }
 
   crearBotonVolver() {
+    const colores = this._obtenerColores()
     const botonVolver = GUI.Button.CreateSimpleButton('btnVolverPartida', 'Volver')
     botonVolver.width = '150px'
     botonVolver.height = '48px'
     botonVolver.left = '20px'
     botonVolver.top = '20px'
-    botonVolver.background = '#362924'
-    botonVolver.color = '#ffd8bc'
+    botonVolver.background = colores.hudBotonVolverBg
+    botonVolver.color = colores.hudBotonTextColor
     botonVolver.cornerRadius = 16
     botonVolver.thickness = 2
-    botonVolver.borderColor = '#8e4d22'
+    botonVolver.borderColor = colores.hudBorderColor
     botonVolver.fontSize = 18
     botonVolver.fontWeight = 'bold'
     botonVolver.fontFamily = 'Comic Sans MS'
@@ -1042,16 +1084,17 @@ export class VistaPartida {
   }
 
   crearBotonReiniciar() {
+    const colores = this._obtenerColores()
     const botonReiniciar = GUI.Button.CreateSimpleButton('btnReiniciarPartida', 'Reiniciar')
     botonReiniciar.width = '150px'
     botonReiniciar.height = '48px'
     botonReiniciar.right = '20px'
     botonReiniciar.top = '20px'
-    botonReiniciar.background = '#5a3321'
-    botonReiniciar.color = '#ffd8bc'
+    botonReiniciar.background = colores.hudBotonReiniciarBg
+    botonReiniciar.color = colores.hudBotonTextColor
     botonReiniciar.cornerRadius = 16
     botonReiniciar.thickness = 2
-    botonReiniciar.borderColor = '#8e4d22'
+    botonReiniciar.borderColor = colores.hudBorderColor
     botonReiniciar.fontSize = 18
     botonReiniciar.fontWeight = 'bold'
     botonReiniciar.fontFamily = 'Comic Sans MS'
@@ -1066,6 +1109,7 @@ export class VistaPartida {
   }
 
   crearPanelCartas() {
+    const colores = this._obtenerColores()
     const panelContenedor = new GUI.Rectangle('panelContenedorCartas')
     panelContenedor.width = '95%'
     panelContenedor.height = '255px'
@@ -1083,10 +1127,10 @@ export class VistaPartida {
     contenedorIntercambio.height = '100%'
     contenedorIntercambio.left = '8px'
     contenedorIntercambio.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
-    contenedorIntercambio.background = 'rgba(28, 20, 18, 0.92)'
+    contenedorIntercambio.background = colores.hudCartaBg
     contenedorIntercambio.cornerRadius = 15
     contenedorIntercambio.thickness = 3
-    contenedorIntercambio.color = '#a85a2a'
+    contenedorIntercambio.color = colores.hudCartaBorder
     contenedorIntercambio.shadowColor = '#00000066'
     contenedorIntercambio.shadowBlur = 20
     contenedorIntercambio.shadowOffsetY = 8
@@ -1108,14 +1152,14 @@ export class VistaPartida {
     contenedorIntercambio.addControl(zonaIntercambio)
 
     const iconoZona = new GUI.TextBlock('iconoZonaIntercambio', '⇄')
-    iconoZona.color = '#a88a6a'
+    iconoZona.color = colores.hudZonaIntercambioIcono
     iconoZona.fontSize = 32
     iconoZona.fontFamily = 'Comic Sans MS'
     iconoZona.fontWeight = 'bold'
     zonaIntercambio.addControl(iconoZona, 0, 0)
 
     const textoZona = new GUI.TextBlock('textoZonaIntercambio', 'Soltar para intercambiar')
-    textoZona.color = '#a88a6a'
+    textoZona.color = colores.hudZonaIntercambioIcono
     textoZona.fontSize = 11
     textoZona.fontFamily = 'Comic Sans MS'
     textoZona.textWrapping = true
@@ -1128,10 +1172,10 @@ export class VistaPartida {
     panelCartas.height = '100%'
     panelCartas.left = '170px'
     panelCartas.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
-    panelCartas.background = 'rgba(28, 20, 18, 0.92)'
+    panelCartas.background = colores.hudCartaBg
     panelCartas.cornerRadius = 15
     panelCartas.thickness = 3
-    panelCartas.color = '#a85a2a'
+    panelCartas.color = colores.hudCartaBorder
     panelCartas.isPointerBlocker = false
     panelContenedor.addControl(panelCartas)
 
@@ -1166,13 +1210,14 @@ export class VistaPartida {
   }
 
   crearCartaManoVacia(indice) {
+    const colores = this._obtenerColores()
     const cartaPanel = new GUI.Rectangle(`carta_${indice}`)
     cartaPanel.width = '96%'
     cartaPanel.height = '92%'
-    cartaPanel.background = 'rgba(33, 23, 19, 0.4)'
+    cartaPanel.background = colores.hudCartaVaciaBg
     cartaPanel.cornerRadius = 14
     cartaPanel.thickness = 2
-    cartaPanel.color = '#4a3528'
+    cartaPanel.color = colores.hudCartaVaciaBorder
     cartaPanel.isVisible = false
     return cartaPanel
   }
@@ -1299,7 +1344,7 @@ export class VistaPartida {
         if (textoCarta && textoCarta.material && textoCarta.material.diffuseTexture) {
           const dt = textoCarta.material.diffuseTexture
           dt.clear()
-          dt.drawText(`${accidente.codigo}: ${accidente.nombre}`, null, 22, '#ffe2c8', 'rgba(0,0,0,0)', true)
+          dt.drawText(`${accidente.codigo}: ${accidente.nombre}`, null, 22, colores.nombreJugadorColor, 'rgba(0,0,0,0)', true)
           dt.update(false)
         }
       } else {
@@ -1401,7 +1446,8 @@ export class VistaPartida {
   configurarNombreJugador(nombre) {
     this.nombreJugador = nombre
     if (this.texturaNombreJugador) {
-      this.texturaNombreJugador.drawText(nombre, null, 48, '#ffe2c8', 'rgba(0,0,0,0)', true)
+      const colores = this._obtenerColores()
+      this.texturaNombreJugador.drawText(nombre, null, 48, colores.nombreJugadorColor, 'rgba(0,0,0,0)', true)
     }
   }
 
@@ -1484,13 +1530,15 @@ export class VistaPartida {
       return
     }
 
+    const colores = this._obtenerColores()
+
     const panelInicio = new GUI.Rectangle('panelInicio')
     panelInicio.width = '1600px'
     panelInicio.height = '820px'
     panelInicio.thickness = 3
     panelInicio.cornerRadius = 20
-    panelInicio.color = '#8e4d22'
-    panelInicio.background = 'rgba(28, 20, 16, 0.95)'
+    panelInicio.color = colores.panelInicioBorder
+    panelInicio.background = colores.panelInicioBg
     panelInicio.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
     panelInicio.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
     panelInicio.zIndex = 1000
@@ -1500,7 +1548,7 @@ export class VistaPartida {
     tituloAcc.top = '-380px'
     tituloAcc.left = '-200px'
     tituloAcc.height = '50px'
-    tituloAcc.color = '#ffe2c8'
+    tituloAcc.color = colores.hudTextColor
     tituloAcc.fontSize = 28
     tituloAcc.fontFamily = 'Comic Sans MS'
     tituloAcc.fontWeight = 'bold'
@@ -1558,7 +1606,7 @@ export class VistaPartida {
     tituloPerfil.top = '-380px'
     tituloPerfil.left = '560px'
     tituloPerfil.height = '50px'
-    tituloPerfil.color = '#ffe2c8'
+    tituloPerfil.color = colores.hudTextColor
     tituloPerfil.fontSize = 28
     tituloPerfil.fontFamily = 'Comic Sans MS'
     tituloPerfil.fontWeight = 'bold'
@@ -1568,7 +1616,7 @@ export class VistaPartida {
     nombrePerf.top = '-240px'
     nombrePerf.left = '560px'
     nombrePerf.height = '40px'
-    nombrePerf.color = '#d66a1f'
+    nombrePerf.color = colores.primary
     nombrePerf.fontSize = 22
     nombrePerf.fontFamily = 'Comic Sans MS'
     nombrePerf.fontWeight = 'bold'
@@ -1578,7 +1626,7 @@ export class VistaPartida {
     horasPerf.top = '-190px'
     horasPerf.left = '560px'
     horasPerf.height = '30px'
-    horasPerf.color = '#cf8a34'
+    horasPerf.color = colores.hudProgresoColor
     horasPerf.fontSize = 18
     horasPerf.fontFamily = 'Comic Sans MS'
     panelInicio.addControl(horasPerf)
@@ -1588,7 +1636,7 @@ export class VistaPartida {
     descPerf.left = '560px'
     descPerf.height = '120px'
     descPerf.width = '400px'
-    descPerf.color = '#f4cbaa'
+    descPerf.color = colores.hudSubtextColor
     descPerf.fontSize = 22
     descPerf.fontFamily = 'Comic Sans MS'
     descPerf.textWrapping = true
@@ -1602,7 +1650,7 @@ export class VistaPartida {
     catsPerf.left = '560px'
     catsPerf.height = '30px'
     catsPerf.width = '400px'
-    catsPerf.color = '#e7cfbc'
+    catsPerf.color = colores.textBody
     catsPerf.fontSize = 14
     catsPerf.fontFamily = 'Comic Sans MS'
     catsPerf.textWrapping = true
@@ -1612,8 +1660,8 @@ export class VistaPartida {
     botonCerrar.width = '180px'
     botonCerrar.height = '44px'
     botonCerrar.top = '370px'
-    botonCerrar.background = '#d66a1f'
-    botonCerrar.color = '#fff7ef'
+    botonCerrar.background = colores.primary
+    botonCerrar.color = colores.primaryText
     botonCerrar.cornerRadius = 14
     botonCerrar.fontSize = 16
     botonCerrar.fontFamily = 'Comic Sans MS'
@@ -1663,6 +1711,7 @@ export class VistaPartida {
   actualizarProgresoPerfil() {
     if (!this.perfil) return
 
+    const colores = this._obtenerColores()
     const progreso = this.perfil.getProgreso()
     const porcentaje = Math.round(progreso * 100)
 
@@ -1670,11 +1719,11 @@ export class VistaPartida {
     if (barra) {
       barra.width = `${porcentaje}%`
       if (progreso >= 1) {
-        barra.background = '#4caf50'
+        barra.background = colores.badgeWork
       } else if (progreso >= 0.5) {
-        barra.background = '#d66a1f'
+        barra.background = colores.primary
       } else {
-        barra.background = '#a85a2a'
+        barra.background = colores.borderAlt
       }
     }
 
@@ -1697,6 +1746,8 @@ export class VistaPartida {
   mostrarModalIntercambio() {
     if (!this.cartas || this.cartas.length === 0) return
 
+    const colores = this._obtenerColores()
+
     const overlay = new GUI.Rectangle('overlayIntercambio')
     overlay.width = 1
     overlay.height = 1
@@ -1710,8 +1761,8 @@ export class VistaPartida {
     panel.height = '350px'
     panel.thickness = 3
     panel.cornerRadius = 20
-    panel.color = '#8e4d22'
-    panel.background = 'rgba(28, 20, 16, 0.98)'
+    panel.color = colores.hudBorderColor
+    panel.background = colores.panelAccidentesBg
     panel.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
     panel.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
     overlay.addControl(panel)
@@ -1719,7 +1770,7 @@ export class VistaPartida {
     const titulo = new GUI.TextBlock('tituloIntercambio', 'Intercambiar Cartas')
     titulo.top = '-130px'
     titulo.height = '40px'
-    titulo.color = '#ffe2c8'
+    titulo.color = colores.hudTextColor
     titulo.fontSize = 24
     titulo.fontFamily = 'Comic Sans MS'
     titulo.fontWeight = 'bold'
@@ -1728,7 +1779,7 @@ export class VistaPartida {
     const subtitulo = new GUI.TextBlock('subtituloIntercambio', 'Selecciona una carta para intercambiar (mismas horas)')
     subtitulo.top = '-90px'
     subtitulo.height = '24px'
-    subtitulo.color = '#a88a6a'
+    subtitulo.color = colores.hudZonaIntercambioIcono
     subtitulo.fontSize = 13
     subtitulo.fontFamily = 'Comic Sans MS'
     panel.addControl(subtitulo)
@@ -1753,8 +1804,8 @@ export class VistaPartida {
       const btnCarta = GUI.Button.CreateSimpleButton(`btnIntercambio_${indice}`, `${carta.titulo} (${carta.horas}h)`)
       btnCarta.width = '140px'
       btnCarta.height = '70px'
-      btnCarta.background = carta.estaDeshabilitada() ? '#3a2a1d' : '#5a3321'
-      btnCarta.color = carta.estaDeshabilitada() ? '#666' : '#ffe0c2'
+      btnCarta.background = carta.estaDeshabilitada() ? colores.hudEstadoBg[0] : colores.hudBotonReiniciarBg
+      btnCarta.color = carta.estaDeshabilitada() ? '#666' : colores.hudTextColor
       btnCarta.cornerRadius = 10
       btnCarta.fontSize = 13
       btnCarta.fontFamily = 'Comic Sans MS'
@@ -1769,8 +1820,8 @@ export class VistaPartida {
     btnCerrar.width = '120px'
     btnCerrar.height = '36px'
     btnCerrar.top = '130px'
-    btnCerrar.background = '#362924'
-    btnCerrar.color = '#ffd8bc'
+    btnCerrar.background = colores.hudBotonVolverBg
+    btnCerrar.color = colores.hudBotonTextColor
     btnCerrar.cornerRadius = 10
     btnCerrar.fontSize = 14
     btnCerrar.fontFamily = 'Comic Sans MS'
@@ -1782,6 +1833,8 @@ export class VistaPartida {
 
   seleccionarCartaParaIntercambio(cartaSeleccionada, overlay) {
     overlay.dispose()
+
+    const colores = this._obtenerColores()
 
     const horasIguales = this.cartas.filter(c =>
       c.horas === cartaSeleccionada.horas &&
@@ -1808,8 +1861,8 @@ export class VistaPartida {
     panel.height = '300px'
     panel.thickness = 3
     panel.cornerRadius = 20
-    panel.color = '#8e4d22'
-    panel.background = 'rgba(28, 20, 16, 0.98)'
+    panel.color = colores.hudBorderColor
+    panel.background = colores.panelAccidentesBg
     panel.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
     panel.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
     overlay2.addControl(panel)
@@ -1817,7 +1870,7 @@ export class VistaPartida {
     const titulo = new GUI.TextBlock('tituloIntercambio2', `Intercambiar ${cartaSeleccionada.titulo}`)
     titulo.top = '-110px'
     titulo.height = '40px'
-    titulo.color = '#ffe2c8'
+    titulo.color = colores.hudTextColor
     titulo.fontSize = 22
     titulo.fontFamily = 'Comic Sans MS'
     titulo.fontWeight = 'bold'
@@ -1826,7 +1879,7 @@ export class VistaPartida {
     const subtitulo = new GUI.TextBlock('subtituloIntercambio2', `Selecciona carta de ${cartaSeleccionada.horas}h para intercambiar`)
     subtitulo.top = '-75px'
     subtitulo.height = '24px'
-    subtitulo.color = '#a88a6a'
+    subtitulo.color = colores.hudZonaIntercambioIcono
     subtitulo.fontSize = 13
     subtitulo.fontFamily = 'Comic Sans MS'
     panel.addControl(subtitulo)
@@ -1850,8 +1903,8 @@ export class VistaPartida {
       const btnCarta = GUI.Button.CreateSimpleButton(`btnIntercambio2_${indice}`, `${carta.titulo} (${carta.horas}h)`)
       btnCarta.width = '120px'
       btnCarta.height = '55px'
-      btnCarta.background = '#5a3321'
-      btnCarta.color = '#ffe0c2'
+      btnCarta.background = colores.hudBotonReiniciarBg
+      btnCarta.color = colores.hudTextColor
       btnCarta.cornerRadius = 10
       btnCarta.fontSize = 12
       btnCarta.fontFamily = 'Comic Sans MS'
@@ -1866,8 +1919,8 @@ export class VistaPartida {
     btnCerrar.width = '120px'
     btnCerrar.height = '36px'
     btnCerrar.top = '110px'
-    btnCerrar.background = '#362924'
-    btnCerrar.color = '#ffd8bc'
+    btnCerrar.background = colores.hudBotonVolverBg
+    btnCerrar.color = colores.hudBotonTextColor
     btnCerrar.cornerRadius = 10
     btnCerrar.fontSize = 14
     btnCerrar.fontFamily = 'Comic Sans MS'
@@ -1895,19 +1948,19 @@ export class VistaPartida {
   }
 
   mostrarMensajeFlotante(texto) {
+    const colores = this._obtenerColores()
     const mensaje = new GUI.TextBlock('mensajeFlotante', texto)
     mensaje.width = '400px'
     mensaje.height = '50px'
     mensaje.bottom = '260px'
-    mensaje.color = '#ffe2c8'
+    mensaje.color = colores.hudTextColor
     mensaje.fontSize = 16
     mensaje.fontFamily = 'Comic Sans MS'
     mensaje.fontWeight = 'bold'
-    mensaje.background = 'rgba(28, 20, 16, 0.9)'
+    mensaje.background = colores.hudCartaBg
     mensaje.cornerRadius = 12
     mensaje.thickness = 2
-    mensaje.color = '#ffe2c8'
-    mensaje.borderColor = '#8e4d22'
+    mensaje.borderColor = colores.hudBorderColor
     this.overlay.addControl(mensaje)
 
     setTimeout(() => {
@@ -1948,13 +2001,15 @@ export class VistaPartida {
   }
 
   mostrarLogFinal(logJSON) {
+    const colores = this._obtenerColores()
+
     const panel = new GUI.Rectangle('panelLogFinal')
     panel.width = '700px'
     panel.height = '500px'
     panel.thickness = 3
     panel.cornerRadius = 20
-    panel.color = '#8e4d22'
-    panel.background = 'rgba(28, 20, 16, 0.98)'
+    panel.color = colores.hudBorderColor
+    panel.background = colores.panelAccidentesBg
     panel.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
     panel.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
     panel.zIndex = 2000
@@ -1963,7 +2018,7 @@ export class VistaPartida {
     const titulo = new GUI.TextBlock('tituloLogFinal', 'Log de la Partida')
     titulo.top = '-200px'
     titulo.height = '50px'
-    titulo.color = '#ffe2c8'
+    titulo.color = colores.hudTextColor
     titulo.fontSize = 26
     titulo.fontFamily = 'Comic Sans MS'
     titulo.fontWeight = 'bold'
@@ -1974,15 +2029,15 @@ export class VistaPartida {
     scrollViewer.height = '340px'
     scrollViewer.top = '-130px'
     scrollViewer.thickness = 2
-    scrollViewer.color = '#8e4d22'
-    scrollViewer.background = 'rgba(18, 14, 13, 0.9)'
+    scrollViewer.color = colores.hudBorderColor
+    scrollViewer.background = colores.topbar
     scrollViewer.cornerRadius = 10
     panel.addControl(scrollViewer)
 
     const textoLog = new GUI.TextBlock('textoLogFinal', logJSON)
     textoLog.width = '620px'
     textoLog.height = '800px'
-    textoLog.color = '#e7cfbc'
+    textoLog.color = colores.textBody
     textoLog.fontSize = 11
     textoLog.fontFamily = 'monospace'
     textoLog.textWrapping = true
@@ -1994,8 +2049,8 @@ export class VistaPartida {
     btnCerrar.width = '150px'
     btnCerrar.height = '44px'
     btnCerrar.top = '200px'
-    btnCerrar.background = '#d66a1f'
-    btnCerrar.color = '#fff7ef'
+    btnCerrar.background = colores.primary
+    btnCerrar.color = colores.primaryText
     btnCerrar.cornerRadius = 14
     btnCerrar.fontSize = 16
     btnCerrar.fontFamily = 'Comic Sans MS'
@@ -2004,5 +2059,168 @@ export class VistaPartida {
       panel.dispose()
     })
     panel.addControl(btnCerrar)
+  }
+
+  aplicarTema(temaId) {
+    const colores = temaService.obtenerColoresTema(temaId)
+
+    if (this.scene) {
+      this.scene.clearColor = colores.sceneBg
+      this.scene.ambientColor = colores.ambientColor
+
+      const hemisferica = this.scene.getLightByName('light1')
+      if (hemisferica) {
+        hemisferica.diffuse = colores.hemisfericaDiffuse
+        hemisferica.groundColor = colores.hemisfericaGround
+      }
+
+      const luzPrincipal = this.scene.getLightByName('light2')
+      if (luzPrincipal) {
+        luzPrincipal.diffuse = colores.spotPrincipalDiffuse
+        luzPrincipal.specular = colores.spotPrincipalSpecular
+      }
+
+      const luzContraste = this.scene.getLightByName('light3')
+      if (luzContraste) {
+        luzContraste.diffuse = colores.spotContrasteDiffuse
+        luzContraste.specular = colores.spotContrasteSpecular
+      }
+
+      const luzAmbiente = this.scene.getLightByName('light4')
+      if (luzAmbiente) {
+        luzAmbiente.diffuse = colores.luzAmbienteDiffuse
+      }
+
+      const luzRelleno = this.scene.getLightByName('light5')
+      if (luzRelleno) {
+        luzRelleno.diffuse = colores.luzRellenoDiffuse
+      }
+
+      const materiales3D = [
+        { nombre: 'matMesa', diffuse: colores.matMesa, specular: colores.matMesaSpecular, emissive: colores.matMesaEmissive },
+        { nombre: 'matResplandorMesa', diffuse: colores.matResplandor, emissive: colores.matResplandorEmissive },
+        { nombre: 'matTablero', diffuse: colores.matTablero, specular: colores.matTableroSpecular, emissive: colores.matTableroEmissive },
+        { nombre: 'matTapete', diffuse: colores.matTapete, specular: colores.matTapeteSpecular, emissive: colores.matTapeteEmissive },
+        { nombre: 'matMarcoInteriorTablero', diffuse: colores.matMarco, specular: colores.matMarcoSpecular, emissive: colores.matMarcoEmissive },
+        { nombre: 'matPlataformaCarruselAccidente', diffuse: colores.matCarruselPlataforma, specular: new BABYLON.Color3(0.1, 0.06, 0.04), emissive: colores.matMesaEmissive },
+        { nombre: 'matSelloCarruselAccidente', diffuse: colores.matCarruselSello, emissive: colores.matCarruselSelloEmissive }
+      ]
+
+      materiales3D.forEach(mat => {
+        const material = this.scene.getMaterialByName(mat.nombre)
+        if (material) {
+          material.diffuseColor = mat.diffuse
+          if (mat.specular) material.specularColor = mat.specular
+          if (mat.emissive) material.emissiveColor = mat.emissive
+        }
+      })
+
+      for (let i = 0; i < 8; i++) {
+        const matCara = this.scene.getMaterialByName(`matCaraCartaCarrusel_${i}`)
+        if (matCara) {
+          const colorIdx = i % colores.matCartaCara.length
+          const colorCarta = colores.matCartaCara[colorIdx]
+          matCara.diffuseColor = colorCarta
+          matCara.emissiveColor = colorCarta.scale(0.05)
+        }
+      }
+
+      const lineaVertical = this.scene.getMaterialByName('mat_lineaVerticalCentro')
+      if (lineaVertical) {
+        lineaVertical.diffuseColor = colores.matLinea
+        lineaVertical.emissiveColor = colores.matLineaEmissive
+      }
+      const lineaHorizontal = this.scene.getMaterialByName('mat_lineaHorizontalCentro')
+      if (lineaHorizontal) {
+        lineaHorizontal.diffuseColor = colores.matLinea
+        lineaHorizontal.emissiveColor = colores.matLineaEmissive
+      }
+      ['lineaNorte', 'lineaSur', 'lineaOeste', 'lineaEste'].forEach(nombre => {
+        const mat = this.scene.getMaterialByName(`mat_${nombre}`)
+        if (mat) {
+          mat.diffuseColor = colores.matLineaSecundaria
+          mat.emissiveColor = colores.matLineaSecundaria.scale(0.1)
+        }
+      })
+
+      const zonaAcc = this.scene.getMaterialByName('mat_zonaAccidente')
+      if (zonaAcc) {
+        zonaAcc.diffuseColor = colores.matZonaAccidente
+        zonaAcc.emissiveColor = colores.matZonaAccidente.scale(0.16)
+      }
+    }
+
+    if (this.guiTexture) {
+      const panelEncabezado = this.guiTexture.getControlByName('panelEncabezadoPartida')
+      if (panelEncabezado) {
+        panelEncabezado.background = colores.hudPanelBg
+        panelEncabezado.color = colores.hudBorderColor
+      }
+
+      const tituloPartida = this.guiTexture.getControlByName('tituloPartida')
+      if (tituloPartida) tituloPartida.color = colores.hudTextColor
+
+      const subtitulo = this.guiTexture.getControlByName('subtituloPartida')
+      if (subtitulo) subtitulo.color = colores.hudSubtextColor
+
+      for (let i = 0; i < 4; i++) {
+        const estado = this.guiTexture.getControlByName(`estado_${i}`)
+        if (estado) {
+          estado.background = colores.hudEstadoBg[i] || colores.hudEstadoBg[0]
+          const texto = estado.children[0]
+          if (texto) texto.color = colores.hudTextColor
+        }
+      }
+
+      const barraContenedor = this.guiTexture.getControlByName('barraProgresoContenedor')
+      if (barraContenedor) {
+        barraContenedor.background = colores.hudProgresoBg
+        barraContenedor.color = colores.hudBorderColor
+      }
+
+      const barra = this.guiTexture.getControlByName('barraProgreso')
+      if (barra) {
+        barra.background = colores.hudProgresoColor
+      }
+
+      const textoProgreso = this.guiTexture.getControlByName('textoProgreso')
+      if (textoProgreso) textoProgreso.color = colores.hudTextColor
+
+      const btnVolver = this.guiTexture.getControlByName('btnVolverPartida')
+      if (btnVolver) {
+        btnVolver.background = colores.hudBotonVolverBg
+        btnVolver.color = colores.hudBotonTextColor
+        btnVolver.borderColor = colores.hudBorderColor
+      }
+
+      const btnReiniciar = this.guiTexture.getControlByName('btnReiniciarPartida')
+      if (btnReiniciar) {
+        btnReiniciar.background = colores.hudBotonReiniciarBg
+        btnReiniciar.color = colores.hudBotonTextColor
+        btnReiniciar.borderColor = colores.hudBorderColor
+      }
+
+      const contenedorIntercambio = this.guiTexture.getControlByName('contenedorZonaIntercambio')
+      if (contenedorIntercambio) {
+        contenedorIntercambio.background = colores.hudCartaBg
+        contenedorIntercambio.color = colores.hudCartaBorder
+      }
+
+      const iconoZona = this.guiTexture.getControlByName('iconoZonaIntercambio')
+      if (iconoZona) iconoZona.color = colores.hudZonaIntercambioIcono
+
+      const textoZona = this.guiTexture.getControlByName('textoZonaIntercambio')
+      if (textoZona) textoZona.color = colores.hudZonaIntercambioIcono
+
+      const panelCartas = this.guiTexture.getControlByName('panelCartas')
+      if (panelCartas) {
+        panelCartas.background = colores.hudCartaBg
+        panelCartas.color = colores.hudCartaBorder
+      }
+    }
+
+    if (this.texturaNombreJugador) {
+      this.texturaNombreJugador.drawText(this.nombreJugador, null, 48, colores.nombreJugadorColor, 'rgba(0,0,0,0)', true)
+    }
   }
 }

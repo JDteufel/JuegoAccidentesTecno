@@ -1,0 +1,151 @@
+.config-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--overlay-full-bg);
+  z-index: 500;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+}
+
+.config-tarjeta {
+  background: var(--card-bg-solid);
+  border: 2px solid var(--border-color);
+  border-radius: 28px;
+  padding: 40px;
+  width: 600px;
+  max-width: 92%;
+  box-shadow: 0 16px 28px var(--shadow-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.config-titulo {
+  color: var(--text-primary);
+  font-size: 32px;
+  margin: 0 0 30px 0;
+  text-align: center;
+}
+
+.config-seccion {
+  width: 100%;
+  margin-bottom: 30px;
+}
+
+.config-seccion-titulo {
+  color: var(--text-secondary);
+  font-size: 22px;
+  margin: 0 0 20px 0;
+  text-align: center;
+}
+
+.config-opciones {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.config-tema-opcion {
+  width: 240px;
+  background: var(--config-theme-bg);
+  border: 2px solid var(--border-dim);
+  border-radius: 18px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  position: relative;
+}
+
+.config-tema-opcion:hover {
+  border-color: var(--border-color);
+  box-shadow: 0 4px 12px var(--shadow-color-light);
+}
+
+.config-tema-opcion.seleccionada {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 16px var(--primary-glow);
+  background: var(--primary-bg-subtle);
+}
+
+.config-tema-preview {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  height: 32px;
+}
+
+.config-tema-muestra {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border-white-subtle);
+}
+
+.config-tema-nombre {
+  color: var(--text-primary);
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.config-tema-descripcion {
+  color: var(--text-secondary);
+  font-size: 14px;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.config-tema-check {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  background: var(--primary-color);
+  color: var(--primary-text);
+  border-radius: 50%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.config-tema-opcion.seleccionada .config-tema-check {
+  display: flex;
+}
+
+.config-botones {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  justify-content: center;
+}
+
+.config-boton {
+  width: 160px;
+  height: 48px;
+  border: none;
+  border-radius: 18px;
+  font-size: 18px;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.config-boton:hover {
+  opacity: 0.85;
+  transform: scale(1.05);
+}
+
+.config-boton:active {
+  opacity: 0.85;
+  transform: scale(0.98);
+}

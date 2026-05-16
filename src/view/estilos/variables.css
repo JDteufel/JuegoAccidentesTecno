@@ -1,0 +1,95 @@
+:root {
+  /* Overlays */
+  --overlay-bg: rgba(12, 9, 8, 0.48);
+  --overlay-full-bg: rgba(12, 9, 8, 0.7);
+  --overlay-bg-light: rgba(12, 9, 8, 0.48);
+  --modal-overlay-bg: rgba(0, 0, 0, 0.7);
+  --modal-bg: rgba(28, 20, 18, 0.98);
+  --modal-bg-blue: rgba(28, 28, 40, 0.98);
+
+  /* Topbar y Cards */
+  --topbar-bg: rgba(18, 14, 13, 0.72);
+  --card-bg: rgba(28, 20, 18, 0.92);
+  --card-bg-solid: rgba(28, 21, 18, 0.95);
+  --card-bg-blue: rgba(28, 28, 40, 0.95);
+  --config-theme-bg: rgba(47, 34, 29, 0.6);
+
+  /* Inputs y Items */
+  --input-bg: #2b211d;
+  --input-focused: #352821;
+  --item-even: #2f221d;
+  --item-odd: #3a2a24;
+
+  /* Colores de tema (botones) */
+  --primary-color: #d66a1f;
+  --primary-text: #fff7ef;
+  --secondary-color: #a84f16;
+  --secondary-text: #fff1e3;
+  --danger-color: #a84f16;
+  --danger-text: #fff1e3;
+  --dark-color: #3c2d27;
+  --dark-text: #ffd6b7;
+  --dark-alt: #362924;
+  --dark-alt-text: #ffd8bc;
+
+  /* Bordes */
+  --border-color: #8a4a20;
+  --border-alt: #8e4d22;
+  --border-dim: #5a3a28;
+  --border-white-subtle: rgba(255, 255, 255, 0.1);
+
+  /* Textos */
+  --text-primary: #ffe6d1;
+  --text-secondary: #ffd9bd;
+  --text-body: #f4cbaa;
+  --text-input: #fff2e8;
+  --text-description: #ffe9d6;
+  --placeholder: #d6a98a;
+
+  /* Estados */
+  --error-color: #ff6b6b;
+  --success-color: #4ade80;
+
+  /* Badges */
+  --badge-work: #90ee90;
+  --badge-entertainment: #ffa500;
+  --badge-bg-overlay: rgba(0, 0, 0, 0.5);
+  --badge-cat-bg: rgba(168, 90, 42, 0.4);
+
+  /* HUD */
+  --hud-panel-bg: rgba(23, 17, 14, 0.88);
+  --hud-border-color: #8e4d22;
+  --hud-text-color: #ffe2c8;
+  --hud-subtext-color: #f4cbaa;
+  --hud-progreso-color: #d66a1f;
+
+  /* Sombras y efectos */
+  --shadow-color: rgba(0, 0, 0, 0.4);
+  --shadow-color-light: rgba(0, 0, 0, 0.3);
+  --primary-glow: rgba(214, 106, 31, 0.3);
+  --primary-bg-subtle: rgba(214, 106, 31, 0.08);
+  --drag-glow: rgba(207, 138, 52, 0.5);
+  --slot-occupied-bg: rgba(74, 140, 63, 0.3);
+  --slider-track-bg: rgba(168, 90, 42, 0.3);
+}
+
+/* Clases de botones temáticos */
+.btn-primary {
+  background: var(--primary-color);
+  color: var(--primary-text);
+}
+
+.btn-secondary {
+  background: var(--secondary-color);
+  color: var(--secondary-text);
+}
+
+.btn-danger {
+  background: var(--danger-color);
+  color: var(--danger-text);
+}
+
+.btn-dark {
+  background: var(--dark-alt);
+  color: var(--dark-alt-text);
+}

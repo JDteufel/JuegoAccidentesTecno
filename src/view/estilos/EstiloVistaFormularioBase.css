@@ -6,7 +6,7 @@
   height: 100%;
   justify-content: center;
   align-items: center;
-  background: rgba(12, 9, 8, 0.64);
+  background: var(--overlay-bg);
   z-index: 100;
   font-family: 'Comic Neue', 'Comic Sans MS', cursive;
   box-sizing: border-box;
@@ -19,9 +19,9 @@
   min-height: 400px;
   max-height: 90vh;
   border-radius: 28px;
-  border: 2px solid #8e4d22;
-  background: rgba(28, 21, 18, 0.95);
-  box-shadow: 0 14px 22px rgba(0, 0, 0, 0.4);
+  border: 2px solid var(--border-alt);
+  background: var(--card-bg-solid);
+  box-shadow: 0 14px 22px var(--shadow-color);
   padding: 40px;
   display: flex;
   flex-direction: column;
@@ -31,7 +31,7 @@
 }
 
 .formulario-titulo {
-  color: #ffe4cf;
+  color: var(--text-primary);
   font-size: 32px;
   margin: 0 0 30px 0;
   text-align: center;
@@ -50,8 +50,8 @@
   flex: 1;
   height: 54px;
   padding: 0 14px;
-  color: #fff2e8;
-  background: #2b211d;
+  color: var(--text-input);
+  background: var(--input-bg);
   border: 2px solid transparent;
   border-radius: 16px;
   font-size: 20px;
@@ -62,15 +62,15 @@
 }
 
 .formulario-input:focus {
-  background: #352821;
+  background: var(--input-focused);
 }
 
 .formulario-toggle-btn {
   width: 80px;
   height: 54px;
-  color: #ffd8bc;
-  background: #4a3328;
-  border: 2px solid #8e4d22;
+  color: var(--dark-alt-text);
+  background: var(--dark-color);
+  border: 2px solid var(--border-alt);
   border-radius: 16px;
   font-size: 16px;
   font-family: 'Comic Neue', 'Comic Sans MS', cursive;
@@ -81,7 +81,7 @@
 }
 
 .formulario-error {
-  color: #ff6b6b;
+  color: var(--error-color);
   font-size: 16px;
   min-height: 40px;
   text-align: center;

@@ -1,5 +1,6 @@
 import * as BABYLON from '@babylonjs/core'
 import { GestorAjusteRatio } from './base/GestorAjusteRatio.js'
+import temaService from '../services/TemaService.js'
 import './estilos/EstiloVistaInicial.css'
 
 export class VistaInicial {
@@ -13,6 +14,8 @@ export class VistaInicial {
     this._onInicioSesion = null
     this._onJugar = null
     this._onReglas = null
+    this._onConfiguracion = null
+    this._materiales = {}
   }
 
   crearEscena() {
@@ -66,10 +69,12 @@ export class VistaInicial {
     materialPrincipal.diffuseColor = new BABYLON.Color3(0.92, 0.4, 0.1)
     materialPrincipal.emissiveColor = new BABYLON.Color3(0.33, 0.12, 0.04)
     materialPrincipal.specularColor = new BABYLON.Color3(0.8, 0.45, 0.18)
+    this.registrarMaterial('materialPrincipal', materialPrincipal)
 
     const materialSecundario = new BABYLON.StandardMaterial('matSecundario', scene)
     materialSecundario.diffuseColor = new BABYLON.Color3(0.96, 0.65, 0.24)
     materialSecundario.emissiveColor = new BABYLON.Color3(0.18, 0.08, 0.03)
+    this.registrarMaterial('materialSecundario', materialSecundario)
 
     const centroOrbita = new BABYLON.Vector3(0, 0.8, 0)
     const anguloDiagonalPantalla = BABYLON.Tools.ToRadians(35)
@@ -112,6 +117,7 @@ export class VistaInicial {
     )
     materialAnilloBorde.diffuseColor = new BABYLON.Color3(0.98, 0.74, 0.3)
     materialAnilloBorde.emissiveColor = new BABYLON.Color3(0.2, 0.11, 0.04)
+    this.registrarMaterial('materialAnilloBorde', materialAnilloBorde)
 
     const puntosAnilloBorde = []
     const ladosAnilloBorde = 8
@@ -289,6 +295,15 @@ export class VistaInicial {
     }
     overlay.appendChild(barraSuperior)
 
+    const btnConfig = this._crearBotonConfig(
+      () => this._onConfiguracion && this._onConfiguracion()
+    )
+    if (esMovil) {
+      btnConfig.style.width = '42px'
+      btnConfig.style.height = '42px'
+    }
+    barraSuperior.appendChild(btnConfig)
+
     const titulo = document.createElement('h1')
     titulo.textContent = 'Juego de Accidentes Tecnológicos'
     titulo.className = 'inicial-titulo'
@@ -303,8 +318,7 @@ export class VistaInicial {
 
     const btnRegistro = this._crearBoton(
       'Registrarse',
-      '#2f2623',
-      '#ffd6b5',
+      'secondary',
       () => this._onRegistro && this._onRegistro()
     )
     if (esMovil) {
@@ -320,8 +334,7 @@ export class VistaInicial {
 
     const btnInicioSesion = this._crearBoton(
       'Iniciar Sesión',
-      '#a84f16',
-      '#fff1e3',
+      'danger',
       () => this._onInicioSesion && this._onInicioSesion()
     )
     if (esMovil) {
@@ -359,8 +372,7 @@ export class VistaInicial {
 
     const btnJugar = this._crearBoton(
       'Jugar',
-      '#d66a1f',
-      '#fff7ef',
+      'primary',
       () => this._onJugar && this._onJugar()
     )
     btnJugar.style.marginBottom = '10px'
@@ -373,8 +385,7 @@ export class VistaInicial {
 
     const btnTutorial = this._crearBoton(
       'Tutorial',
-      '#3c2d27',
-      '#ffd6b7',
+      'dark',
       () => this._onTutorial && this._onTutorial()
     )
     btnTutorial.style.marginBottom = '10px'
@@ -387,8 +398,7 @@ export class VistaInicial {
 
     const btnReglas = this._crearBoton(
       'Ver reglas',
-      '#3c2d27',
-      '#ffd6b7',
+      'dark',
       () => this._onReglas && this._onReglas()
     )
     if (esMovil) {
@@ -399,12 +409,27 @@ export class VistaInicial {
     panelAcciones.appendChild(btnReglas)
   }
 
-  _crearBoton(texto, fondo, color, callback) {
+  _crearBoton(texto, temaClave, callback) {
+    const colores = temaService.obtenerColoresTema(temaService.obtenerTemaActual())
+    let fondo, colorTexto
+    if (temaClave === 'primary') {
+      fondo = colores.primary
+      colorTexto = colores.primaryText
+    } else if (temaClave === 'secondary') {
+      fondo = colores.secondary
+      colorTexto = colores.secondaryText
+    } else if (temaClave === 'danger') {
+      fondo = colores.danger || '#a84f16'
+      colorTexto = colores.dangerText || '#fff1e3'
+    } else {
+      fondo = colores.darkAlt
+      colorTexto = colores.darkAltText
+    }
     const btn = document.createElement('button')
     btn.textContent = texto
     btn.className = 'inicial-boton'
     btn.style.background = fondo
-    btn.style.color = color
+    btn.style.color = colorTexto
     const aplicarActivo = () => {
       btn.style.opacity = '0.85'
       btn.style.transform = 'scale(0.98)'
@@ -412,6 +437,39 @@ export class VistaInicial {
     const removerActivo = () => {
       btn.style.opacity = '1'
       btn.style.transform = 'scale(1)'
+    }
+    btn.addEventListener('mouseenter', aplicarActivo)
+    btn.addEventListener('mouseleave', removerActivo)
+    btn.addEventListener('touchstart', aplicarActivo, { passive: true })
+    btn.addEventListener('touchend', removerActivo, { passive: true })
+    btn.addEventListener('touchcancel', removerActivo, { passive: true })
+    btn.addEventListener('click', callback)
+    return btn
+  }
+
+  _crearBotonConfig(callback) {
+    const btn = document.createElement('button')
+    btn.innerHTML = '&#9881;'
+    btn.className = 'inicial-boton-config'
+    btn.style.width = '44px'
+    btn.style.height = '44px'
+    btn.style.background = 'transparent'
+    btn.style.color = '#ffe6d1'
+    btn.style.fontSize = '24px'
+    btn.style.border = 'none'
+    btn.style.borderRadius = '12px'
+    btn.style.cursor = 'pointer'
+    btn.style.display = 'flex'
+    btn.style.alignItems = 'center'
+    btn.style.justifyContent = 'center'
+    btn.style.transition = 'transform 0.3s, opacity 0.2s'
+    const aplicarActivo = () => {
+      btn.style.opacity = '0.7'
+      btn.style.transform = 'rotate(90deg) scale(0.95)'
+    }
+    const removerActivo = () => {
+      btn.style.opacity = '1'
+      btn.style.transform = 'rotate(0deg) scale(1)'
     }
     btn.addEventListener('mouseenter', aplicarActivo)
     btn.addEventListener('mouseleave', removerActivo)
@@ -450,6 +508,10 @@ export class VistaInicial {
     this._onReglas = callback
   }
 
+  onConfiguracion(callback) {
+    this._onConfiguracion = callback
+  }
+
   render(targetFps = 60) {
     this.crearEscena()
     if (!this.scene) return
@@ -468,5 +530,80 @@ export class VistaInicial {
     window.addEventListener('resize', () => {
       this.engine.resize()
     })
+  }
+
+  aplicarTema(temaId) {
+    const colores = temaService.obtenerColoresTema(temaId)
+
+    if (this.scene) {
+      this.scene.clearColor = colores.sceneBg
+
+      if (this._materiales.materialPrincipal) {
+        this._materiales.materialPrincipal.diffuseColor = colores.matPrimDiffuse
+        this._materiales.materialPrincipal.emissiveColor = colores.matPrimEmissive
+      }
+      if (this._materiales.materialSecundario) {
+        this._materiales.materialSecundario.diffuseColor = colores.matSecDiffuse
+        this._materiales.materialSecundario.emissiveColor = colores.matSecEmissive
+      }
+      if (this._materiales.materialAnilloBorde) {
+        this._materiales.materialAnilloBorde.diffuseColor = colores.matRingDiffuse
+        this._materiales.materialAnilloBorde.emissiveColor = colores.matRingEmissive
+      }
+    }
+
+    if (this.overlayEl) {
+      this.overlayEl.style.background = colores.overlay
+    }
+
+    const barraSuperior = this.overlayEl?.querySelector('.inicial-barra-superior')
+    if (barraSuperior) {
+      barraSuperior.style.background = colores.topbar
+    }
+
+    const panelAcciones = this.overlayEl?.querySelector('.inicial-panel-acciones')
+    if (panelAcciones) {
+      panelAcciones.style.background = colores.cardBg
+      panelAcciones.style.borderColor = colores.border
+    }
+
+    const titulo = this.overlayEl?.querySelector('.inicial-titulo')
+    if (titulo) {
+      titulo.style.color = colores.textPrimary
+    }
+
+    const panelTitulo = this.overlayEl?.querySelector('.inicial-panel-titulo')
+    if (panelTitulo) {
+      panelTitulo.style.color = colores.textSecondary
+    }
+
+    const botones = this.overlayEl?.querySelectorAll('.inicial-boton')
+    if (botones) {
+      botones.forEach(btn => {
+        const texto = btn.textContent
+        if (texto === 'Registrarse') {
+          btn.style.background = colores.secondary
+          btn.style.color = colores.secondaryText
+        } else if (texto === 'Iniciar Sesión') {
+          btn.style.background = colores.danger || '#a84f16'
+          btn.style.color = colores.dangerText || '#fff1e3'
+        } else if (texto === 'Jugar') {
+          btn.style.background = colores.primary
+          btn.style.color = colores.primaryText
+        } else if (texto === 'Tutorial' || texto === 'Ver reglas') {
+          btn.style.background = colores.darkAlt
+          btn.style.color = colores.darkAltText
+        }
+      })
+    }
+
+    const btnConfig = this.overlayEl?.querySelector('.inicial-boton-config')
+    if (btnConfig) {
+      btnConfig.style.color = colores.textPrimary
+    }
+  }
+
+  registrarMaterial(nombre, material) {
+    this._materiales[nombre] = material
   }
 }

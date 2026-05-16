@@ -1,3 +1,4 @@
+import './view/estilos/variables.css'
 import { VistaInicial } from './view/VistaInicial.js'
 import { VistaInicialR } from './view/VistaInicialR.js'
 import { VistaTutorial } from './view/VistaTutorial.js'
@@ -11,6 +12,7 @@ import { VistaCartas } from './view/VistaCartas.js'
 import { VistaAccidentes } from './view/VistaAccidentes.js'
 import { VistaPartida } from './view/VistaPartida.js'
 import { VistaPartidaPrueba } from './view/VistaPartidaPrueba.js'
+import { VistaConfiguracion } from './view/VistaConfiguracion.js'
 import { EstadoApp } from './model/EstadoApp.js'
 import { ControladorVistaInicial } from './controller/ControladorVistaInicial.js'
 import { ControladorVistaInicialR } from './controller/ControladorVistaInicialR.js'
@@ -26,8 +28,10 @@ import { ControladorVistaCartas } from './controller/ControladorVistaCartas.js'
 import { ControladorVistaAccidentes } from './controller/ControladorVistaAccidentes.js'
 import { ControladorVistaPartida } from './controller/ControladorVistaPartida.js'
 import { ControladorVistaPartidaPrueba } from './controller/ControladorVistaPartidaPrueba.js'
+import { ControladorVistaConfiguracion } from './controller/ControladorVistaConfiguracion.js'
 import { testSmartFoxPing, getSmartFoxInstance } from './services/SmartFoxService.js'
 import { initLogsService } from './services/LogsService.js'
+import temaService from './services/TemaService.js'
 
 const canvas = document.getElementById('renderCanvas')
 
@@ -68,8 +72,11 @@ const vistaPartida = new VistaPartida(canvas, vistaInicial.engine, vistaInicial.
 vistaPartida.crear()
 const vistaPartidaPrueba = new VistaPartidaPrueba(canvas, vistaInicial.engine, vistaInicial.scene)
 vistaPartidaPrueba.crear()
+const vistaConfiguracion = new VistaConfiguracion()
+vistaConfiguracion.crear()
 
 const estadoApp = new EstadoApp()
+window.estadoAppGlobal = estadoApp
 
 const controladorPartida = new ControladorVistaPartida(vistaPartida, null)
 const controladorPartidaPrueba = new ControladorVistaPartidaPrueba(vistaPartidaPrueba, null)
@@ -86,7 +93,8 @@ const controladorEstadoApp = new ControladorEstadoApp(estadoApp, {
   vistaCartas,
   vistaAccidentes,
   vistaPartida,
-  vistaPartidaPrueba
+  vistaPartidaPrueba,
+  vistaConfiguracion
 }, controladorPartida, controladorPartidaPrueba)
 
 controladorPartida.controladorEstadoApp = controladorEstadoApp
@@ -135,6 +143,11 @@ const controladorCartas = new ControladorVistaCartas(vistaCartas, controladorEst
 
 const controladorAccidentes = new ControladorVistaAccidentes(vistaAccidentes, controladorEstadoApp)
 
+const controladorConfiguracion = new ControladorVistaConfiguracion(
+  vistaConfiguracion,
+  controladorEstadoApp
+)
+
 controladorVistaInicial.init()
 controladorVistaInicialR.init()
 controladorTutorial.init()
@@ -148,6 +161,12 @@ controladorCartas.init()
 controladorAccidentes.init()
 controladorPartida.init()
 controladorPartidaPrueba.init()
+controladorConfiguracion.init()
+
+temaService.cargarTemaInicial(estadoApp.getUsername()).then(() => {
+  controladorEstadoApp.aplicarTemaActual()
+})
+
 controladorEstadoApp.actualizarVista()
 
 testSmartFoxPing()

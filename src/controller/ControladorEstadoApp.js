@@ -5,6 +5,7 @@ import {
   subscribeToRoomJoin,
   subscribeToRoomEnter
 } from '../services/SmartFoxService.js'
+import temaService from '../services/TemaService.js'
 
 export class ControladorEstadoApp {
   constructor(estadoApp, vistas, controladorPartida = null, controladorPartidaPrueba = null) {
@@ -101,6 +102,9 @@ export class ControladorEstadoApp {
         }
         this.vistas.vistaPartidaPrueba.mostrar()
         break
+      case PANTALLAS.CONFIGURACION:
+        this.vistas.vistaConfiguracion.mostrar()
+        break
       default:
         this.vistas.vistaInicial.mostrar()
         break
@@ -140,6 +144,89 @@ export class ControladorEstadoApp {
     this.vistas.vistaAccidentes.ocultar()
     this.vistas.vistaPartida.ocultar()
     this.vistas.vistaPartidaPrueba.ocultar()
+    if (this.vistas.vistaConfiguracion) {
+      this.vistas.vistaConfiguracion.ocultar()
+    }
+  }
+
+  aplicarTemaActual() {
+    const temaId = temaService.obtenerTemaActual()
+    const colores = temaService.obtenerColoresTema(temaId)
+
+    this._aplicarVariablesCSS(colores)
+
+    if (this.vistas.vistaInicial) {
+      this.vistas.vistaInicial.aplicarTema(temaId)
+    }
+    if (this.vistas.vistaInicialR) {
+      this.vistas.vistaInicialR.aplicarTema(temaId)
+    }
+    if (this.vistas.vistaPartida) {
+      this.vistas.vistaPartida.aplicarTema(temaId)
+    }
+    if (this.vistas.vistaGestion) {
+      this.vistas.vistaGestion.aplicarTema(temaId)
+    }
+    if (this.vistas.vistaRegistro) {
+      this.vistas.vistaRegistro.aplicarTema(temaId)
+    }
+    if (this.vistas.vistaInicioSesion) {
+      this.vistas.vistaInicioSesion.aplicarTema(temaId)
+    }
+    if (this.vistas.vistaJugar) {
+      this.vistas.vistaJugar.aplicarTema(temaId)
+    }
+    if (this.vistas.vistaReglas) {
+      this.vistas.vistaReglas.aplicarTema(temaId)
+    }
+    if (this.vistas.vistaCrearJuego) {
+      this.vistas.vistaCrearJuego.aplicarTema(temaId)
+    }
+    if (this.vistas.vistaCartas) {
+      this.vistas.vistaCartas.aplicarTema(temaId)
+    }
+    if (this.vistas.vistaAccidentes) {
+      this.vistas.vistaAccidentes.aplicarTema(temaId)
+    }
+    if (this.vistas.vistaTutorial) {
+      this.vistas.vistaTutorial.aplicarTema(temaId)
+    }
+  }
+
+  _aplicarVariablesCSS(colores) {
+    const root = document.documentElement
+    root.style.setProperty('--overlay-bg', colores.overlay)
+    root.style.setProperty('--overlay-full-bg', colores.overlayFull)
+    root.style.setProperty('--topbar-bg', colores.topbar)
+    root.style.setProperty('--card-bg', colores.cardBg)
+    root.style.setProperty('--card-bg-solid', colores.cardBgSolid)
+    root.style.setProperty('--input-bg', colores.inputBg)
+    root.style.setProperty('--input-focused', colores.inputFocused)
+    root.style.setProperty('--item-even', colores.itemEven)
+    root.style.setProperty('--item-odd', colores.itemOdd)
+    root.style.setProperty('--primary-color', colores.primary)
+    root.style.setProperty('--primary-text', colores.primaryText)
+    root.style.setProperty('--secondary-color', colores.secondary)
+    root.style.setProperty('--secondary-text', colores.secondaryText)
+    root.style.setProperty('--dark-color', colores.dark)
+    root.style.setProperty('--dark-text', colores.darkText)
+    root.style.setProperty('--dark-alt', colores.darkAlt)
+    root.style.setProperty('--dark-alt-text', colores.darkAltText)
+    root.style.setProperty('--border-color', colores.border)
+    root.style.setProperty('--border-alt', colores.borderAlt)
+    root.style.setProperty('--text-primary', colores.textPrimary)
+    root.style.setProperty('--text-secondary', colores.textSecondary)
+    root.style.setProperty('--text-body', colores.textBody)
+    root.style.setProperty('--text-input', colores.textInput)
+    root.style.setProperty('--placeholder', colores.placeholder)
+    root.style.setProperty('--error-color', colores.error)
+    root.style.setProperty('--badge-work', colores.badgeWork)
+    root.style.setProperty('--badge-entertainment', colores.badgeEntertainment)
+    root.style.setProperty('--hud-panel-bg', colores.hudPanelBg)
+    root.style.setProperty('--hud-border-color', colores.hudBorderColor)
+    root.style.setProperty('--hud-text-color', colores.hudTextColor)
+    root.style.setProperty('--hud-subtext-color', colores.hudSubtextColor)
+    root.style.setProperty('--hud-progreso-color', colores.hudProgresoColor)
   }
 
   obtenerPerfilesAsignados() {

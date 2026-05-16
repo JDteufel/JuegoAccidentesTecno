@@ -68,10 +68,11 @@ class MongoDBService {
     }
   }
 
-  async registerUser(username, password, callback = null) {
+  async registerUser(username, password, tema = 'clasico', callback = null) {
     return this.request('/usuarios/register', {
       username: username,
-      password: password
+      password: password,
+      tema: tema
     }, 'POST', callback)
   }
   async loginUser(username, password, callback = null) {
@@ -79,6 +80,11 @@ class MongoDBService {
       username: username,
       password: password
     }, 'POST', callback)
+  }
+  async actualizarTemaUsuario(username, tema, callback = null) {
+    return this.request(`/usuarios/${username}/tema`, {
+      tema: tema
+    }, 'PATCH', callback)
   }
   async getUser(username, callback = null) {
     const result = await this.getAllUsers()

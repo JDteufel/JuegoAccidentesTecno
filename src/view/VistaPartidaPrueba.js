@@ -1,6 +1,7 @@
 import * as BABYLON from '@babylonjs/core'
 import * as GUI from '@babylonjs/gui'
 import { GestorAjusteRatio } from './base/GestorAjusteRatio.js'
+import temaService from '../services/TemaService.js'
 
 export class VistaPartidaPrueba {
   constructor(canvas, engine, sceneInicial) {
@@ -43,6 +44,48 @@ export class VistaPartidaPrueba {
     this.zonaDropTablero = null
     this.cartasJugadasMeshes = []
     this.ranurasCartasJugadas = []
+  }
+
+  _obtenerColores() {
+    return temaService.obtenerColoresTema(temaService.obtenerTemaActual())
+  }
+
+  _coloresDefecto() {
+    return {
+      hudPanelBg: 'rgba(23, 17, 14, 0.88)',
+      hudBorderColor: '#8e4d22',
+      hudTextColor: '#ffe2c8',
+      hudSubtextColor: '#f4cbaa',
+      hudEstadoBg: ['#2d221d', '#5a2e1d', '#2d221d', '#3a2a1d'],
+      hudProgresoBg: '#1a1210',
+      hudProgresoColor: '#d66a1f',
+      hudBotonVolverBg: '#362924',
+      hudBotonReiniciarBg: '#5a3321',
+      hudBotonTextColor: '#ffd8bc',
+      hudCartaBg: 'rgba(28, 20, 18, 0.92)',
+      hudCartaBorder: '#a85a2a',
+      hudCartaVaciaBg: 'rgba(33, 23, 19, 0.4)',
+      hudCartaVaciaBorder: '#4a3528',
+      hudZonaIntercambioIcono: '#a88a6a',
+      nombreJugadorColor: '#ffe2c8',
+      panelAccidentesBorder: '#8e4d22',
+      panelAccidentesBg: 'rgba(28, 20, 16, 0.97)',
+      panelInicioBorder: '#8e4d22',
+      panelInicioBg: 'rgba(28, 20, 16, 0.95)',
+      primary: '#d66a1f',
+      primaryText: '#fff7ef',
+      secondary: '#a84f16',
+      secondaryText: '#fff1e3',
+      darkAlt: '#362924',
+      darkAltText: '#ffd8bc',
+      danger: '#a84f16',
+      dangerText: '#fff1e3',
+      badgeWork: '#90ee90',
+      badgeBg: 'rgba(168, 90, 42, 0.4)',
+      borderAlt: '#8e4d22',
+      textBody: '#f4cbaa',
+      topbar: 'rgba(18, 14, 13, 0.72)'
+    }
   }
 
   crear() {
@@ -553,6 +596,7 @@ export class VistaPartidaPrueba {
   }
 
   crearCarruselAccidente() {
+    const colores = this._coloresDefecto()
     this.carruselAccidentes = new BABYLON.TransformNode(
       'carruselAccidentes',
       this.scene
@@ -621,7 +665,7 @@ export class VistaPartidaPrueba {
       { width: 512, height: 128 },
       this.scene
     )
-    texturaNombre.drawText(this.nombreJugador, null, 48, '#ffe2c8', 'rgba(0,0,0,0)', true)
+    texturaNombre.drawText(this.nombreJugador, null, 48, colores.nombreJugadorColor, 'rgba(0,0,0,0)', true)
     materialTextoNombre.diffuseTexture = texturaNombre
     materialTextoNombre.emissiveTexture = texturaNombre
     materialTextoNombre.useAlphaFromDiffuseTexture = true
@@ -649,6 +693,7 @@ export class VistaPartidaPrueba {
   }
 
   crearCartaCarruselAccidente(indice, contenedor) {
+    const colores = this._coloresDefecto()
     const baseCarta = BABYLON.MeshBuilder.CreateBox(
       `baseCartaCarrusel_${indice}`,
       { width: 1.04, height: 1.38, depth: 0.08 },
@@ -715,7 +760,7 @@ export class VistaPartidaPrueba {
       { width: 256, height: 64 },
       this.scene
     )
-    codigoTexto.drawText('---', null, 40, '#ffe2c8', 'rgba(0,0,0,0)', true)
+    codigoTexto.drawText('---', null, 40, colores.nombreJugadorColor, 'rgba(0,0,0,0)', true)
     materialTextoCarta.diffuseTexture = codigoTexto
     materialTextoCarta.useAlphaFromDiffuseTexture = false
   }
@@ -764,6 +809,7 @@ export class VistaPartidaPrueba {
   mostrarPanelAccidentes() {
     if (!this.accidentes || this.accidentes.length === 0) return
 
+    const colores = this._coloresDefecto()
     this.panelAccidentesVisible = true
 
     const fondo = new GUI.Rectangle('fondoPanelAccidentesPrueba')
@@ -796,7 +842,7 @@ export class VistaPartidaPrueba {
     const titulo = new GUI.TextBlock('tituloPanelAccidentesPrueba', 'Accidentes en Mesa')
     titulo.top = '-300px'
     titulo.height = '50px'
-    titulo.color = '#ffe2c8'
+    titulo.color = colores.hudTextColor
     titulo.fontSize = 28
     titulo.fontFamily = 'Comic Sans MS'
     titulo.fontWeight = 'bold'
@@ -843,7 +889,7 @@ export class VistaPartidaPrueba {
     botonCerrar.height = '40px'
     botonCerrar.top = '295px'
     botonCerrar.background = '#5a3321'
-    botonCerrar.color = '#ffd8bc'
+    botonCerrar.color = colores.hudBotonTextColor
     botonCerrar.cornerRadius = 12
     botonCerrar.fontSize = 14
     botonCerrar.fontFamily = 'Comic Sans MS'
@@ -886,6 +932,7 @@ export class VistaPartidaPrueba {
   }
 
   crearEncabezadoPrueba() {
+    const colores = this._coloresDefecto()
     const panelEncabezado = new GUI.Rectangle('panelEncabezadoPrueba')
     panelEncabezado.width = '860px'
     panelEncabezado.height = '124px'
@@ -904,7 +951,7 @@ export class VistaPartidaPrueba {
     const titulo = new GUI.TextBlock('tituloPrueba', 'Modo Prueba - Gamemaster')
     titulo.top = '-28px'
     titulo.height = '34px'
-    titulo.color = '#ffe2c8'
+    titulo.color = colores.hudTextColor
     titulo.fontSize = 28
     titulo.fontFamily = 'Comic Sans MS'
     titulo.fontWeight = 'bold'
@@ -966,14 +1013,14 @@ export class VistaPartidaPrueba {
     barra.height = '100%'
     barra.thickness = 0
     barra.cornerRadius = 9
-    barra.background = '#d66a1f'
+    barra.background = colores.hudProgresoColor
     barra.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
     barraProgreso.addControl(barra)
 
     const textoProgreso = new GUI.TextBlock('textoProgresoPrueba', '0/0 horas')
     textoProgreso.width = '100%'
     textoProgreso.height = '100%'
-    textoProgreso.color = '#ffe2c8'
+    textoProgreso.color = colores.hudTextColor
     textoProgreso.fontSize = 11
     textoProgreso.fontFamily = 'Comic Sans MS'
     textoProgreso.fontWeight = 'bold'
@@ -981,13 +1028,14 @@ export class VistaPartidaPrueba {
   }
 
   crearBotonVolver() {
+    const colores = this._coloresDefecto()
     const botonVolver = GUI.Button.CreateSimpleButton('btnVolverPrueba', 'Volver')
     botonVolver.width = '150px'
     botonVolver.height = '48px'
     botonVolver.left = '20px'
     botonVolver.top = '20px'
     botonVolver.background = '#362924'
-    botonVolver.color = '#ffd8bc'
+    botonVolver.color = colores.hudBotonTextColor
     botonVolver.cornerRadius = 16
     botonVolver.thickness = 2
     botonVolver.borderColor = '#8e4d22'
@@ -1115,6 +1163,7 @@ export class VistaPartidaPrueba {
   }
 
   crearBotonesAccion() {
+    const colores = this._coloresDefecto()
     const panelBotones = new GUI.StackPanel('panelBotonesPrueba')
     panelBotones.width = '120px'
     panelBotones.height = '400px'
@@ -1129,8 +1178,8 @@ export class VistaPartidaPrueba {
     btnFinTurno.width = '100px'
     btnFinTurno.height = '80px'
     btnFinTurno.cornerRadius = 40
-    btnFinTurno.background = '#d66a1f'
-    btnFinTurno.color = '#fff7ef'
+    btnFinTurno.background = colores.primary
+    btnFinTurno.color = colores.primaryText
     btnFinTurno.fontSize = 14
     btnFinTurno.fontWeight = 'bold'
     btnFinTurno.fontFamily = 'Comic Sans MS'
@@ -1145,7 +1194,7 @@ export class VistaPartidaPrueba {
     btnAccidente.width = '100px'
     btnAccidente.height = '80px'
     btnAccidente.cornerRadius = 40
-    btnAccidente.background = '#a84f16'
+    btnAccidente.background = colores.secondary
     btnAccidente.color = '#fff1e3'
     btnAccidente.fontSize = 14
     btnAccidente.fontWeight = 'bold'
@@ -1162,7 +1211,7 @@ export class VistaPartidaPrueba {
     btnPasar.height = '80px'
     btnPasar.cornerRadius = 40
     btnPasar.background = '#3c2d27'
-    btnPasar.color = '#ffd6b7'
+    btnPasar.color = colores.darkAltText
     btnPasar.fontSize = 14
     btnPasar.fontWeight = 'bold'
     btnPasar.fontFamily = 'Comic Sans MS'
@@ -1178,7 +1227,7 @@ export class VistaPartidaPrueba {
     btnReiniciar.height = '80px'
     btnReiniciar.cornerRadius = 40
     btnReiniciar.background = '#5a3321'
-    btnReiniciar.color = '#ffd8bc'
+    btnReiniciar.color = colores.hudBotonTextColor
     btnReiniciar.fontSize = 14
     btnReiniciar.fontWeight = 'bold'
     btnReiniciar.fontFamily = 'Comic Sans MS'
@@ -1275,6 +1324,7 @@ export class VistaPartidaPrueba {
   mostrarModalIntercambio() {
     if (!this.cartas || this.cartas.length === 0) return
 
+    const colores = this._coloresDefecto()
     const overlay = new GUI.Rectangle('overlayIntercambioPrueba')
     overlay.width = 1
     overlay.height = 1
@@ -1297,7 +1347,7 @@ export class VistaPartidaPrueba {
     const titulo = new GUI.TextBlock('tituloIntercambioPrueba', 'Intercambiar Cartas')
     titulo.top = '-130px'
     titulo.height = '40px'
-    titulo.color = '#ffe2c8'
+    titulo.color = colores.hudTextColor
     titulo.fontSize = 24
     titulo.fontFamily = 'Comic Sans MS'
     titulo.fontWeight = 'bold'
@@ -1366,7 +1416,7 @@ export class VistaPartidaPrueba {
     btnCerrar.height = '40px'
     btnCerrar.top = '140px'
     btnCerrar.background = '#5a3321'
-    btnCerrar.color = '#ffd8bc'
+    btnCerrar.color = colores.hudBotonTextColor
     btnCerrar.cornerRadius = 12
     btnCerrar.fontSize = 14
     btnCerrar.fontFamily = 'Comic Sans MS'
@@ -1396,7 +1446,7 @@ export class VistaPartidaPrueba {
     const titulo = new GUI.TextBlock(`${nombre}_titulo`, tituloTexto)
     titulo.top = '-200px'
     titulo.height = '50px'
-    titulo.color = '#ffe2c8'
+    titulo.color = colores.hudTextColor
     titulo.fontSize = 26
     titulo.fontFamily = 'Comic Sans MS'
     titulo.fontWeight = 'bold'
@@ -1427,7 +1477,7 @@ export class VistaPartidaPrueba {
     botonCerrar.height = '40px'
     botonCerrar.top = '180px'
     botonCerrar.background = '#5a3321'
-    botonCerrar.color = '#ffd8bc'
+    botonCerrar.color = colores.hudBotonTextColor
     botonCerrar.cornerRadius = 12
     botonCerrar.thickness = 2
     botonCerrar.borderColor = '#8e4d22'
@@ -1488,6 +1538,7 @@ export class VistaPartidaPrueba {
 
   mostrarPanelPerfilInicio() {
     if (!this.panelPerfilInicio || !this.perfil) return
+    const colores = this._coloresDefecto()
     const { panel, grid, titulo } = this.panelPerfilInicio
 
     titulo.text = `Perfil: ${this.perfil.nombre}`
@@ -1504,10 +1555,10 @@ export class VistaPartidaPrueba {
     nombrePerfil.height = '70px'
     nombrePerfil.thickness = 2
     nombrePerfil.cornerRadius = 10
-    nombrePerfil.color = '#d66a1f'
+    nombrePerfil.color = colores.primary
     nombrePerfil.background = '#3d2a1d'
     const textoNombre = new GUI.TextBlock('perfilPruebaNombre', this.perfil.nombre)
-    textoNombre.color = '#ffe2c8'
+    textoNombre.color = colores.hudTextColor
     textoNombre.fontSize = 16
     textoNombre.fontFamily = 'Comic Sans MS'
     textoNombre.fontWeight = 'bold'
@@ -1567,6 +1618,8 @@ export class VistaPartidaPrueba {
   mostrarSecuenciaInicio() {
     if (!this.overlay) return
 
+    const colores = this._coloresDefecto()
+
     const panelInicio = new GUI.Rectangle('panelInicioPrueba')
     panelInicio.width = '1600px'
     panelInicio.height = '820px'
@@ -1583,7 +1636,7 @@ export class VistaPartidaPrueba {
     tituloAcc.top = '-380px'
     tituloAcc.left = '-200px'
     tituloAcc.height = '50px'
-    tituloAcc.color = '#ffe2c8'
+    tituloAcc.color = colores.hudTextColor
     tituloAcc.fontSize = 28
     tituloAcc.fontFamily = 'Comic Sans MS'
     tituloAcc.fontWeight = 'bold'
@@ -1641,7 +1694,7 @@ export class VistaPartidaPrueba {
     tituloPerfil.top = '-380px'
     tituloPerfil.left = '560px'
     tituloPerfil.height = '50px'
-    tituloPerfil.color = '#ffe2c8'
+    tituloPerfil.color = colores.hudTextColor
     tituloPerfil.fontSize = 28
     tituloPerfil.fontFamily = 'Comic Sans MS'
     tituloPerfil.fontWeight = 'bold'
@@ -1651,7 +1704,7 @@ export class VistaPartidaPrueba {
     nombrePerf.top = '-240px'
     nombrePerf.left = '560px'
     nombrePerf.height = '40px'
-    nombrePerf.color = '#d66a1f'
+    nombrePerf.color = colores.primary
     nombrePerf.fontSize = 22
     nombrePerf.fontFamily = 'Comic Sans MS'
     nombrePerf.fontWeight = 'bold'
@@ -1695,8 +1748,8 @@ export class VistaPartidaPrueba {
     botonCerrar.width = '180px'
     botonCerrar.height = '44px'
     botonCerrar.top = '370px'
-    botonCerrar.background = '#d66a1f'
-    botonCerrar.color = '#fff7ef'
+    botonCerrar.background = colores.primary
+    botonCerrar.color = colores.primaryText
     botonCerrar.cornerRadius = 14
     botonCerrar.fontSize = 16
     botonCerrar.fontFamily = 'Comic Sans MS'
@@ -1745,6 +1798,7 @@ export class VistaPartidaPrueba {
   actualizarCarruselAccidentes() {
     if (!this.accidentes || this.accidentes.length === 0) return
 
+    const colores = this._coloresDefecto()
     const cantidad = Math.min(this.accidentes.length, 8)
     for (let i = 0; i < 8; i++) {
       const caraCarta = this.scene.getMeshByName(`caraCartaCarrusel_${i}`)
@@ -1774,7 +1828,7 @@ export class VistaPartidaPrueba {
         if (textoCarta && textoCarta.material && textoCarta.material.diffuseTexture) {
           const dt = textoCarta.material.diffuseTexture
           dt.clear()
-          dt.drawText(`${accidente.codigo}: ${accidente.nombre}`, null, 22, '#ffe2c8', 'rgba(0,0,0,0)', true)
+          dt.drawText(`${accidente.codigo}: ${accidente.nombre}`, null, 22, colores.nombreJugadorColor, 'rgba(0,0,0,0)', true)
           dt.update(false)
         }
       } else {
@@ -1826,6 +1880,7 @@ export class VistaPartidaPrueba {
   actualizarProgresoPerfil() {
     if (!this.perfil) return
 
+    const colores = this._coloresDefecto()
     const progreso = this.perfil.getProgreso()
     const porcentaje = Math.round(progreso * 100)
 
@@ -1835,7 +1890,7 @@ export class VistaPartidaPrueba {
       if (progreso >= 1) {
         barra.background = '#4caf50'
       } else if (progreso >= 0.5) {
-        barra.background = '#d66a1f'
+        barra.background = colores.hudProgresoColor
       } else {
         barra.background = '#a85a2a'
       }
@@ -1974,6 +2029,7 @@ export class VistaPartidaPrueba {
   }
 
   mostrarMensaje(mensaje, duracion = 3000) {
+    const colores = this._coloresDefecto()
     const panel = new GUI.Rectangle('panelMensajePrueba')
     panel.width = '500px'
     panel.height = '80px'
@@ -1989,7 +2045,7 @@ export class VistaPartidaPrueba {
     this.overlay.addControl(panel)
 
     const texto = new GUI.TextBlock('textoMensajePrueba', mensaje)
-    texto.color = '#ffe2c8'
+    texto.color = colores.hudTextColor
     texto.fontSize = 16
     texto.fontFamily = 'Comic Sans MS'
     texto.textWrapping = true
@@ -2056,7 +2112,8 @@ export class VistaPartidaPrueba {
   configurarNombreJugador(nombre) {
     this.nombreJugador = nombre
     if (this.texturaNombreJugador) {
-      this.texturaNombreJugador.drawText(nombre, null, 48, '#ffe2c8', 'rgba(0,0,0,0)', true)
+      const colores = this._coloresDefecto()
+      this.texturaNombreJugador.drawText(nombre, null, 48, colores.nombreJugadorColor, 'rgba(0,0,0,0)', true)
     }
   }
 

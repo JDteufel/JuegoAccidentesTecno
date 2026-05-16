@@ -6,7 +6,7 @@
   height: 100%;
   flex-direction: column;
   align-items: center;
-  background: rgba(12, 9, 8, 0.75);
+  background: var(--overlay-full-bg);
   z-index: 100;
   font-family: 'Comic Neue', 'Comic Sans MS', cursive;
   box-sizing: border-box;
@@ -25,7 +25,7 @@
 }
 
 .cartas-titulo {
-  color: #ffe6d1;
+  color: var(--text-primary);
   margin: 0;
   text-align: center;
 }
@@ -83,18 +83,18 @@
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  background: #a85a2a;
+  background: var(--border-color);
   cursor: pointer;
-  border: 2px solid #ffd8bc;
+  border: 2px solid var(--dark-alt-text);
 }
 
 .cartas-slider::-moz-range-thumb {
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  background: #a85a2a;
+  background: var(--border-color);
   cursor: pointer;
-  border: 2px solid #ffd8bc;
+  border: 2px solid var(--dark-alt-text);
 }
 
 .cartas-boton {
