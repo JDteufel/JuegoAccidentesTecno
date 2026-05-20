@@ -114,8 +114,13 @@ class MongoDBService {
   async getAllUsers(callback = null) {
     return this.request('/usuarios', {}, 'GET', callback)
   }
+
   async logEvent(type, action, details = {}, callback = null) {
     return this.request('/logs', { type, action, details }, 'POST', callback)
+  }
+
+  async logMetric(type, action, details = {}, callback = null) {
+    return this.request('/Metricas', { type, action, details }, 'POST', callback)
   }
 
   async getLogs(category = null, callback = null) {
@@ -126,66 +131,6 @@ class MongoDBService {
   async clearLogs(category = null, callback = null) {
     const endpoint = category ? `/logs?type=${category}` : '/logs'
     return this.request(endpoint, {}, 'DELETE', callback)
-  }
-
-  async createPartida(data, callback = null) {
-    const response = {
-      ok: false,
-      skipped: true,
-      message: 'Endpoint de partidas no implementado en rest-bridge'
-    }
-    if (callback) {
-      callback(response, 501)
-    }
-    return response
-  }
-
-  async getPartida(partidaId, callback = null) {
-    const response = {
-      ok: false,
-      skipped: true,
-      message: 'Endpoint de partidas no implementado en rest-bridge'
-    }
-    if (callback) {
-      callback(response, 501)
-    }
-    return response
-  }
-
-  async getAllPartidas(callback = null) {
-    const response = {
-      ok: true,
-      skipped: true,
-      partidas: []
-    }
-    if (callback) {
-      callback(response, 200)
-    }
-    return response
-  }
-
-  async updatePartida(partidaId, data, callback = null) {
-    const response = {
-      ok: false,
-      skipped: true,
-      message: 'Endpoint de partidas no implementado en rest-bridge'
-    }
-    if (callback) {
-      callback(response, 501)
-    }
-    return response
-  }
-
-  async deletePartida(partidaId, callback = null) {
-    const response = {
-      ok: false,
-      skipped: true,
-      message: 'Endpoint de partidas no implementado en rest-bridge'
-    }
-    if (callback) {
-      callback(response, 501)
-    }
-    return response
   }
 
   async healthCheck(callback = null) {

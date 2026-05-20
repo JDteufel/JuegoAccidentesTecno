@@ -3,7 +3,7 @@ import { seleccionarAccidentesAleatorios } from '../model/accidentes/index.js'
 import { seleccionarPerfilAleatorio } from '../model/perfiles/index.js'
 import { seleccionarCartasAleatorias } from '../model/cartas/index.js'
 import { seleccionarActividadesAleatorias } from '../model/actividades/index.js'
-import { logEvent, exportarJSON, obtenerEstadisticas } from '../services/LogsService.js'
+import { logEvent, exportarJSON, obtenerEstadisticas, syncAllToMongoDB } from '../services/LogsService.js'
 
 export class ControladorVistaPartidaPrueba {
   constructor(vistaPartidaPrueba, controladorEstadoApp) {
@@ -48,6 +48,10 @@ export class ControladorVistaPartidaPrueba {
 
     this.vistaPartidaPrueba.onPasarTurno(() => {
       this.pasarTurno()
+    })
+
+    this.vistaPartidaPrueba.onEnviarLog(() => {
+      this.enviarLogsCapaMongo()
     })
 
     this.vistaPartidaPrueba.onIntercambioCarta((carta1, carta2) => {
@@ -342,7 +346,18 @@ export class ControladorVistaPartidaPrueba {
     this.vistaPartidaPrueba.actualizarAccidentes(this.accidentesSeleccionados)
   }
 
-  reiniciarPartida() {
+  async enviarLogsCapaMongo() {
+    this.vistaPartidaPrueba.mostrarMensaje('Sincronizando logs con MongoDB...')
+    const exito = await syncAllToMongoDB()
+    if (exito) {
+      this.vistaPartidaPrueba.mostrarMensaje('Logs enviados correctamente a MongoDB', 4000)
+    } else {
+      this.vistaPartidaPrueba.mostrarMensaje('Error al enviar logs a MongoDB', 4000)
+    }
+  }
+
+  async reiniciarPartida() {
+    await this.enviarLogsCapaMongo()
     this.accidentesSeleccionados.forEach(a => a.activo = false)
     this.accidentesSeleccionados = []
     this.accidentesActivosOrden = []

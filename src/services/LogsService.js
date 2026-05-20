@@ -44,14 +44,62 @@ export function logEvent(type, action, details = {}) {
     }
   }
 
-  syncToMongoDB(type, action, details)
+  // Si es un evento de métricas, lo enviamos individualmente de inmediato para análisis
+  if (type === 'METRICAS') {
+    syncToMongoDB(type, action, details)
+  }
+}
+
+export async function syncAllToMongoDB() {
+  const allLogs = obtenerTodosLogs()
+  if (allLogs.length === 0) {
+    console.log('[LogsService] No hay logs para sincronizar')
+    return true
+  }
+
+  try {
+    console.log(`[LogsService] Preparando envío de ${allLogs.length} eventos...`)
+
+    // Creamos una copia limpia de los logs para evitar cualquier problema de serialización
+    const logsCopia = JSON.parse(JSON.stringify(allLogs))
+
+    console.log('[LogsService] Contenido del historial a enviar:', logsCopia)
+
+    // Enviamos todo el historial acumulado como un único documento
+    // Usamos la acción 'sesion_completa' y ponemos el array de logs en el campo 'historial' de los detalles
+    await mongoDBService.logEvent('SISTEMA', 'sesion_completa', {
+      totalEventos: logsCopia.length,
+      historial: logsCopia,
+      timestampSincronizacion: new Date().toISOString(),
+      nota: 'Este registro contiene la secuencia completa de eventos de la sesión'
+    })
+
+    console.log('[LogsService] Lote de logs sincronizado con éxito en un único registro')
+
+    // Limpiamos los logs locales para que el siguiente envío sea un nuevo lote
+    limpiarLogs()
+
+    return true
+  } catch (error) {
+    console.error(`[LogsService] Error al sincronizar lote de logs: ${error.message}`)
+    return false
+  }
 }
 
 async function syncToMongoDB(type, action, details) {
   try {
-    await mongoDBService.logEvent(type, action, details)
+    let result
+    if (type === 'METRICAS') {
+      result = await mongoDBService.logMetric(type, action, details)
+    } else {
+      result = await mongoDBService.logEvent(type, action, details)
+    }
+
+    if (result && result.ok === false) {
+      console.warn(`[LogsService] Error de servidor al sincronizar ${type}: ${result.message || 'Error desconocido'} (Status: ${result.status})`)
+    }
   } catch (error) {
-    console.warn(`[LogsService] Error al sincronizar con MongoDB: ${error.message}`)
+    console.warn(`[LogsService] Error de red al sincronizar con MongoDB: ${error.message}`)
   }
 }
 
