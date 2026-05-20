@@ -23,6 +23,7 @@ export class VistaPartidaPrueba {
     this.callbackActivarAccidente = null
     this.callbackReiniciar = null
     this.callbackPasarTurno = null
+    this.callbackEnviarLog = null
 
     this.nombreJugador = 'Jugador'
     this.accidentes = []
@@ -1166,11 +1167,12 @@ export class VistaPartidaPrueba {
     const colores = this._coloresDefecto()
     const panelBotones = new GUI.StackPanel('panelBotonesPrueba')
     panelBotones.width = '120px'
-    panelBotones.height = '400px'
+    panelBotones.height = '600px'
     panelBotones.right = '20px'
     panelBotones.isVertical = true
-    panelBotones.spacing = 15
-    panelBotones.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
+    panelBotones.spacing = 12
+    panelBotones.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP
+    panelBotones.top = '15%'
     panelBotones.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT
     this.overlay.addControl(panelBotones)
 
@@ -1221,6 +1223,22 @@ export class VistaPartidaPrueba {
       this.callbackPasarTurno && this.callbackPasarTurno()
     })
     panelBotones.addControl(btnPasar)
+
+    const btnEnviarLog = GUI.Button.CreateSimpleButton('btnEnviarLogPrueba', 'Enviar Log')
+    btnEnviarLog.width = '100px'
+    btnEnviarLog.height = '80px'
+    btnEnviarLog.cornerRadius = 40
+    btnEnviarLog.background = colores.secondary
+    btnEnviarLog.color = colores.hudBotonTextColor
+    btnEnviarLog.fontSize = 14
+    btnEnviarLog.fontWeight = 'bold'
+    btnEnviarLog.fontFamily = 'Comic Sans MS'
+    btnEnviarLog.thickness = 2
+    btnEnviarLog.borderColor = '#8e4d22'
+    btnEnviarLog.onPointerUpObservable.add(() => {
+      this.callbackEnviarLog && this.callbackEnviarLog()
+    })
+    panelBotones.addControl(btnEnviarLog)
 
     const btnReiniciar = GUI.Button.CreateSimpleButton('btnReiniciarPrueba', 'Reiniciar')
     btnReiniciar.width = '100px'
@@ -2107,6 +2125,10 @@ export class VistaPartidaPrueba {
 
   onPasarTurno(callback) {
     this.callbackPasarTurno = callback
+  }
+
+  onEnviarLog(callback) {
+    this.callbackEnviarLog = callback
   }
 
   configurarNombreJugador(nombre) {

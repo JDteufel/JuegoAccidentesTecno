@@ -5,6 +5,7 @@ require('dotenv').config();
 const connectDB = require('./config/database');
 const gameMastersRoutes = require('./routes/gameMasters');
 const logsRoutes = require('./routes/logs');
+const metricasRoutes = require('./routes/metricas');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -14,6 +15,7 @@ app.use(express.json());
 
 app.use('/api/usuarios', gameMastersRoutes);
 app.use('/api/logs', logsRoutes);
+app.use('/api/Metricas', metricasRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
