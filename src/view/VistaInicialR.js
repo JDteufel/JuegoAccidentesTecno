@@ -8,6 +8,7 @@ export class VistaInicialR {
     this._onReglas = null
     this._onCerrarSesion = null
     this._onConfiguracion = null
+    this._onEncuesta = null
     this.containerEl = null
   }
 
@@ -49,7 +50,15 @@ export class VistaInicialR {
       'dark',
       () => this._onReglas && this._onReglas()
     )
+    btnReglas.style.marginBottom = '10px'
     panelAcciones.appendChild(btnReglas)
+
+    const btnEncuesta = this._crearBoton(
+      'Encuesta',
+      'dark',
+      () => this._onEncuesta && this._onEncuesta()
+    )
+    panelAcciones.appendChild(btnEncuesta)
 
     const barraSuperior = document.createElement('div')
     barraSuperior.className = 'inicialr-barra-superior'
@@ -161,6 +170,10 @@ export class VistaInicialR {
 
   onConfiguracion(callback) {
     this._onConfiguracion = callback
+  }
+
+  onEncuesta(callback) {
+    this._onEncuesta = callback
   }
 
   mostrar() {

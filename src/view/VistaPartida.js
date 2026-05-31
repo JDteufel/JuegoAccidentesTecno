@@ -1315,6 +1315,7 @@ export class VistaPartida {
   actualizarCarruselAccidentes() {
     if (!this.accidentes || this.accidentes.length === 0) return
 
+    const colores = this._obtenerColores()
     const cantidad = Math.min(this.accidentes.length, 8)
     for (let i = 0; i < 8; i++) {
       const caraCarta = this.scene.getMeshByName(`caraCartaCarrusel_${i}`)
@@ -2000,55 +2001,210 @@ export class VistaPartida {
     this.mostrarMensajeFlotante(`Actividad grupal: ${actividad.nombre} - ${actividad.descripcion}`)
   }
 
-  mostrarLogFinal(logJSON) {
+  mostrarResumenFinal(resumen, logJSON) {
     const colores = this._obtenerColores()
 
-    const panel = new GUI.Rectangle('panelLogFinal')
-    panel.width = '700px'
-    panel.height = '500px'
-    panel.thickness = 3
-    panel.cornerRadius = 20
-    panel.color = colores.hudBorderColor
-    panel.background = colores.panelAccidentesBg
-    panel.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
-    panel.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
-    panel.zIndex = 2000
-    this.overlay.addControl(panel)
+    const fondo = new GUI.Rectangle('fondoResumenFinal')
+    fondo.width = 1
+    fondo.height = 1
+    fondo.thickness = 0
+    fondo.background = 'rgba(0, 0, 0, 0.85)'
+    fondo.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
+    fondo.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
+    fondo.zIndex = 3000
+    fondo.isPointerBlocker = true
+    this.overlay.addControl(fondo)
 
-    const titulo = new GUI.TextBlock('tituloLogFinal', 'Log de la Partida')
-    titulo.top = '-200px'
+    const panelPrincipal = new GUI.Rectangle('panelResumenFinal')
+    panelPrincipal.width = '1400px'
+    panelPrincipal.height = '800px'
+    panelPrincipal.thickness = 3
+    panelPrincipal.cornerRadius = 24
+    panelPrincipal.color = colores.hudBorderColor
+    panelPrincipal.background = colores.panelInicioBg
+    panelPrincipal.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
+    panelPrincipal.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
+    panelPrincipal.zIndex = 3001
+    panelPrincipal.shadowColor = '#00000088'
+    panelPrincipal.shadowBlur = 30
+    panelPrincipal.shadowOffsetY = 10
+    fondo.addControl(panelPrincipal)
+
+    const titulo = new GUI.TextBlock('tituloResumen', 'Partida Finalizada')
+    titulo.top = '-370px'
     titulo.height = '50px'
-    titulo.color = colores.hudTextColor
-    titulo.fontSize = 26
+    titulo.color = colores.primary
+    titulo.fontSize = 34
     titulo.fontFamily = 'Comic Sans MS'
     titulo.fontWeight = 'bold'
-    panel.addControl(titulo)
+    panelPrincipal.addControl(titulo)
 
-    const scrollViewer = new GUI.ScrollViewer('scrollLog')
-    scrollViewer.width = '640px'
-    scrollViewer.height = '340px'
-    scrollViewer.top = '-130px'
+    const subtitulo = new GUI.TextBlock('subtituloResumen', resumen.perfil)
+    subtitulo.top = '-320px'
+    subtitulo.height = '36px'
+    subtitulo.color = colores.hudTextColor
+    subtitulo.fontSize = 24
+    subtitulo.fontFamily = 'Comic Sans MS'
+    subtitulo.fontWeight = 'bold'
+    panelPrincipal.addControl(subtitulo)
+
+    const descPerfil = new GUI.TextBlock('descPerfilResumen', resumen.descripcion)
+    descPerfil.top = '-280px'
+    descPerfil.height = '30px'
+    descPerfil.width = '800px'
+    descPerfil.color = colores.hudSubtextColor
+    descPerfil.fontSize = 16
+    descPerfil.fontFamily = 'Comic Sans MS'
+    descPerfil.textWrapping = true
+    panelPrincipal.addControl(descPerfil)
+
+    const barraContenedor = new GUI.Rectangle('barraProgresoResumen')
+    barraContenedor.width = '600px'
+    barraContenedor.height = '28px'
+    barraContenedor.top = '-235px'
+    barraContenedor.thickness = 2
+    barraContenedor.cornerRadius = 14
+    barraContenedor.color = colores.hudBorderColor
+    barraContenedor.background = colores.hudProgresoBg
+    panelPrincipal.addControl(barraContenedor)
+
+    const barra = new GUI.Rectangle('barraResumen')
+    barra.width = `${resumen.porcentajeCompletado}%`
+    barra.height = '100%'
+    barra.thickness = 0
+    barra.cornerRadius = 12
+    barra.background = resumen.porcentajeCompletado >= 100 ? colores.badgeWork : colores.hudProgresoColor
+    barra.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
+    barraContenedor.addControl(barra)
+
+    const textoBarra = new GUI.TextBlock('textoBarraResumen', `${resumen.porcentajeCompletado}% completado`)
+    textoBarra.width = '100%'
+    textoBarra.height = '100%'
+    textoBarra.color = colores.hudTextColor
+    textoBarra.fontSize = 14
+    textoBarra.fontFamily = 'Comic Sans MS'
+    textoBarra.fontWeight = 'bold'
+    barraContenedor.addControl(textoBarra)
+
+    const gridDatos = new GUI.Grid('gridDatosResumen')
+    gridDatos.width = '700px'
+    gridDatos.height = '120px'
+    gridDatos.top = '-185px'
+    gridDatos.paddingLeft = '10px'
+    gridDatos.paddingRight = '10px'
+    gridDatos.paddingTop = '8px'
+    gridDatos.paddingBottom = '8px'
+    for (let i = 0; i < 2; i++) {
+      gridDatos.addRowDefinition(56)
+    }
+    for (let i = 0; i < 4; i++) {
+      gridDatos.addColumnDefinition(0.25)
+    }
+    panelPrincipal.addControl(gridDatos)
+
+    resumen.datos.slice(0, 8).forEach((dato, indice) => {
+      const fila = Math.floor(indice / 4)
+      const columna = indice % 4
+
+      const celda = new GUI.Rectangle(`celdaDato_${indice}`)
+      celda.thickness = 1
+      celda.cornerRadius = 10
+      celda.color = colores.hudBorderColor
+      celda.background = colores.hudEstadoBg[indice % colores.hudEstadoBg.length]
+      gridDatos.addControl(celda, fila, columna)
+
+      const etiqueta = new GUI.TextBlock(`etiquetaDato_${indice}`, dato.etiqueta)
+      etiqueta.top = '-10px'
+      etiqueta.height = '18px'
+      etiqueta.color = colores.hudSubtextColor
+      etiqueta.fontSize = 11
+      etiqueta.fontFamily = 'Comic Sans MS'
+      celda.addControl(etiqueta)
+
+      const valor = new GUI.TextBlock(`valorDato_${indice}`, dato.valor)
+      valor.top = '12px'
+      valor.height = '22px'
+      valor.color = colores.hudTextColor
+      valor.fontSize = 14
+      valor.fontFamily = 'Comic Sans MS'
+      valor.fontWeight = 'bold'
+      celda.addControl(valor)
+    })
+
+    const scrollViewer = new GUI.ScrollViewer('scrollMensajesResumen')
+    scrollViewer.width = '1200px'
+    scrollViewer.height = '260px'
+    scrollViewer.top = '-40px'
     scrollViewer.thickness = 2
     scrollViewer.color = colores.hudBorderColor
     scrollViewer.background = colores.topbar
-    scrollViewer.cornerRadius = 10
-    panel.addControl(scrollViewer)
+    scrollViewer.cornerRadius = 14
+    panelPrincipal.addControl(scrollViewer)
 
-    const textoLog = new GUI.TextBlock('textoLogFinal', logJSON)
-    textoLog.width = '620px'
-    textoLog.height = '800px'
-    textoLog.color = colores.textBody
-    textoLog.fontSize = 11
-    textoLog.fontFamily = 'monospace'
-    textoLog.textWrapping = true
-    textoLog.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
-    textoLog.textVerticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP
-    scrollViewer.addControl(textoLog)
+    let yPos = 10
+    resumen.mensajes.forEach((mensaje, indice) => {
+      const bloque = new GUI.Rectangle(`bloqueMensaje_${indice}`)
+      bloque.width = '1160px'
+      bloque.height = 'auto'
+      bloque.top = `${yPos}px`
+      bloque.thickness = 0
+      bloque.background = 'transparent'
+      bloque.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
+      bloque.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP
+      scrollViewer.addControl(bloque)
 
-    const btnCerrar = GUI.Button.CreateSimpleButton('btnCerrarLog', 'Cerrar')
-    btnCerrar.width = '150px'
-    btnCerrar.height = '44px'
-    btnCerrar.top = '200px'
+      const icono = new GUI.TextBlock(`iconoMensaje_${indice}`, '▸')
+      icono.width = '24px'
+      icono.height = 'auto'
+      icono.color = colores.primary
+      icono.fontSize = 16
+      icono.fontFamily = 'Comic Sans MS'
+      icono.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
+      icono.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP
+      bloque.addControl(icono)
+
+      const texto = new GUI.TextBlock(`textoMensaje_${indice}`, mensaje)
+      texto.width = '1120px'
+      texto.height = 'auto'
+      texto.left = '28px'
+      texto.color = colores.textBody
+      texto.fontSize = 15
+      texto.fontFamily = 'Comic Sans MS'
+      texto.textWrapping = true
+      texto.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
+      texto.textVerticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP
+      bloque.addControl(texto)
+
+      const alturaEstimada = Math.ceil(texto.text.length / 70) * 20 + 20
+      bloque.height = `${Math.max(alturaEstimada, 50)}px`
+      yPos += alturaEstimada + 12
+    })
+
+    scrollViewer.height = `${Math.min(yPos + 20, 260)}px`
+
+    const btnVerLog = GUI.Button.CreateSimpleButton('btnVerLogCompleto', 'Ver registro completo de la partida')
+    btnVerLog.width = '320px'
+    btnVerLog.height = '48px'
+    btnVerLog.top = '260px'
+    btnVerLog.left = '-200px'
+    btnVerLog.background = colores.hudBotonVolverBg
+    btnVerLog.color = colores.hudBotonTextColor
+    btnVerLog.cornerRadius = 14
+    btnVerLog.thickness = 2
+    btnVerLog.borderColor = colores.hudBorderColor
+    btnVerLog.fontSize = 16
+    btnVerLog.fontFamily = 'Comic Sans MS'
+    btnVerLog.fontWeight = 'bold'
+    btnVerLog.onPointerUpObservable.add(() => {
+      this.mostrarLogCompleto(logJSON)
+    })
+    panelPrincipal.addControl(btnVerLog)
+
+    const btnCerrar = GUI.Button.CreateSimpleButton('btnCerrarResumen', 'Responder encuesta')
+    btnCerrar.width = '260px'
+    btnCerrar.height = '48px'
+    btnCerrar.top = '260px'
+    btnCerrar.left = '200px'
     btnCerrar.background = colores.primary
     btnCerrar.color = colores.primaryText
     btnCerrar.cornerRadius = 14
@@ -2056,9 +2212,109 @@ export class VistaPartida {
     btnCerrar.fontFamily = 'Comic Sans MS'
     btnCerrar.fontWeight = 'bold'
     btnCerrar.onPointerUpObservable.add(() => {
-      panel.dispose()
+      fondo.dispose()
+      if (this.callbackVolver) {
+        this.callbackVolver()
+      }
     })
-    panel.addControl(btnCerrar)
+    panelPrincipal.addControl(btnCerrar)
+  }
+
+  mostrarLogCompleto(logJSON) {
+    const colores = this._obtenerColores()
+    const jsonString = typeof logJSON === 'string' ? logJSON : JSON.stringify(logJSON, null, 2)
+
+    const fondo = new GUI.Rectangle('fondoLogCompleto')
+    fondo.width = 1
+    fondo.height = 1
+    fondo.thickness = 0
+    fondo.background = 'rgba(0, 0, 0, 0.9)'
+    fondo.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
+    fondo.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
+    fondo.zIndex = 3100
+    fondo.isPointerBlocker = true
+    this.overlay.addControl(fondo)
+
+    const panel = new GUI.Rectangle('panelLogCompleto')
+    panel.width = '1500px'
+    panel.height = '850px'
+    panel.thickness = 3
+    panel.cornerRadius = 20
+    panel.color = colores.hudBorderColor
+    panel.background = colores.panelInicioBg
+    panel.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
+    panel.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
+    panel.zIndex = 3101
+    fondo.addControl(panel)
+
+    const titulo = new GUI.TextBlock('tituloLogCompleto', 'Registro Completo de la Partida')
+    titulo.top = '-395px'
+    titulo.height = '44px'
+    titulo.color = colores.primary
+    titulo.fontSize = 28
+    titulo.fontFamily = 'Comic Sans MS'
+    titulo.fontWeight = 'bold'
+    panel.addControl(titulo)
+
+    const scrollViewer = new GUI.ScrollViewer('scrollLogCompleto')
+    scrollViewer.width = '1420px'
+    scrollViewer.height = '720px'
+    scrollViewer.top = '-320px'
+    scrollViewer.thickness = 2
+    scrollViewer.color = colores.hudBorderColor
+    scrollViewer.background = 'rgba(18, 14, 13, 0.85)'
+    scrollViewer.cornerRadius = 12
+    panel.addControl(scrollViewer)
+
+    const textoLog = new GUI.TextBlock('textoLogCompleto', jsonString)
+    textoLog.width = '1380px'
+    textoLog.height = 'auto'
+    textoLog.color = colores.textBody
+    textoLog.fontSize = 13
+    textoLog.fontFamily = 'monospace'
+    textoLog.textWrapping = true
+    textoLog.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
+    textoLog.textVerticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP
+    scrollViewer.addControl(textoLog)
+
+    const btnCopiar = GUI.Button.CreateSimpleButton('btnCopiarLog', 'Copiar al portapapeles')
+    btnCopiar.width = '240px'
+    btnCopiar.height = '42px'
+    btnCopiar.top = '280px'
+    btnCopiar.left = '-160px'
+    btnCopiar.background = colores.hudBotonVolverBg
+    btnCopiar.color = colores.hudBotonTextColor
+    btnCopiar.cornerRadius = 12
+    btnCopiar.fontSize = 14
+    btnCopiar.fontFamily = 'Comic Sans MS'
+    btnCopiar.fontWeight = 'bold'
+    btnCopiar.onPointerUpObservable.add(() => {
+      navigator.clipboard.writeText(jsonString).then(() => {
+        btnCopiar.color = colores.badgeWork
+        btnCopiar.text = 'Copiado!'
+        setTimeout(() => {
+          btnCopiar.color = colores.hudBotonTextColor
+          btnCopiar.text = 'Copiar al portapapeles'
+        }, 2000)
+      }).catch(() => {})
+    })
+    panel.addControl(btnCopiar)
+
+    const btnCerrarLog = GUI.Button.CreateSimpleButton('btnCerrarLogCompleto', 'Volver al resumen')
+    btnCerrarLog.width = '200px'
+    btnCerrarLog.height = '42px'
+    btnCerrarLog.top = '280px'
+    btnCerrarLog.left = '160px'
+    btnCerrarLog.background = colores.primary
+    btnCerrarLog.color = colores.primaryText
+    btnCerrarLog.cornerRadius = 12
+    btnCerrarLog.fontSize = 14
+    btnCerrarLog.fontFamily = 'Comic Sans MS'
+    btnCerrarLog.fontWeight = 'bold'
+    btnCerrarLog.onPointerUpObservable.add(() => {
+      fondo.dispose()
+    })
+    panel.addControl(btnCerrarLog)
   }
 
   aplicarTema(temaId) {

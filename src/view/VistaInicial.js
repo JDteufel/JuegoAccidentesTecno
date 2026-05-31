@@ -15,6 +15,7 @@ export class VistaInicial {
     this._onJugar = null
     this._onReglas = null
     this._onConfiguracion = null
+    this._onEncuesta = null
     this._materiales = {}
   }
 
@@ -309,7 +310,7 @@ export class VistaInicial {
     titulo.className = 'inicial-titulo'
     if (esMovil) {
       titulo.style.fontSize = '26px'
-      titulo.style.top = '20%'
+      titulo.style.top = '28%'
       titulo.style.width = '90%'
       titulo.style.lineHeight = '1.2'
       titulo.style.wordWrap = 'break-word'
@@ -351,7 +352,7 @@ export class VistaInicial {
     const panelAcciones = document.createElement('div')
     panelAcciones.className = 'inicial-panel-acciones'
     if (esMovil) {
-      panelAcciones.style.top = '34%'
+      panelAcciones.style.top = '42%'
       panelAcciones.style.left = '50%'
       panelAcciones.style.transform = 'translateX(-50%)'
       panelAcciones.style.width = '88%'
@@ -401,12 +402,25 @@ export class VistaInicial {
       'dark',
       () => this._onReglas && this._onReglas()
     )
+    btnReglas.style.marginBottom = '10px'
     if (esMovil) {
       btnReglas.style.width = '100%'
       btnReglas.style.height = '48px'
       btnReglas.style.fontSize = '20px'
     }
     panelAcciones.appendChild(btnReglas)
+
+    const btnEncuesta = this._crearBoton(
+      'Encuesta',
+      'dark',
+      () => this._onEncuesta && this._onEncuesta()
+    )
+    if (esMovil) {
+      btnEncuesta.style.width = '100%'
+      btnEncuesta.style.height = '48px'
+      btnEncuesta.style.fontSize = '20px'
+    }
+    panelAcciones.appendChild(btnEncuesta)
   }
 
   _crearBoton(texto, temaClave, callback) {
@@ -510,6 +524,10 @@ export class VistaInicial {
 
   onConfiguracion(callback) {
     this._onConfiguracion = callback
+  }
+
+  onEncuesta(callback) {
+    this._onEncuesta = callback
   }
 
   render(targetFps = 60) {

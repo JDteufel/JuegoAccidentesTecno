@@ -1,7 +1,7 @@
 import { logEvent } from './LogsService.js'
 const LOBBY_CODE_LENGTH = 6
 const LOBBY_CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
-const MAX_PLAYERS_PER_LOBBY = 32
+const MAX_PLAYERS_PER_LOBBY = 33
 class LobbiesService {
   constructor() {
     this.lobbiesByCode = {} 

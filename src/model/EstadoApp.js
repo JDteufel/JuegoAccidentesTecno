@@ -13,7 +13,8 @@ export const PANTALLAS = {
   ACCIDENTES: 'accidentes',
   PARTIDA: 'partida',
   PARTIDA_PRUEBA: 'partida_prueba',
-  CONFIGURACION: 'configuracion'
+  CONFIGURACION: 'configuracion',
+  ENCUESTA: 'encuesta'
 }
 
 export const TIPOS_JUGADOR = {

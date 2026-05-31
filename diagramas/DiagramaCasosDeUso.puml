@@ -1,0 +1,77 @@
+@startuml JuegoAccidentesTecno_CasosDeUso
+
+skinparam shadowing false
+skinparam linetype ortho
+skinparam backgroundColor white
+skinparam usecaseBackgroundColor #E8F5E9
+skinparam usecaseBorderColor #4CAF50
+skinparam actorBackgroundColor #E3F2FD
+skinparam actorBorderColor #2196F3
+skinparam defaultFontSize 14
+
+title JuegoAccidentesTecno - Diagrama de Casos de Uso
+
+left to right direction
+
+actor "Jugador" as jugador
+actor "GameMaster" as gm
+actor "Sistema" as system
+
+package "Juego Educativo - Accidentes Tecnológicos" {
+
+    usecase "CU01\nRegistro de Usuario" as UC01
+    usecase "CU02\nInicio de Sesión" as UC02
+    usecase "CU03\nCreación de Lobby" as UC03
+    usecase "CU04\nUnión a Lobby" as UC04
+    usecase "CU05\nGestión de Partidas" as UC05
+    usecase "CU06\nInicio de Partida" as UC06
+    usecase "CU07\nArranque del Juego" as UC07
+    usecase "CU08\nJugada de Turno" as UC08
+    usecase "CU09\nActivación de Accidente" as UC09
+    usecase "CU10\nFinalización de Partida" as UC10
+    usecase "CU11\nEnvío de Datos al Servidor" as UC11
+    usecase "CU12\nMuestra de Información" as UC12
+    usecase "Consultar Reglas" as UC_reglas
+    usecase "Ver Cartas" as UC_cartas
+    usecase "Ver Accidentes" as UC_accidentes
+    usecase "Ver Tutorial" as UC_tutorial
+    usecase "Cambiar Tema Visual" as UC_tema
+    usecase "Responder Encuesta" as UC_encuesta
+    usecase "Probar Mecánicas\n(Modo Prueba)" as UC_prueba
+
+}
+
+gm --> UC01
+gm --> UC02
+gm --> UC03
+gm --> UC05
+gm --> UC06
+gm --> UC_prueba
+
+jugador --> UC04
+jugador --> UC08
+jugador --> UC_reglas
+jugador --> UC_cartas
+jugador --> UC_accidentes
+jugador --> UC_tutorial
+jugador --> UC_tema
+jugador --> UC_encuesta
+
+system --> UC07
+system --> UC09
+system --> UC10
+system --> UC11
+system --> UC12
+
+UC03 ..> UC04 : <<include>>
+UC05 ..> UC06 : <<include>>
+UC06 ..> UC07 : <<include>>
+UC07 ..> UC08 : <<include>>
+UC08 ..> UC09 : <<extend>>
+UC10 ..> UC11 : <<include>>
+UC11 ..> UC12 : <<include>>
+
+UC01 ..> UC02 : <<precedes>>
+UC02 ..> UC03 : <<precedes>>
+
+@enduml

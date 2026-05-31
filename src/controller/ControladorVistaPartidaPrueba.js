@@ -3,7 +3,7 @@ import { seleccionarAccidentesAleatorios } from '../model/accidentes/index.js'
 import { seleccionarPerfilAleatorio } from '../model/perfiles/index.js'
 import { seleccionarCartasAleatorias } from '../model/cartas/index.js'
 import { seleccionarActividadesAleatorias } from '../model/actividades/index.js'
-import { logEvent, exportarJSON, obtenerEstadisticas, syncAllToMongoDB } from '../services/LogsService.js'
+import { logEvent, exportarJSON, obtenerEstadisticas, syncAllToMongoDB, obtenerTodosLogs } from '../services/LogsService.js'
 
 export class ControladorVistaPartidaPrueba {
   constructor(vistaPartidaPrueba, controladorEstadoApp) {
@@ -270,10 +270,103 @@ export class ControladorVistaPartidaPrueba {
     const estadisticas = obtenerEstadisticas()
     logEvent('METRICAS', 'estadisticas_finales', estadisticas)
 
-    const logJSON = exportarJSON()
-    console.log('[ControladorVistaPartidaPrueba] Log completo de la partida:', logJSON)
+    const historialCompleto = obtenerTodosLogs()
 
-    this.vistaPartidaPrueba.mostrarLogFinal(logJSON)
+    const logJSON = {
+      timestamp: new Date().toISOString(),
+      type: 'SISTEMA',
+      action: 'sesion_completa',
+      details: {
+        totalEventos: historialCompleto.length,
+        historial: historialCompleto,
+        timestampSincronizacion: new Date().toISOString(),
+        nota: 'Este registro contiene la secuencia completa de eventos de la sesión'
+      }
+    }
+
+    console.log('[ControladorVistaPartidaPrueba] Log completo de la partida:', JSON.stringify(logJSON, null, 2))
+
+    const resumenDebate = this.generarResumenDebate(duracion)
+
+    this.vistaPartidaPrueba.mostrarResumenFinal(resumenDebate, logJSON)
+  }
+
+  generarResumenDebate(duracionSegundos) {
+    const minutos = Math.round(duracionSegundos / 60)
+    const totalCartasJugadas = this.cartasJugadas.length
+    const totalAccidentes = this.accidentesActivosOrden.length
+    const cartaMasUsada = Object.entries(this.metricasUsoCartas).sort((a, b) => b[1] - a[1])[0]
+
+    const accidentesNombres = this.accidentesActivosOrden.map(a => a.nombre)
+    const categoriasAfectadas = new Set()
+    this.accidentesActivosOrden.forEach(acc => {
+      if (acc.categorias) {
+        acc.categorias.forEach(cat => categoriasAfectadas.add(cat))
+      }
+    })
+
+    const progreso = this.perfilAsignado.getProgreso()
+    const porcentajeCompletado = Math.round(progreso * 100)
+
+    const mensajes = []
+    const datos = []
+
+    mensajes.push(`Completaste el ${porcentajeCompletado}% del perfil "${this.perfilAsignado.nombre}" en ${minutos} minutos.`)
+    datos.push({ etiqueta: 'Perfil', valor: this.perfilAsignado.nombre })
+    datos.push({ etiqueta: 'Tiempo', valor: `${minutos} min` })
+    datos.push({ etiqueta: 'Progreso', valor: `${porcentajeCompletado}%` })
+    datos.push({ etiqueta: 'Cartas jugadas', valor: totalCartasJugadas.toString() })
+
+    if (totalAccidentes > 0) {
+      mensajes.push(`Durante la partida ocurrieron ${totalAccidentes} accidente(s) tecnológico(s).`)
+      datos.push({ etiqueta: 'Accidentes', valor: totalAccidentes.toString() })
+
+      const accidenteMasGrave = this.accidentesActivosOrden.reduce((prev, current) =>
+        (current.nivel > prev.nivel) ? current : prev
+      )
+      mensajes.push(`El más severo fue "${accidenteMasGrave.nombre}" (nivel ${accidenteMasGrave.nivel}), lo que demuestra cómo un fallo técnico puede alterar completamente tu productividad.`)
+      datos.push({ etiqueta: 'Accidente más grave', valor: accidenteMasGrave.nombre })
+
+      if (categoriasAfectadas.size > 0) {
+        mensajes.push(`Las categorías afectadas fueron: ${Array.from(categoriasAfectadas).join(', ')}. Piensa en cómo estos accidentes en la vida real impactan áreas interconectadas de tu vida.`)
+      }
+    } else {
+      mensajes.push('No se activaron accidentes en esta partida. En la realidad, los accidentes tecnológicos pueden ocurrir en cualquier momento sin previo aviso.')
+    }
+
+    if (cartaMasUsada) {
+      mensajes.push(`La actividad más utilizada fue "${cartaMasUsada[0]}" (${cartaMasUsada[1]} veces). ¿Refleja esto cómo distribuyes tu tiempo en la vida real?`)
+      datos.push({ etiqueta: 'Actividad más usada', valor: `${cartaMasUsada[0]} (${cartaMasUsada[1]}x)` })
+    }
+
+    const cartasDeshabilitadas = this.cartasMano.filter(c => c.estaDeshabilitada()).length
+    if (cartasDeshabilitadas > 0) {
+      mensajes.push(`${cartasDeshabilitadas} carta(s) de tu mano fueron inhabilitadas por accidentes. Esto ilustra cómo los fallos tecnológicos nos obligan a cambiar de planes constantemente.`)
+      datos.push({ etiqueta: 'Cartas inhabilitadas', valor: cartasDeshabilitadas.toString() })
+    }
+
+    mensajes.push('Cada accidente tecnológico tiene consecuencias reales: pérdida de datos, violación de privacidad, interrupción de servicios esenciales. ¿Cómo te prepararías para estos escenarios en tu vida profesional?')
+
+    const top3Cartas = Object.entries(this.metricasUsoCartas)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([carta, cantidad]) => ({ nombre: carta, cantidad }))
+
+    return {
+      perfil: this.perfilAsignado.nombre,
+      descripcion: this.perfilAsignado.descripcion,
+      porcentajeCompletado,
+      duracionMinutos: minutos,
+      totalCartasJugadas,
+      totalAccidentes,
+      accidentesActivos: accidentesNombres,
+      categoriasAfectadas: Array.from(categoriasAfectadas),
+      cartaMasUsada: cartaMasUsada ? cartaMasUsada[0] : 'Ninguna',
+      cartasDeshabilitadas,
+      top3Cartas,
+      mensajes,
+      datos
+    }
   }
 
   intercambiarCartas(carta1, carta2) {
@@ -348,9 +441,28 @@ export class ControladorVistaPartidaPrueba {
 
   async enviarLogsCapaMongo() {
     this.vistaPartidaPrueba.mostrarMensaje('Sincronizando logs con MongoDB...')
+
+    const historialAntesSync = obtenerTodosLogs()
+    const logJSON = {
+      timestamp: new Date().toISOString(),
+      type: 'SISTEMA',
+      action: 'sesion_completa',
+      details: {
+        totalEventos: historialAntesSync.length,
+        historial: historialAntesSync,
+        timestampSincronizacion: new Date().toISOString(),
+        nota: 'Este registro contiene la secuencia completa de eventos de la sesión'
+      }
+    }
+
     const exito = await syncAllToMongoDB()
     if (exito) {
       this.vistaPartidaPrueba.mostrarMensaje('Logs enviados correctamente a MongoDB', 4000)
+      const duracion = this.turnoInicio
+        ? Math.round((new Date() - this.turnoInicio) / 1000)
+        : 0
+      const resumenDebate = this.generarResumenDebate(duracion)
+      this.vistaPartidaPrueba.mostrarResumenFinal(resumenDebate, logJSON)
     } else {
       this.vistaPartidaPrueba.mostrarMensaje('Error al enviar logs a MongoDB', 4000)
     }

@@ -80,6 +80,10 @@ export class ControladorVistaInicialR {
     this.vistaInicialR.onConfiguracion(() => {
       this.controladorEstadoApp.irAPantalla(PANTALLAS.CONFIGURACION)
     })
+
+    this.vistaInicialR.onEncuesta(() => {
+      this.controladorEstadoApp.irAPantalla(PANTALLAS.ENCUESTA)
+    })
   }
 
   generarCodigoLobby() {

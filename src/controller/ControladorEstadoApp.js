@@ -8,11 +8,12 @@ import {
 import temaService from '../services/TemaService.js'
 
 export class ControladorEstadoApp {
-  constructor(estadoApp, vistas, controladorPartida = null, controladorPartidaPrueba = null) {
+  constructor(estadoApp, vistas, controladorPartida = null, controladorPartidaPrueba = null, controladorEncuesta = null) {
     this.estadoApp = estadoApp
     this.vistas = vistas
     this.controladorPartida = controladorPartida
     this.controladorPartidaPrueba = controladorPartidaPrueba
+    this.controladorEncuesta = controladorEncuesta
     this.perfilesAsignados = []
     this.unsubscribeLobbyUpdates = subscribeToLobbyUpdates((lobbyData) => {
       if (!lobbyData) {
@@ -105,6 +106,15 @@ export class ControladorEstadoApp {
       case PANTALLAS.CONFIGURACION:
         this.vistas.vistaConfiguracion.mostrar()
         break
+      case PANTALLAS.ENCUESTA:
+        if (this.vistas.vistaEncuesta && this.controladorEncuesta) {
+          this.controladorEncuesta.configurarUsuario(
+            this.estadoApp.getUsername() || this.estadoApp.lobbyPlayerName || 'anonimo',
+            this.estadoApp.getLobbyActual()?.code || 'N/A'
+          )
+        }
+        this.vistas.vistaEncuesta.mostrar()
+        break
       default:
         this.vistas.vistaInicial.mostrar()
         break
@@ -146,6 +156,9 @@ export class ControladorEstadoApp {
     this.vistas.vistaPartidaPrueba.ocultar()
     if (this.vistas.vistaConfiguracion) {
       this.vistas.vistaConfiguracion.ocultar()
+    }
+    if (this.vistas.vistaEncuesta) {
+      this.vistas.vistaEncuesta.ocultar()
     }
   }
 

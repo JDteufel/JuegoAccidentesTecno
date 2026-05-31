@@ -5,7 +5,7 @@ const DEFAULT_CONFIG = {
 }
 
 const LOBBY_GROUP_ID = 'default'
-const LOBBY_MAX_USERS = 16
+const LOBBY_MAX_USERS = 33
 
 let smartFoxInstance = null
 let config = { ...DEFAULT_CONFIG }

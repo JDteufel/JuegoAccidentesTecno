@@ -1,0 +1,173 @@
+@startuml JuegoAccidentesTecno_Estados
+
+skinparam shadowing false
+skinparam linetype ortho
+skinparam backgroundColor white
+skinparam defaultFontSize 12
+skinparam state {
+    BackgroundColor #E3F2FD
+    BorderColor #1976D2
+    ArrowColor #424242
+    FontColor #212121
+}
+skinparam roundcorner 10
+skinparam nodesep 70
+skinparam ranksep 70
+
+title JuegoAccidentesTecno - Diagrama de Estados: EstadoApp (PANTALLAS)
+
+left to right direction
+
+[*] --> INICIAL_PUBLICA
+
+state INICIAL_PUBLICA {
+    [*] --> MenuPublico
+    state MenuPublico : pantallaActual = INICIAL_PUBLICA\ntipoJugador = JUGADOR\nVista: VistaInicial\nOpciones: Jugar, Registrarse,\nIniciar Sesion, Reglas, Tutorial,\nCartas, Accidentes, Configuracion
+}
+
+state REGISTRO {
+    [*] --> FormRegistro
+    state FormRegistro : pantallaActual = REGISTRO\ntipoJugador = JUGADOR\nVista: VistaRegistro\nCampos: username, password\nGuarda en MongoDB
+}
+
+state INICIO_SESION {
+    [*] --> FormLogin
+    state FormLogin : pantallaActual = INICIO_SESION\ntipoJugador = JUGADOR\nVista: VistaInicioSesion\nCampos: username, password\nValida credenciales en MongoDB
+}
+
+state INICIAL_GAMEMASTER {
+    [*] --> MenuGM
+    state MenuGM : pantallaActual = INICIAL_GAMEMASTER\ntipoJugador = GAMEMASTER\nusuario = GameMaster(username)\nVista: VistaInicialR\nOpciones: Crear Lobby, Gestionar,\nProbar, Reglas, Tutorial,\nCartas, Accidentes, Config,\nCerrar Sesion
+}
+
+state UNIRSE_LOBBY {
+    [*] --> FormUnion
+    state FormUnion : pantallaActual = UNIRSE_LOBBY\ntipoJugador = INVITADO\nVista: VistaJugar\nCampos: codigoLobby, nombre\nValida codigo contra SmartFox
+}
+
+state GESTION_LOBBY {
+    [*] --> EsperaLobby
+    state EsperaLobby : pantallaActual = GESTION_LOBBY\ntipoJugador = INVITADO\nlobbyActual = {code, host, jugadores}\nVista: VistaCrearJuego\nEsperando inicio del GameMaster\nLista de jugadores en sala
+}
+
+state GESTION {
+    [*] --> PanelGestion
+    state PanelGestion : pantallaActual = GESTION\ntipoJugador = GAMEMASTER\nlobbyActual = {code, host}\njugadoresPool = [nombres]\nsubSalas = [{num, jugadores}]\njugadoresAsignados = {nombre: numSala}\nVista: VistaGestion\nDistribucion manual o automatica\nInicio de partidas por sala o todas
+}
+
+state PARTIDA {
+    [*] --> JuegoActivo
+    state JuegoActivo : pantallaActual = PARTIDA\ntipoJugador = INVITADO\nperfilAsignado = Perfil\naccidentesSeleccionados = [8 Accidente]\ncartasMano = [3 Carta]\nVista: VistaPartida (Babylon.js 3D + GUI)\nTurnos, cartas, accidentes\nSincronizacion via SmartFox
+}
+
+state PARTIDA_PRUEBA {
+    [*] --> ModoPrueba
+    state ModoPrueba : pantallaActual = PARTIDA_PRUEBA\ntipoJugador = GAMEMASTER\nVista: VistaPartidaPrueba\nModo individual\nBotones: Fin Turno, Accidente,\nIntercambiar, Reiniciar\nUsado para testing y balanceo
+}
+
+state ENCUESTA {
+    [*] --> FormEncuesta
+    state FormEncuesta : pantallaActual = ENCUESTA\ntipoJugador = INVITADO\nVista: VistaEncuesta\nPreguntas de retroalimentacion\nEnvio a MongoDB\nNavegacion entre preguntas
+}
+
+state REGLAS {
+    [*] --> InfoReglas
+    state InfoReglas : pantallaActual = REGLAS\ntipoJugador = JUGADOR\nVista: VistaReglas\nInformacion de cartas y accidentes\nHerencia: VistaListaBase
+}
+
+state CARTAS {
+    [*] --> GaleriaCartas
+    state GaleriaCartas : pantallaActual = CARTAS\ntipoJugador = JUGADOR\nVista: VistaCartas\nGaleria de 34 cartas con imagenes\ny descripciones
+}
+
+state ACCIDENTES {
+    [*] --> GaleriaAccidentes
+    state GaleriaAccidentes : pantallaActual = ACCIDENTES\ntipoJugador = JUGADOR\nVista: VistaAccidentes\nGaleria de 16 accidentes con imagenes\ny descripciones
+}
+
+state CONFIGURACION {
+    [*] --> PanelConfig
+    state PanelConfig : pantallaActual = CONFIGURACION\ntipoJugador = JUGADOR\nVista: VistaConfiguracion\nSeleccion de tema (clasico/moderno)\nPersistencia via TemaService
+}
+
+state TUTORIAL {
+    [*] --> VideoTutorial
+    state VideoTutorial : pantallaActual = TUTORIAL\ntipoJugador = JUGADOR\nVista: VistaTutorial\nVideo: VideoTutorial.mp4\nExplicacion de mecanicas e interfaces
+}
+
+' ============================================
+' TRANSICIONES - FLUJO DE AUTENTICACION
+' ============================================
+INICIAL_PUBLICA --> REGISTRO : Selecciona "Registrarse"
+
+REGISTRO --> REGISTRO : Usuario ya existe
+
+REGISTRO --> INICIAL_PUBLICA : Registro exitoso
+
+INICIAL_PUBLICA --> INICIO_SESION : Selecciona "Iniciar Sesion"
+
+INICIO_SESION --> INICIO_SESION : Credenciales invalidas
+
+INICIO_SESION --> INICIAL_GAMEMASTER : Login exitoso
+
+' ============================================
+' TRANSICIONES - FLUJO DE INVITADO
+' ============================================
+INICIAL_PUBLICA --> UNIRSE_LOBBY : Selecciona "Jugar"
+
+UNIRSE_LOBBY --> UNIRSE_LOBBY : Codigo invalido
+
+UNIRSE_LOBBY --> GESTION_LOBBY : Codigo valido
+
+' ============================================
+' TRANSICIONES - FLUJO GAMEMASTER
+' ============================================
+INICIAL_GAMEMASTER --> GESTION_LOBBY : Selecciona "Crear Lobby"
+
+INICIAL_GAMEMASTER --> GESTION : Selecciona "Gestionar"
+
+GESTION --> GESTION : Jugador se une al lobby\nGM arrastra jugador a sala\nGM usa auto-distribuir
+
+GESTION --> PARTIDA : GM inicia sala\n(minimo 2 jugadores)
+
+INICIAL_GAMEMASTER --> PARTIDA_PRUEBA : Selecciona "Probar"
+
+PARTIDA_PRUEBA --> INICIAL_GAMEMASTER : Selecciona "Volver"
+
+INICIAL_GAMEMASTER --> INICIAL_PUBLICA : Selecciona "Cerrar Sesion"
+
+' ============================================
+' TRANSICIONES - FLUJO DE PARTIDA
+' ============================================
+GESTION_LOBBY --> PARTIDA : GM inicia la partida
+
+PARTIDA --> PARTIDA : Jugador juega carta\no intercambia carta\nSe activa accidente (prob. 35%)
+
+PARTIDA --> ENCUESTA : Todos los perfiles completados
+
+ENCUESTA --> INICIAL_PUBLICA : Envia o salta la encuesta
+
+' ============================================
+' TRANSICIONES - VISTAS DE INFORMACION
+' ============================================
+INICIAL_PUBLICA --> REGLAS : Selecciona "Reglas"
+
+REGLAS --> INICIAL_PUBLICA : Selecciona "Volver"
+
+INICIAL_PUBLICA --> CARTAS : Selecciona "Cartas"
+
+CARTAS --> INICIAL_PUBLICA : Selecciona "Volver"
+
+INICIAL_PUBLICA --> ACCIDENTES : Selecciona "Accidentes"
+
+ACCIDENTES --> INICIAL_PUBLICA : Selecciona "Volver"
+
+INICIAL_PUBLICA --> CONFIGURACION : Selecciona "Configuracion"
+
+CONFIGURACION --> INICIAL_PUBLICA : Selecciona "Volver"
+
+INICIAL_PUBLICA --> TUTORIAL : Selecciona "Tutorial"
+
+TUTORIAL --> INICIAL_PUBLICA : Selecciona "Volver"
+
+@enduml

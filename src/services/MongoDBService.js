@@ -123,6 +123,10 @@ class MongoDBService {
     return this.request('/Metricas', { type, action, details }, 'POST', callback)
   }
 
+  async submitEncuesta(datosEncuesta, callback = null) {
+    return this.request('/encuestas', datosEncuesta, 'POST', callback)
+  }
+
   async getLogs(category = null, callback = null) {
     const endpoint = category ? `/logs?type=${category}` : '/logs'
     return this.request(endpoint, {}, 'GET', callback)

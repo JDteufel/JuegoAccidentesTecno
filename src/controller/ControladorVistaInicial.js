@@ -35,5 +35,9 @@ export class ControladorVistaInicial {
     this.vistaInicial.onConfiguracion(() => {
       this.controladorEstadoApp.irAPantalla(PANTALLAS.CONFIGURACION)
     })
+
+    this.vistaInicial.onEncuesta(() => {
+      this.controladorEstadoApp.irAPantalla(PANTALLAS.ENCUESTA)
+    })
   }
 }

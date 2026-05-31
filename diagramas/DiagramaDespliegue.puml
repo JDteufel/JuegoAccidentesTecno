@@ -1,0 +1,120 @@
+@startuml JuegoAccidentesTecno_Despliegue
+
+skinparam shadowing false
+skinparam linetype ortho
+skinparam backgroundColor white
+skinparam defaultFontSize 14
+skinparam nodeBackgroundColor #FFF3E0
+skinparam nodeBorderColor #F57C00
+skinparam artifactBackgroundColor #E8F5E9
+skinparam artifactBorderColor #4CAF50
+
+title JuegoAccidentesTecno - Diagrama de Despliegue
+
+node "Cliente Web\n(Navegador - Desktop/Mobile)" as cliente {
+    artifact "index.html" as html
+    artifact "main.js" as mainJS
+    artifact "src/model/" as model
+    artifact "src/view/" as view
+    artifact "src/controller/" as controller
+    artifact "src/services/" as services
+    artifact "vendor/sfs2x-api-1.7.15.js" as sfsAPI
+
+    html --> mainJS : carga
+    mainJS --> model : importa
+    mainJS --> view : importa
+    mainJS --> controller : importa
+    mainJS --> services : importa
+    services --> sfsAPI : usa SDK
+
+    node "Babylon.js Engine" as babylon {
+        artifact "Escena 3D\n(Octaedro + Orbitales)" as escena3D
+        artifact "GUI 2D\n(HUD del juego)" as gui2D
+    }
+
+    view --> babylon : renderiza
+}
+
+node "Servidor SmartFox 2X\n(SmartFoxServer 2X)" as smartfox {
+    artifact "Zone: Lobby Principal" as zone
+    artifact "Room: Sala 1" as room1
+    artifact "Room: Sala N" as roomN
+    artifact "JuegoExtension.js\n(Nashorn JavaScript)" as extension
+
+    zone --> room1 : contiene
+    zone --> roomN : contiene
+    zone --> extension : adjunta
+}
+
+node "Servidor REST Bridge\n(Node.js + Express)" as restbridge {
+    artifact "server.js\n(Express App)" as server
+    artifact "config/database.js\n(Mongoose)" as dbConfig
+    artifact "routes/gameMasters.js" as routesGM
+    artifact "routes/logs.js" as routesLogs
+    artifact "routes/metricas.js" as routesMetrics
+    artifact "routes/encuestas.js" as routesEncuestas
+    artifact "models/GameMaster.js" as modelGM
+    artifact "models/Log.js" as modelLog
+    artifact "models/Metric.js" as modelMetric
+    artifact "models/Encuesta.js" as modelEncuesta
+
+    server --> dbConfig : inicializa
+    server --> routesGM : monta /api/usuarios
+    server --> routesLogs : monta /api/logs
+    server --> routesMetrics : monta /api/Metricas
+    server --> routesEncuestas : monta /api/encuestas
+
+    routesGM --> modelGM : usa
+    routesLogs --> modelLog : usa
+    routesMetrics --> modelMetric : usa
+    routesEncuestas --> modelEncuesta : usa
+}
+
+node "Base de Datos\n(MongoDB)" as mongodb {
+    database "Colección: Usuarios" as colUsuarios
+    database "Colección: Logs" as colLogs
+    database "Colección: Metricas" as colMetrics
+    database "Colección: Encuestas" as colEncuestas
+}
+
+' Conexiones entre nodos
+cliente -right-> smartfox : WebSocket\nPuerto 8080\nProtocolo SFS2X
+
+cliente -down-> restbridge : HTTP/REST\nPuerto 3000\nPOST /api/usuarios, /api/logs,\n/api/Metricas, /api/encuestas
+
+restbridge -right-> mongodb : MongoDB Driver\nPuerto 27017\nProtocolo BSON
+
+note top of cliente
+  Tecnologías:
+  - Vanilla JS (ES Modules)
+  - Vite (bundler)
+  - Babylon.js v9.6.2 (3D)
+  - SmartFox JS SDK
+  - CSS Custom Properties
+end note
+
+note top of smartfox
+  SmartFoxServer 2X
+  - Extension en Nashorn JS
+  - Gestión de Rooms dinámicas
+  - Sincronización multijugador
+  - Heartbeat cada 30s
+end note
+
+note top of restbridge
+  Node.js + Express v5
+  - Mongoose (ODM)
+  - bcryptjs (auth)
+  - CORS habilitado
+  - Endpoints REST CRUD
+end note
+
+note top of mongodb
+  MongoDB (No SQL)
+  - Documentos BSON
+  - Sin esquema rígido
+  - MongoDB Compass (GUI)
+  - 4 colecciones principales
+end note
+
+@enduml

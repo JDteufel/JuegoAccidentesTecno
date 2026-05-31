@@ -1,0 +1,156 @@
+@startuml JuegoAccidentesTecno_Componentes
+
+skinparam shadowing false
+skinparam linetype ortho
+skinparam backgroundColor white
+skinparam defaultFontSize 14
+skinparam componentStyle rectangle
+skinparam componentBackgroundColor #E3F2FD
+skinparam componentBorderColor #1976D2
+
+title JuegoAccidentesTecno - Diagrama de Componentes
+
+package "Frontend (Navegador Web)" {
+
+    [VistaInicial] as vInicial
+    [VistaPartida] as vPartida
+    [VistaPartidaPrueba] as vPrueba
+    [VistaGestion] as vGestion
+    [VistaRegistro] as vRegistro
+    [VistaInicioSesion] as vLogin
+    [VistaJugar] as vJugar
+    [VistaCrearJuego] as vCrear
+    [VistaReglas] as vReglas
+    [VistaTutorial] as vTutorial
+    [VistaCartas] as vCartas
+    [VistaAccidentes] as vAccidentes
+    [VistaConfiguracion] as vConfig
+    [VistaEncuesta] as vEncuesta
+    [VistaInicialR] as vInicialR
+
+    package "Motor Gráfico" {
+        [Babylon.js\n(3D + GUI)] as babylon
+    }
+
+    package "CSS + HTML DOM" {
+        [variables.css] as cssVars
+        [GestorAjusteRatio.js] as gestorRatio
+    }
+
+    package "Controladores" {
+        [ControladorEstadoApp] as ctrlEstado
+        [ControladorVistaPartida] as ctrlPartida
+        [ControladorVistaGestion] as ctrlGestion
+        [ControladorVistaRegistro] as ctrlRegistro
+        [ControladorVistaInicioSesion] as ctrlLogin
+        [ControladorVistaJugar] as ctrlJugar
+        [ControladorVistaCrearJuego] as ctrlCrear
+        [ControladorVistaConfiguracion] as ctrlConfig
+        [ControladorVistaEncuesta] as ctrlEncuesta
+        [ControladorVistaInicial] as ctrlInicial
+        [ControladorVistaInicialR] as ctrlInicialR
+    }
+
+    package "Modelo" {
+        [EstadoApp] as estadoApp
+        [GameMaster] as gameMaster
+        [Carta + 34 subclases] as carta
+        [Accidente + 16 subclases] as accidente
+        [Perfil + 18 subclases] as perfil
+        [ActividadGrupal + 6 subclases] as actividad
+        [constantes.js] as constantes
+    }
+
+    package "Servicios" {
+        [SmartFoxService] as sfsService
+        [MongoDBService] as mongoService
+        [PartidaService] as partidaService
+        [LobbiesService] as lobbyService
+        [LogsService] as logsService
+        [UsuariosService] as usuariosService
+        [TemaService] as temaService
+    }
+}
+
+package "SmartFoxServer 2X" {
+    [JuegoExtension.js\n(Nashorn JS)] as sfsExtension
+    [Zone: Lobby Principal] as sfsZone
+    [Room: Sala 1..N] as sfsRoom
+}
+
+package "REST Bridge (Node.js)" {
+    [Express Server\n(port 3000)] as express
+    [gameMastersRoutes] as routesGM
+    [logsRoutes] as routesLogs
+    [metricasRoutes] as routesMetrics
+    [encuestasRoutes] as routesEncuestas
+    [database.js\n(Mongoose)] as mongoose
+}
+
+package "MongoDB" {
+    database "Colección: Usuarios" as colUsuarios
+    database "Colección: Logs" as colLogs
+    database "Colección: Metricas" as colMetrics
+    database "Colección: Encuestas" as colEncuestas
+}
+
+' Relaciones internas Frontend
+babylon --> vInicial : renderiza
+babylon --> vPartida : renderiza
+babylon --> vPrueba : renderiza
+
+cssVars --> vRegistro : estilos
+cssVars --> vLogin : estilos
+cssVars --> vConfig : estilos
+gestorRatio --> vPartida : ajusta
+gestorRatio --> vGestion : ajusta
+
+ctrlEstado --> vInicial : navega
+ctrlEstado --> vPartida : navega
+ctrlEstado --> vGestion : navega
+ctrlEstado --> estadoApp : gestiona
+
+ctrlPartida --> carta : usa
+ctrlPartida --> accidente : usa
+ctrlPartida --> perfil : usa
+ctrlPartida --> logsService : registra
+
+ctrlGestion --> sfsService : crea salas
+ctrlGestion --> partidaService : gestiona partidas
+
+ctrlRegistro --> usuariosService : registra
+ctrlLogin --> usuariosService : autentica
+ctrlJugar --> sfsService : une a lobby
+ctrlCrear --> sfsService : crea lobby
+ctrlConfig --> temaService : cambia tema
+ctrlEncuesta --> mongoService : envía encuesta
+
+estadoApp --> temaService : aplica temas
+estadoApp --> sfsService : escucha eventos
+
+sfsService --> partidaService : sincroniza
+sfsService --> lobbyService : gestiona lobbies
+usuariosService --> mongoService : HTTP
+usuariosService --> temaService : lee tema
+logsService --> mongoService : sincroniza
+logsService --> sfsService : envía vía SFS
+temaService --> usuariosService : lee tema
+
+' Conexión al servidor
+sfsService -right-> sfsExtension : WebSocket\npuerto 8080
+sfsExtension --> sfsZone : gestiona
+sfsZone --> sfsRoom : contiene
+
+mongoService -down-> express : HTTP REST\npuerto 3000
+express --> routesGM : /api/usuarios
+express --> routesLogs : /api/logs
+express --> routesMetrics : /api/Metricas
+express --> routesEncuestas : /api/encuestas
+express --> mongoose : conexión
+
+routesGM --> colUsuarios : CRUD
+routesLogs --> colLogs : CRUD
+routesMetrics --> colMetrics : CRUD
+routesEncuestas --> colEncuestas : CRUD
+
+@enduml

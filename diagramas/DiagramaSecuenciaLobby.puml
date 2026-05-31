@@ -1,0 +1,106 @@
+@startuml JuegoAccidentesTecno_SecuenciaLobby
+
+skinparam shadowing false
+skinparam linetype ortho
+skinparam backgroundColor white
+skinparam sequenceMessageAlign center
+skinparam defaultFontSize 14
+skinparam responseMessageBelowArrow true
+
+title JuegoAccidentesTecno - Diagrama de Secuencia: Creación y Unión al Lobby (CU03, CU04)
+
+actor "GameMaster" as gm
+actor "Jugador" as jugador
+participant "VistaCrearJuego\nVistaGestion" as vistaGM
+participant "VistaJugar" as vistaJug
+participant "ControladorVistaCrearJuego\nControladorVistaGestion" as ctrlGM
+participant "ControladorVistaJugar" as ctrlJug
+participant "SmartFoxService\n(cliente)" as sfs
+participant "LobbiesService\n(cliente)" as lobbies
+participant "JuegoExtension\n(SmartFox Server)" as extension
+participant "ControladorEstadoApp" as estado
+
+== CU03: Creación de Lobby (GameMaster) ==
+
+gm -> vistaGM : Selecciona "Crear Lobby"
+activate vistaGM
+vistaGM -> ctrlGM : crearLobby()
+activate ctrlGM
+
+ctrlGM -> sfs : ensureConnection(username)
+activate sfs
+sfs -> sfs : Conexión WebSocket\npuerto 8080
+sfs --> ctrlGM : Conectado
+deactivate sfs
+
+ctrlGM -> sfs : sendExtensionRequest('createLobby', {host})
+activate sfs
+sfs -> extension : handleCreateLobby(params)
+activate extension
+extension --> sfs : Forwarda al cliente\n(Use LobbiesService.crearLobby())
+deactivate extension
+
+sfs --> ctrlGM : Respuesta de extensión
+deactivate sfs
+
+ctrlGM -> lobbies : crearLobby(host, sender)
+activate lobbies
+lobbies -> lobbies : Genera código 6 caracteres\nAlmacena estado local
+lobbies --> ctrlGM : Lobby con código
+deactivate lobbies
+
+ctrlGM -> ctrlGM : logEvent('Log', 'create', {lobbyCode, hostName})
+ctrlGM --> vistaGM : Lobby creado, muestra código
+deactivate ctrlGM
+
+vistaGM --> gm : Muestra código de lobby y botones de gestión
+deactivate vistaGM
+
+estado -> estado : Actualiza pantalla a GESTION_LOBBY
+
+== CU04: Unión a Lobby (Jugador) ==
+
+jugador -> vistaJug : Selecciona "Jugar"
+activate vistaJug
+vistaJug --> jugador : Pide código + nombre
+deactivate vistaJug
+
+jugador -> vistaJug : Ingresa código y nombre
+activate vistaJug
+vistaJug -> ctrlJug : unirseAlLobby(code, name)
+activate ctrlJug
+
+ctrlJug -> sfs : joinLobbyRoom(code, name)
+activate sfs
+sfs -> sfs : Conexión WebSocket\nSFS JoinRoomRequest
+sfs -> extension : handleJoinLobby(code, name)
+activate extension
+extension --> sfs : Forwarda al cliente
+deactivate extension
+
+sfs --> ctrlJug : ROOM_JOIN event
+deactivate sfs
+
+ctrlJug -> lobbies : unirseALobby(code, guest, sender)
+activate lobbies
+lobbies --> ctrlJug : Jugador registrado\nen lobby local
+deactivate lobbies
+
+ctrlJug -> ctrlJug : logEvent('Log', 'join', {lobbyCode, guestName})
+
+sfs -> sfs : subscribeToLobbyUpdates callback\nactualiza estado del lobby
+sfs --> estado : ROOM_JOIN + lobby update
+activate estado
+
+estado -> estado : Construye datos del lobby\nactualiza pantalla
+estado --> vistaGM : Actualiza lista de jugadores
+vistaGM --> gm : Muestra nuevo jugador en pool
+deactivate estado
+
+ctrlJug --> vistaJug : Unión exitosa
+deactivate ctrlJug
+
+vistaJug --> jugador : Redirige a VistaCrearJuego\n(espera en sala)
+deactivate vistaJug
+
+@enduml

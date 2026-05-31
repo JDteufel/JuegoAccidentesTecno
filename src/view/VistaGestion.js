@@ -1,4 +1,4 @@
-import './estilos/VistaGestion.css'
+import './estilos/EstiloVistaGestion.css'
 import temaService from '../services/TemaService.js'
 
 export class VistaGestion {

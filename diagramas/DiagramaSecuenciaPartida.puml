@@ -1,0 +1,178 @@
+@startuml JuegoAccidentesTecno_SecuenciaPartida
+
+skinparam shadowing false
+skinparam linetype ortho
+skinparam backgroundColor white
+skinparam sequenceMessageAlign center
+skinparam defaultFontSize 14
+skinparam responseMessageBelowArrow true
+
+title JuegoAccidentesTecno - Diagrama de Secuencia: Flujo de Turno Completo (CU06-CU10)
+
+actor "GameMaster" as gm
+actor "Jugador 1" as j1
+actor "Jugador 2" as j2
+participant "VistaGestion" as vistaGestion
+participant "VistaPartida" as vistaPartida
+participant "ControladorVistaGestion" as ctrlGestion
+participant "ControladorVistaPartida" as ctrlPartida
+participant "ControladorEstadoApp" as estado
+participant "PartidaService" as partida
+participant "SmartFoxService" as sfs
+participant "JuegoExtension" as extension
+participant "LogsService" as logs
+participant "Perfil" as perfil
+participant "Carta" as carta
+participant "Accidente" as accidente
+
+== CU06: Inicio de Partida ==
+
+gm -> vistaGestion : Presiona "Iniciar" en sala
+activate vistaGestion
+vistaGestion -> ctrlGestion : iniciarSala(num)
+activate ctrlGestion
+
+ctrlGestion -> sfs : sendExtensionRequest('iniciarPartida', {sala})
+activate sfs
+sfs -> extension : handleIniciarPartida(params)
+activate extension
+extension --> sfs : Broadcast a jugadores en sala
+deactivate extension
+sfs --> estado : evento iniciarPartida
+activate estado
+deactivate sfs
+
+estado --> ctrlPartida : Notificar inicio de partida
+activate ctrlPartida
+deactivate estado
+
+ctrlGestion --> vistaGestion : Sala iniciada
+deactivate ctrlGestion
+deactivate vistaGestion
+
+== CU07: Arranque del Juego ==
+
+ctrlPartida -> ctrlPartida : Selecciona 8 accidentes aleatorios
+ctrlPartida -> ctrlPartida : Asigna perfiles aleatorios\nsin repetir (excluyendo usados)
+ctrlPartida -> perfil : perfil.cartaEsValida(categorias)
+activate perfil
+perfil --> ctrlPartida : cartas válidas para perfil
+deactivate perfil
+
+ctrlPartida -> ctrlPartida : seleccionarCartasAleatorias(3,\ncategoriasValidas del perfil)
+ctrlPartida -> carta : Crea instancias de cartas\nfiltradas por categorías
+activate carta
+carta --> ctrlPartida : cartasMano[] (3 cartas)
+deactivate carta
+
+ctrlPartida -> vistaPartida : configurarAccidentes(accidentes)
+vistaPartida --> j1 : Muestra accidentes en carrusel
+ctrlPartida -> vistaPartida : configurarPerfil(perfil)
+vistaPartida --> j1 : Muestra perfil asignado
+
+ctrlPartida -> logs : logEvent('Partida', 'start', {lobbyCode, jugadores})
+activate logs
+logs --> ctrlPartida : Log guardado en caché local
+deactivate logs
+
+ctrlPartida --> j1 : Entrega cartas iniciales,\nselecciona jugador al azar
+deactivate ctrlPartida
+
+== CU08: Jugada de Turno ==
+
+j1 -> vistaPartida : Arrastra carta al tablero
+activate vistaPartida
+vistaPartida -> ctrlPartida : jugarCarta(carta)
+activate ctrlPartida
+
+ctrlPartida -> perfil : cartaEsValida(carta.categorias)
+activate perfil
+perfil --> ctrlPartida : true (carta válida)
+deactivate perfil
+
+ctrlPartida -> carta : aplicarHoras(perfil)
+activate carta
+carta --> ctrlPartida : horas agregadas al perfil\n(verificarCompletado interno)
+deactivate carta
+
+ctrlPartida -> vistaPartida : Mostrar carta jugada en tablero 3D
+vistaPartida --> j1 : Carta visible sobre el tablero
+vistaPartida --> j2 : Carta visible sobre el tablero
+
+ctrlPartida -> logs : logEvent('Carta', 'play', {carta, jugador, horas})
+activate logs
+logs --> ctrlPartida : Log registrado en caché
+deactivate logs
+
+ctrlPartida --> vistaPartida : Turno finalizado
+deactivate ctrlPartida
+deactivate vistaPartida
+
+== CU09: Activación de Accidente (extend) ==
+
+ctrlPartida -> ctrlPartida : Math.random() > 0.35\n(probabilidad fija)
+alt Accidente se activa (prob 35%)
+    ctrlPartida -> ctrlPartida : Selecciona accidente activo
+    ctrlPartida -> accidente : aplicarEfecto(cartasMano)
+    activate accidente
+    accidente -> carta : degradar() / deshabilitar()\npotenciar() según nivel
+    activate carta
+    carta --> accidente : cartas afectadas
+    deactivate carta
+    accidente --> ctrlPartida : {negativas[], positivas[]}
+    deactivate accidente
+
+    ctrlPartida -> logs : logEvent('Accidente', 'activate', {accidente, afectadas})
+    activate logs
+    logs --> ctrlPartida : Log registrado
+    deactivate logs
+
+    ctrlPartida --> j1 : Notificación de accidente
+    ctrlPartida --> j2 : Notificación de accidente
+else No se activa (prob 65%)
+    ctrlPartida --> ctrlPartida : Continúa normalmente
+end
+
+== Turno siguiente ==
+
+j2 -> vistaPartida : Arrastra carta al tablero
+activate vistaPartida
+vistaPartida -> ctrlPartida : jugarCarta(carta)
+activate ctrlPartida
+
+ctrlPartida -> perfil : cartaEsValida(carta.categorias)
+activate perfil
+perfil --> ctrlPartida : true
+deactivate perfil
+
+ctrlPartida -> carta : aplicarHoras(perfil)
+activate carta
+carta --> ctrlPartida : horas agregadas
+deactivate carta
+
+ctrlPartida --> vistaPartida : Turno finalizado
+deactivate ctrlPartida
+deactivate vistaPartida
+
+== CU10: Finalización de Partida ==
+
+ctrlPartida -> ctrlPartida : Verifica perfilAsignado.completado\n(set interno en agregarHoras)
+alt Perfil completado
+    ctrlPartida -> ctrlPartida : generarResumenDebate()
+    ctrlPartida -> vistaPartida : mostrarResumenFinal(resumen, logJSON)
+    activate vistaPartida
+
+    ctrlPartida -> logs : logEvent('Partida', 'end', {...})
+    activate logs
+    logs --> ctrlPartida : Log registrado
+    deactivate logs
+
+    vistaPartida --> j1 : Muestra resumen + log completo
+    vistaPartida --> j2 : Muestra resumen + log completo
+
+    deactivate vistaPartida
+else Perfil no completado
+    ctrlPartida --> ctrlPartida : Continúa al siguiente turno
+end
+
+@enduml

@@ -1,0 +1,94 @@
+@startuml JuegoAccidentesTecno_SecuenciaRegistroLogin
+
+skinparam shadowing false
+skinparam linetype ortho
+skinparam backgroundColor white
+skinparam sequenceMessageAlign center
+skinparam defaultFontSize 14
+skinparam responseMessageBelowArrow true
+
+title JuegoAccidentesTecno - Diagrama de Secuencia: Registro e Inicio de Sesión (CU01, CU02)
+
+actor "GameMaster" as gm
+participant "VistaRegistro\nVistaInicioSesion" as vista
+participant "ControladorVistaRegistro\nControladorVistaInicioSesion" as ctrl
+participant "UsuariosService" as usuarios
+participant "MongoDBService" as mongo
+participant "Express Server\n(port 3000)" as server
+database "MongoDB\n(port 27017)" as db
+
+== CU01: Registro de Usuario ==
+
+gm -> vista : Selecciona "Registrarse"
+activate vista
+vista --> gm : Muestra formulario
+deactivate vista
+
+gm -> vista : Ingresa username + password
+activate vista
+vista -> ctrl : enviarRegistro(user, pass)
+activate ctrl
+
+ctrl -> usuarios : registrar(user, pass, tema)
+activate usuarios
+
+usuarios -> mongo : registerUser(user, pass, tema)
+activate mongo
+
+mongo -> server : POST /api/usuarios/register
+activate server
+server -> db : INSERT en colección "Usuarios"
+db --> server : Usuario creado
+server --> mongo : 201 Created
+deactivate server
+
+deactivate mongo
+mongo --> usuarios : Registro exitoso
+deactivate usuarios
+deactivate mongo
+
+ctrl -> ctrl : logEvent('Usuario', 'register', {username})
+ctrl --> vista : Registro exitoso
+deactivate ctrl
+
+vista --> gm : Regresa a VistaInicial\n(usuario debe iniciar sesión manualmente)
+deactivate vista
+
+== CU02: Inicio de Sesión ==
+
+gm -> vista : Selecciona "Iniciar Sesión"
+activate vista
+vista --> gm : Muestra formulario
+deactivate vista
+
+gm -> vista : Ingresa credenciales
+activate vista
+vista -> ctrl : enviarLogin(user, pass)
+activate ctrl
+
+ctrl -> usuarios : login(user, pass)
+activate usuarios
+
+usuarios -> mongo : loginUser(user, pass)
+activate mongo
+
+mongo -> server : POST /api/usuarios/login
+activate server
+server -> db : FIND en colección "Usuarios"
+db --> server : Datos del usuario
+server --> mongo : 200 OK + datos
+deactivate server
+
+deactivate mongo
+mongo --> usuarios : Login exitoso
+deactivate usuarios
+deactivate mongo
+
+ctrl -> ctrl : logEvent('Usuario', 'login_success', {username})
+ctrl --> vista : Login exitoso, estado = GAMEMASTER
+deactivate ctrl
+
+vista --> gm : Redirige a VistaInicialR (modo GameMaster)
+deactivate vista
+
+@enduml

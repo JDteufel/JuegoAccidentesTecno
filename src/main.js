@@ -13,6 +13,7 @@ import { VistaAccidentes } from './view/VistaAccidentes.js'
 import { VistaPartida } from './view/VistaPartida.js'
 import { VistaPartidaPrueba } from './view/VistaPartidaPrueba.js'
 import { VistaConfiguracion } from './view/VistaConfiguracion.js'
+import { VistaEncuesta } from './view/VistaEncuesta.js'
 import { EstadoApp } from './model/EstadoApp.js'
 import { ControladorVistaInicial } from './controller/ControladorVistaInicial.js'
 import { ControladorVistaInicialR } from './controller/ControladorVistaInicialR.js'
@@ -29,6 +30,7 @@ import { ControladorVistaAccidentes } from './controller/ControladorVistaAcciden
 import { ControladorVistaPartida } from './controller/ControladorVistaPartida.js'
 import { ControladorVistaPartidaPrueba } from './controller/ControladorVistaPartidaPrueba.js'
 import { ControladorVistaConfiguracion } from './controller/ControladorVistaConfiguracion.js'
+import { ControladorVistaEncuesta } from './controller/ControladorVistaEncuesta.js'
 import { testSmartFoxPing, getSmartFoxInstance } from './services/SmartFoxService.js'
 import { initLogsService } from './services/LogsService.js'
 import temaService from './services/TemaService.js'
@@ -74,12 +76,15 @@ const vistaPartidaPrueba = new VistaPartidaPrueba(canvas, vistaInicial.engine, v
 vistaPartidaPrueba.crear()
 const vistaConfiguracion = new VistaConfiguracion()
 vistaConfiguracion.crear()
+const vistaEncuesta = new VistaEncuesta()
+vistaEncuesta.crear()
 
 const estadoApp = new EstadoApp()
 window.estadoAppGlobal = estadoApp
 
 const controladorPartida = new ControladorVistaPartida(vistaPartida, null)
 const controladorPartidaPrueba = new ControladorVistaPartidaPrueba(vistaPartidaPrueba, null)
+const controladorEncuesta = new ControladorVistaEncuesta(vistaEncuesta, null)
 
 const controladorEstadoApp = new ControladorEstadoApp(estadoApp, {
   vistaInicial,
@@ -94,8 +99,9 @@ const controladorEstadoApp = new ControladorEstadoApp(estadoApp, {
   vistaAccidentes,
   vistaPartida,
   vistaPartidaPrueba,
-  vistaConfiguracion
-}, controladorPartida, controladorPartidaPrueba)
+  vistaConfiguracion,
+  vistaEncuesta
+}, controladorPartida, controladorPartidaPrueba, controladorEncuesta)
 
 controladorPartida.controladorEstadoApp = controladorEstadoApp
 controladorPartidaPrueba.controladorEstadoApp = controladorEstadoApp
@@ -148,6 +154,8 @@ const controladorConfiguracion = new ControladorVistaConfiguracion(
   controladorEstadoApp
 )
 
+controladorEncuesta.controladorEstadoApp = controladorEstadoApp
+
 controladorVistaInicial.init()
 controladorVistaInicialR.init()
 controladorTutorial.init()
@@ -162,6 +170,7 @@ controladorAccidentes.init()
 controladorPartida.init()
 controladorPartidaPrueba.init()
 controladorConfiguracion.init()
+controladorEncuesta.init()
 
 temaService.cargarTemaInicial(estadoApp.getUsername()).then(() => {
   controladorEstadoApp.aplicarTemaActual()

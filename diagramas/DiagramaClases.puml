@@ -1,0 +1,733 @@
+@startuml JuegoAccidentesTecno
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam roundcorner 10
+skinparam linetype ortho
+
+left to right direction
+
+title JuegoAccidentesTecno - Diagrama de Clases UML
+
+' ============================================
+' MODEL LAYER
+' ============================================
+package "src/model/" #LightBlue {
+
+    abstract class Carta {
+        - titulo: String
+        - categorias: String[]
+        - codigo: String
+        - detalle: String
+        - color: String
+        - horas: int
+        - tipo: String
+        - tipoHora: String
+        - estado: String
+        - degradada: boolean
+        + aplicarHoras(perfil): int
+        + activar()
+        + degradar()
+        + deshabilitar()
+        + potenciar()
+        + estaActiva(): boolean
+        + estaDeshabilitada(): boolean
+        + getColor(): String
+        + obtenerImagen()
+        + obtenerDescripcion(): String
+        + toJSON(): Object
+        + {static} fromJSON(json): Carta
+    }
+
+    class CartasHijas {
+        34 clases:
+        CartaGitHub, CartaNetflix, CartaTwitch,
+        CartaYouTube, CartaSpotify, CartaTikTok,
+        CartaReddit, CartaDiscord, CartaSlack,
+        CartaNotion, CartaFigma, CartaTrello,
+        CartaJira, CartaTeams, CartaLinkedIn,
+        CartaAWS, CartaDocker, CartaKubernetes,
+        CartaVSCode, CartaCoursera, CartaGoogleDrive,
+        CartaObsidian, CartaPinterest, CartaTwitter,
+        CartaZoom, CartaStrava, CartaSiesta,
+        CartaDormirNoche, CartaMeditar, CartaLeer,
+        CartaCaminar, CartaFutbol, CartaComodin, CartaDuolingo
+    }
+
+    abstract class Accidente {
+        - nombre: String
+        - codigo: String
+        - descripcion: String
+        - categoriasAfectadas: String[]
+        - categoriasPositivas: String[]
+        - nivel: int
+        - activo: boolean
+        + activar()
+        + desactivar()
+        + afectaCategoria(cats): boolean
+        + beneficiaCategoria(cats): boolean
+        + aplicarEfecto(cartas): Object
+        + obtenerMensaje(): String
+        + obtenerImagen()
+        + toJSON(): Object
+        + {static} fromJSON(json): Accidente
+    }
+
+    class AccidentesHijos {
+        16 clases:
+        AccidenteAtaqueDDoS, AccidenteAtaqueSeguridad,
+        AccidenteCorrupcionDatos, AccidenteCorteEnergia,
+        AccidenteExfiltracionDatos, AccidenteFalloActualizacion,
+        AccidenteFalloAutenticacion, AccidenteFalloHardware,
+        AccidenteFalloNube, AccidenteFalloSoftware,
+        AccidenteFugaDatos, AccidenteInterferenciaEM,
+        AccidentePhishingMasivo, AccidenteSesgoIA,
+        AccidenteSobrecargaRed, AccidenteVulnerabilidadZeroDay
+    }
+
+    abstract class Perfil {
+        - nombre: String
+        - horasPorCategoria: Object
+        - categoriasValidas: String[]
+        - descripcion: String
+        - horasCompletadasPorCategoria: Object
+        - completado: boolean
+        + horasRequeridas: int
+        + horasCompletadas: int
+        + agregarHoras(horas, tipoHora)
+        + verificarCompletado()
+        + getProgreso(): float
+        + getProgresoPorCategoria(tipoHora): float
+        + cartaEsValida(cats): boolean
+        + reset()
+        + toJSON(): Object
+        + {static} fromJSON(json): Perfil
+    }
+
+    class PerfilesHijos {
+        18 clases:
+        PerfilEstudiante, PerfilDesarrolladorFullStack,
+        PerfilIngenieroSoftware, PerfilArquitectoSoluciones,
+        PerfilCientificoDatos, PerfilEspecialistaSeguridad,
+        PerfilEspecialistaCloud, PerfilEspecialistaRedes,
+        PerfilGerenteProyectosTI, PerfilDesarrolladorDevOps,
+        PerfilDocente, PerfilFreelancer, PerfilGamer,
+        PerfilAdictoRedes, PerfilCommunityManager,
+        PerfilAnalistaIA, PerfilAnalistaSistemas,
+        PerfilAdminBasesDatos
+    }
+
+    abstract class ActividadGrupal {
+        - nombre: String
+        - codigo: String
+        - descripcion: String
+        - horasBeneficio: int
+        - categoriasBeneficiadas: String[]
+        - activa: boolean
+        + activar()
+        + desactivar()
+        + beneficiaCategoria(cats): boolean
+        + aplicarBeneficio(cartas, perfil): Carta[]
+        + obtenerMensaje(): String
+        + toJSON(): Object
+        + {static} fromJSON(json): ActividadGrupal
+    }
+
+    class ActividadesHijas {
+        6 clases:
+        ActividadHackathon, ActividadFutbol,
+        ActividadPelicula, ActividadYoga,
+        ActividadEstudioGrupal, ActividadKaraoke
+    }
+
+    class GameMaster {
+        - username: String
+        - tipo: String
+        - fechaRegistro: Date
+        - ultimaSesion: Date
+        + setUsername(username)
+        + getUsername(): String
+        + getTipo(): String
+        + actualizarUltimaSesion()
+        + toJSON(): Object
+    }
+
+    class EstadoApp {
+        - pantallaActual: String
+        - pantallaAnterior: String
+        - tipoJugador: String
+        - usuario: GameMaster
+        - lobbyActual: Object
+        - lobbySenderName: String
+        - lobbyPlayerName: String
+        - salaMaestra: Object
+        - jugadoresPool: String[]
+        - subSalas: Object[]
+        - jugadoresAsignados: Object
+        + setPantalla(pantalla)
+        + setTipoJugador(tipo)
+        + setUsuario(username)
+        + getUsuario(): GameMaster
+        + getUsername(): String
+        + estaLogueado(): boolean
+        + cerrarSesion()
+        + setLobbyActual(data, sender, player)
+        + getLobbyActual(): Object
+        + getLobbySenderName(): String
+        + getLobbyPlayerName(): String
+        + limpiarLobbyActual()
+        + setSalaMaestra(data)
+        + getSalaMaestra(): Object
+        + limpiarSalaMaestra()
+        + agregarJugadorPool(nombre)
+        + removerJugadorPool(nombre)
+        + asignarJugadorASala(nombre, numSala)
+        + desasignarJugador(nombre)
+        + obtenerJugadoresDeSala(numSala): String[]
+        + crearSubSala(num)
+        + eliminarSubSala(num)
+        + renumerarSubSalas()
+        + regresarPantallaAnterior()
+    }
+
+    enum constantes {
+        CATEGORIAS_CARTA
+        CATEGORIAS_ACCIDENTE
+        TIPOS_HORA
+    }
+
+    enum PANTALLAS {
+        INICIAL_PUBLICA
+        INICIAL_GAMEMASTER
+        REGISTRO
+        INICIO_SESION
+        UNIRSE_LOBBY
+        GESTION_LOBBY
+        GESTION
+        REGLAS
+        CARTAS
+        ACCIDENTES
+        PARTIDA
+        PARTIDA_PRUEBA
+        CONFIGURACION
+        ENCUESTA
+    }
+
+    enum TIPOS_JUGADOR {
+        JUGADOR
+        GAMEMASTER
+        INVITADO
+    }
+
+    Carta <.. CartasHijas : 34 extends
+    Accidente <.. AccidentesHijos : 16 extends
+    Perfil <.. PerfilesHijos : 18 extends
+    ActividadGrupal <.. ActividadesHijas : 6 extends
+
+    EstadoApp "1" *-- "1" GameMaster : usuario
+    EstadoApp "1" o-- "*" String : jugadoresPool
+    EstadoApp "1" o-- "*" Object : jugadoresAsignados
+    EstadoApp ..> PANTALLAS : uses
+    EstadoApp ..> TIPOS_JUGADOR : uses
+    Accidente "1" --> "*" Carta : affects
+    ActividadGrupal "1" --> "*" Carta : benefits
+    Perfil "1" --> "*" Carta : validates
+}
+
+' ============================================
+' VIEW LAYER
+' ============================================
+package "src/view/" #LightYellow {
+
+    abstract class VistaListaBase {
+        + containerEl: HTMLElement
+        + {abstract} obtenerConfiguracionLista(): Object
+        + crear()
+        + actualizarItems(items)
+        + mostrar()
+        + ocultar()
+    }
+
+    abstract class VistaFormularioBase {
+        + containerEl: HTMLElement
+        + {abstract} obtenerConfiguracionFormulario(): Object
+        + crear()
+        + getValorCampo(nombre): String
+        + mostrar()
+        + ocultar()
+    }
+
+    class VistaInicial {
+        + engine: BABYLON.Engine
+        + scene: BABYLON.Scene
+        + overlayEl: HTMLElement
+        + crearEscena()
+        + crearMenuDOM()
+        + render(targetFps)
+    }
+
+    class VistaInicialR {
+        + containerEl: HTMLElement
+        + crear()
+        + mostrar()
+        + ocultar()
+    }
+
+    class VistaPartida {
+        + engine: BABYLON.Engine
+        + scene: BABYLON.Scene
+        + guiTexture: GUI.AdvancedDynamicTexture
+        + crear()
+        + crearEscena3D()
+        + crearHUD()
+        + configurarAccidentes(accidentes)
+        + configurarPerfil(perfil)
+        + mostrarResumenFinal(resumen, logJSON)
+        + mostrarLogCompleto(logJSON)
+    }
+
+    class VistaPartidaPrueba {
+        + engine: BABYLON.Engine
+        + scene: BABYLON.Scene
+        + crear()
+        + mostrarResumenFinal(resumen, logJSON)
+        + mostrarLogCompletoPrueba(logJSON, overlay)
+    }
+
+    class VistaEncuesta {
+        + containerEl: HTMLElement
+        + respuestas: Object
+        + preguntaActual: int
+        + crear()
+        + _renderPregunta(zona, indice)
+        + _navegar(direccion)
+        + mostrar()
+        + ocultar()
+        + resetear()
+    }
+
+    class VistaGestion {
+        + containerEl: HTMLElement
+        + crear()
+        + actualizarPool(jugadores)
+        + actualizarSalas(subSalas, asignados)
+    }
+
+    class VistaCrearJuego
+    class VistaReglas
+    class VistaJugar
+    class VistaInicioSesion
+    class VistaRegistro
+    class VistaConfiguracion
+    class VistaCartas
+    class VistaAccidentes
+    class VistaTutorial
+
+    class GestorAjusteRatio {
+        {static} esMovil(): boolean
+        {static} esTablet(): boolean
+        {static} configurarGUI(gui)
+        {static} crearAjustadorElemento(el, cfg)
+    }
+
+    VistaListaBase <|-- VistaCrearJuego
+    VistaListaBase <|-- VistaReglas
+    VistaFormularioBase <|-- VistaJugar
+    VistaFormularioBase <|-- VistaInicioSesion
+    VistaFormularioBase <|-- VistaRegistro
+
+    VistaInicial ..> GestorAjusteRatio : uses
+    VistaPartida ..> GestorAjusteRatio : uses
+    VistaEncuesta ..> GestorAjusteRatio : uses
+    VistaGestion ..> GestorAjusteRatio : uses
+    VistaCartas ..> GestorAjusteRatio : uses
+    VistaAccidentes ..> GestorAjusteRatio : uses
+    VistaTutorial ..> GestorAjusteRatio : uses
+}
+
+' ============================================
+' CONTROLLER LAYER
+' ============================================
+package "src/controller/" #LightGreen {
+
+    class ControladorEstadoApp {
+        - estadoApp: EstadoApp
+        - vistas: Object
+        - controladorPartida: ControladorVistaPartida
+        - controladorPartidaPrueba: ControladorVistaPartidaPrueba
+        - controladorEncuesta: ControladorVistaEncuesta
+        - perfilesAsignados: Perfil[]
+        + actualizarVista()
+        + irAPantalla(pantalla)
+        + aplicarTemaActual()
+        + cerrarSesion()
+        + actualizarVistaGestion()
+        + regresarPantallaAnterior()
+        + ocultarVistasPrimarias()
+        + obtenerPerfilesAsignados(): Perfil[]
+        + agregarPerfilAsignado(perfil)
+        + reiniciarPerfilesAsignados()
+    }
+
+    class ControladorVistaInicial {
+        - vistaInicial: VistaInicial
+        - controladorEstadoApp: ControladorEstadoApp
+        + init()
+    }
+
+    class ControladorVistaPartida {
+        - vistaPartida: VistaPartida
+        - controladorEstadoApp: ControladorEstadoApp
+        - accidentesSeleccionados: Accidente[]
+        - perfilAsignado: Perfil
+        - cartasMano: Carta[]
+        - metricasUsoCartas: Object
+        + init()
+        + iniciarPartida(nombre)
+        + jugarCarta(carta)
+        + pasarTurno()
+        + finTurno()
+        + verificarActivarAccidente()
+        + verificarVictoria()
+        + obtenerPerfilesUsados(): String[]
+        + intercambiarCartas(carta1, carta2)
+        + activarActividadGrupal(actividad)
+        + desactivarAccidenteMasAntiguo()
+        + reiniciarPartida()
+        + finalizarPartida()
+        + generarResumenDebate(duracion): Object
+        + getPerfilAsignado(): Perfil
+        + getAccidentesSeleccionados(): Accidente[]
+        + getCartasMano(): Carta[]
+    }
+
+    class ControladorVistaEncuesta {
+        - vistaEncuesta: VistaEncuesta
+        - controladorEstadoApp: ControladorEstadoApp
+        - username: String
+        + configurarUsuario(username, lobbyCode)
+        + enviarEncuesta(respuestas)
+    }
+
+    class ControladorVistaGestion {
+        - vistaGestion: VistaGestion
+        - controladorEstadoApp: ControladorEstadoApp
+        - estadoApp: EstadoApp
+        - estrategiaActual: EstrategiaDistribucion
+        + init()
+        + actualizarVistaGestion()
+        + autoDistribuir()
+        + asignarJugadorManual(jugador, sala)
+        + iniciarSala(num)
+        + iniciarTodasLasSalas()
+    }
+
+    abstract class EstrategiaDistribucion {
+        + {abstract} ejecutar(jugadores, salas): Object
+    }
+
+    class EstrategiaBalanceada
+    class EstrategiaSecuencial
+    class EstrategiaPersonalizada
+
+    class ControladorVistaCrearJuego
+    class ControladorVistaJugar
+    class ControladorVistaInicioSesion
+    class ControladorVistaRegistro
+    class ControladorVistaConfiguracion
+    class ControladorVistaAccidentes
+    class ControladorVistaCartas
+    class ControladorVistaReglas
+    class ControladorVistaTutorial
+    class ControladorVistaInicialR
+    class ControladorVistaPartidaPrueba
+
+    EstrategiaDistribucion <|-- EstrategiaBalanceada
+    EstrategiaDistribucion <|-- EstrategiaSecuencial
+    EstrategiaDistribucion <|-- EstrategiaPersonalizada
+
+    ControladorEstadoApp "1" *-- "1" EstadoApp : manages
+    ControladorEstadoApp "1" o-- "1" ControladorVistaPartida : partida
+    ControladorEstadoApp "1" o-- "1" ControladorVistaPartidaPrueba : partidaPrueba
+    ControladorEstadoApp "1" o-- "1" ControladorVistaEncuesta : encuesta
+    ControladorEstadoApp "1" o-- "*" Perfil : perfilesAsignados
+    ControladorVistaGestion "1" *-- "1" EstrategiaDistribucion : usa
+    ControladorVistaInicial "1" o-- "1" VistaInicial : vista
+    ControladorVistaInicial "1" --> "1" ControladorEstadoApp : estado
+    ControladorVistaPartida "1" o-- "1" VistaPartida : vista
+    ControladorVistaPartida "1" --> "1" ControladorEstadoApp : estado
+    ControladorVistaPartida "1" o-- "*" Accidente : seleccionados
+    ControladorVistaPartida "1" o-- "1" Perfil : asignado
+    ControladorVistaPartida "1" o-- "*" Carta : mano
+    ControladorVistaEncuesta "1" o-- "1" VistaEncuesta : vista
+    ControladorVistaEncuesta "1" --> "1" ControladorEstadoApp : estado
+    ControladorVistaGestion "1" o-- "1" VistaGestion : vista
+    ControladorVistaGestion "1" --> "1" EstadoApp : estado
+}
+
+' ============================================
+' SERVICES LAYER
+' ============================================
+package "src/services/" #LightCoral {
+
+    class SmartFoxService {
+        <<module>>
+        + ensureConnection(username): Promise
+        + createLobbyRoom(code, host): Promise
+        + joinLobbyRoom(code, name): Promise
+        + leaveCurrentRoom(): Promise
+        + sendExtensionRequest(cmd, params)
+        + subscribeToLobbyUpdates(listener)
+        + subscribeToRoomJoin(listener)
+        + subscribeToRoomEnter(listener)
+        + subscribeToIniciarPartida(listener)
+        + subscribeToJugadorSalaAsignada(listener)
+        + getCurrentLobbyState(): Object
+        + emitLobbyUpdate()
+        + getSmartFoxInstance(): SFS2X.SmartFox
+        + registerUser(user, pass): Promise
+        + loginUser(user, pass): Promise
+        + testSmartFoxPing(): Promise
+        + updateConfig(cfg)
+        + getConfig(): Object
+    }
+
+    class MongoDBService {
+        - baseUrl: String
+        + request(endpoint, data, method): Promise
+        + registerUser(user, pass, tema): Promise
+        + loginUser(user, pass): Promise
+        + actualizarTemaUsuario(user, tema): Promise
+        + getUser(user): Promise
+        + getAllUsers(): Promise
+        + logEvent(type, action, details): Promise
+        + logMetric(type, action, details): Promise
+        + submitEncuesta(data): Promise
+        + getLogs(): Promise
+        + clearLogs(): Promise
+        + healthCheck(): Promise
+        + checkConnection(): Object
+    }
+
+    class PartidaService {
+        - partidasActivas: Object
+        + crearSalaPartida(name, host): Promise
+        + unirseASalaPartida(name, player): Promise
+        + iniciarPartida(name): Promise
+        + onJugadorAsignado(cb)
+        + onIniciarPartida(cb)
+        + obtenerEstadoPartida(name): Object
+        + obtenerPartidaDelJugador(player): Object
+        + obtenerTodasLasPartidas(): Object[]
+        + asignarJugadorASala(name, player, numSala)
+        + removerJugadorDePartida(name, player)
+        + cerrarPartida(name)
+        + registrarSmartFoxListeners()
+    }
+
+    class LobbiesService {
+        - lobbiesByCode: Object
+        - lobbyCodeBySender: Object
+        + crearLobby(host, sender): Object
+        + unirseALobby(code, guest, sender): Object
+        + salirDelLobby(code, sender): Object
+        + obtenerEstadoLobby(code): Object
+        + obtenerTodosLosLobbies(): Object
+        + obtenerCodigoDelSender(sender): String
+    }
+
+    class UsuariosService {
+        + inicializar()
+        + registrar(user, pass, tema): Promise
+        + login(user, pass): Promise
+        + actualizarTema(user, tema): Promise
+        + obtenerTemaUsuario(user): String
+        + obtenerUsuario(user): Object
+        + obtenerTodos(): Object[]
+        + existe(user): boolean
+    }
+
+    class LogsService {
+        <<module>>
+        + logsLocales: Object
+        + initLogsService(sfs)
+        + logEvent(type, action, details)
+        + syncAllToMongoDB(): Promise
+        + exportarJSON(category): String
+        + obtenerEstadisticas(): Object
+        + limpiarLogs(category)
+        + obtenerLogs(category): Object[]
+        + obtenerTodosLogs(): Object[]
+    }
+
+    class TemaService {
+        - temaActual: String
+        + obtenerTemaActual(): String
+        + cargarTemaInicial(user): Promise
+        + cambiarTema(temaId): Promise
+        + obtenerColoresTema(temaId): Object
+        + onCambioTema(callback)
+    }
+
+    PartidaService ..> SmartFoxService : uses
+    PartidaService ..> LogsService : logs
+    LobbiesService ..> LogsService : logs
+    UsuariosService ..> MongoDBService : HTTP
+    UsuariosService ..> TemaService : theme
+    LogsService ..> MongoDBService : syncs
+    LogsService ..> SmartFoxService : envia via SFS
+    TemaService ..> UsuariosService : lee tema
+}
+
+' ============================================
+' SMARTFOX EXTENSIONS
+' ============================================
+package "smartfox/extensions/" #Lavender {
+    class JuegoExtension {
+        <<SFS Extension>>
+        + init()
+        + destroy()
+        + handlePing(params, sender)
+        + handleRegister(params, sender)
+        + handleLogin(params, sender)
+        + handleCreateLobby(params, sender)
+        + handleJoinLobby(params, sender)
+        + handleGetLobbyState(params, sender)
+        + handleLeaveLobby(params, sender)
+        + handleLog(params, sender)
+        + handleGetLogs(params, sender)
+        + handleClearLogs(params, sender)
+        + handleGetAllLobbies(params, sender)
+        + handleCrearSubSala(params, sender)
+        + handleIniciarPartida(params, sender)
+        + getString(params, key): String
+        + getSenderName(sender): String
+    }
+}
+
+' ============================================
+' REST BRIDGE
+' ============================================
+package "rest-bridge/" #MistyRose {
+
+    class ExpressServer {
+        <<Express App>>
+        + listen(PORT)
+        ---
+        GET /health
+        POST /api/usuarios/register
+        POST /api/usuarios/login
+        PATCH /api/usuarios/:user/tema
+        GET /api/usuarios
+        POST /api/logs
+        GET /api/logs
+        DELETE /api/logs
+        POST /api/Metricas
+        GET /api/Metricas
+        POST /api/encuestas
+        GET /api/encuestas
+    }
+
+    class GameMasterModel {
+        <<Mongoose>>
+        - username: String {unique}
+        - password: String
+        - tema: String
+        - createdAt: Date
+        ---
+        collection: "Usuarios"
+    }
+
+    class LogModel {
+        <<Mongoose>>
+        - timestamp: Date
+        - type: String
+        - action: String
+        - details: Mixed
+        ---
+        collection: "Logs"
+    }
+
+    class MetricModel {
+        <<Mongoose>>
+        - timestamp: Date
+        - type: String
+        - action: String
+        - details: Mixed
+        ---
+        collection: "Metricas"
+    }
+
+    class EncuestaModel {
+        <<Mongoose>>
+        - username: String
+        - lobbyCode: String
+        - respuestas: Mixed
+        - promedioGeneral: Number
+        - timestamp: Date
+        ---
+        collection: "Encuestas"
+    }
+
+    class connectDB {
+        + connectDB(): Promise
+    }
+
+    class gameMastersRoutes {
+        <<Router>>
+        + POST /register
+        + POST /login
+        + PATCH /:user/tema
+        + GET /
+    }
+
+    class logsRoutes {
+        <<Router>>
+        + POST /
+        + GET /
+        + DELETE /
+    }
+
+    class metricasRoutes {
+        <<Router>>
+        + POST /
+        + GET /
+    }
+
+    class encuestasRoutes {
+        <<Router>>
+        + POST /
+        + GET /
+    }
+
+    ExpressServer "1" *-- "1" connectDB : init
+    ExpressServer "1" --> "4" gameMastersRoutes : "/api/usuarios"
+    ExpressServer "1" --> "1" logsRoutes : "/api/logs"
+    ExpressServer "1" --> "1" metricasRoutes : "/api/Metricas"
+    ExpressServer "1" --> "1" encuestasRoutes : "/api/encuestas"
+
+    gameMastersRoutes "1" --> "*" GameMasterModel : CRUD
+    logsRoutes "1" --> "*" LogModel : CRUD
+    metricasRoutes "1" --> "*" MetricModel : CRUD
+    encuestasRoutes "1" --> "*" EncuestaModel : CRUD
+}
+
+' ============================================
+' CROSS-LAYER RELATIONSHIPS
+' ============================================
+ControladorEstadoApp "1" --> "1" TemaService : aplica temas
+ControladorEstadoApp "1" --> "1" SmartFoxService : suscribe eventos
+ControladorVistaPartida "1" --> "1" LogsService : registra eventos
+ControladorVistaEncuesta "1" --> "1" MongoDBService : envia encuesta
+ControladorVistaInicioSesion "1" --> "1" UsuariosService : autentica
+ControladorVistaRegistro "1" --> "1" UsuariosService : registra
+ControladorVistaConfiguracion "1" --> "1" TemaService : cambia tema
+ControladorVistaGestion "1" --> "1" SmartFoxService : crea salas
+ControladorVistaJugar "1" --> "1" SmartFoxService : une a lobby
+VistaPartida "1" --> "*" Accidente : configura
+VistaPartida "1" --> "1" Perfil : configura
+
+MongoDBService "1" --> "1" ExpressServer : HTTP fetch
+JuegoExtension "1" --> "1" SmartFoxService : reenvia al cliente
+
+@enduml

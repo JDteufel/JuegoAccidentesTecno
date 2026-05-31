@@ -2222,8 +2222,370 @@ export class VistaPartidaPrueba {
     this.mostrarMensaje(`Actividad grupal: ${actividad.nombre} - ${actividad.descripcion}`, 4000)
   }
 
-  mostrarLogFinal(logJSON) {
-    console.log('[VistaPartidaPrueba] Log completo de la partida:', logJSON)
-    this.mostrarMensaje('Partida finalizada. Revisa la consola para el log completo.', 6000)
+  mostrarResumenFinal(resumen, logJSON) {
+    const colores = this._coloresDefecto()
+
+    const overlay = document.createElement('div')
+    overlay.id = 'resumen-final-prueba-overlay'
+    overlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 10000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+    `
+    document.body.appendChild(overlay)
+
+    const panel = document.createElement('div')
+    panel.style.cssText = `
+      background: rgba(28, 20, 16, 0.97);
+      border: 3px solid ${colores.hudBorderColor};
+      border-radius: 24px;
+      width: 90%;
+      max-width: 1000px;
+      height: 85vh;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      color: ${colores.hudTextColor};
+      overflow-y: auto;
+    `
+    overlay.appendChild(panel)
+
+    const titulo = document.createElement('h2')
+    titulo.textContent = 'Partida Finalizada (Prueba)'
+    titulo.style.cssText = `
+      font-size: 32px;
+      margin: 0 0 8px 0;
+      text-align: center;
+      color: ${colores.primary};
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+    `
+    panel.appendChild(titulo)
+
+    const subtitulo = document.createElement('h3')
+    subtitulo.textContent = resumen.perfil
+    subtitulo.style.cssText = `
+      font-size: 22px;
+      margin: 0 0 4px 0;
+      text-align: center;
+      color: ${colores.hudTextColor};
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+    `
+    panel.appendChild(subtitulo)
+
+    const desc = document.createElement('p')
+    desc.textContent = resumen.descripcion
+    desc.style.cssText = `
+      font-size: 14px;
+      margin: 0 0 16px 0;
+      text-align: center;
+      color: ${colores.hudSubtextColor};
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+      max-width: 600px;
+    `
+    panel.appendChild(desc)
+
+    const barraContenedor = document.createElement('div')
+    barraContenedor.style.cssText = `
+      width: 80%;
+      max-width: 500px;
+      height: 24px;
+      background: ${colores.hudProgresoBg};
+      border-radius: 12px;
+      border: 2px solid ${colores.hudBorderColor};
+      margin-bottom: 20px;
+      overflow: hidden;
+    `
+    panel.appendChild(barraContenedor)
+
+    const barra = document.createElement('div')
+    barra.style.cssText = `
+      width: ${resumen.porcentajeCompletado}%;
+      height: 100%;
+      background: ${resumen.porcentajeCompletado >= 100 ? colores.badgeWork : colores.hudProgresoColor};
+      border-radius: 10px;
+    `
+    barraContenedor.appendChild(barra)
+
+    const textoBarra = document.createElement('div')
+    textoBarra.textContent = `${resumen.porcentajeCompletado}% completado`
+    textoBarra.style.cssText = `
+      position: relative;
+      top: -20px;
+      font-size: 12px;
+      font-weight: bold;
+      color: ${colores.hudTextColor};
+      text-align: center;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+    `
+    panel.appendChild(textoBarra)
+
+    const gridContainer = document.createElement('div')
+    gridContainer.style.cssText = `
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      width: 90%;
+      max-width: 700px;
+      margin-bottom: 20px;
+    `
+    panel.appendChild(gridContainer)
+
+    resumen.datos.slice(0, 8).forEach((dato, indice) => {
+      const celda = document.createElement('div')
+      celda.style.cssText = `
+        background: ${colores.hudEstadoBg[indice % colores.hudEstadoBg.length]};
+        border: 1px solid ${colores.hudBorderColor};
+        border-radius: 10px;
+        padding: 8px;
+        text-align: center;
+      `
+      gridContainer.appendChild(celda)
+
+      const etiqueta = document.createElement('div')
+      etiqueta.textContent = dato.etiqueta
+      etiqueta.style.cssText = `
+        font-size: 11px;
+        color: ${colores.hudSubtextColor};
+        font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+        margin-bottom: 4px;
+      `
+      celda.appendChild(etiqueta)
+
+      const valor = document.createElement('div')
+      valor.textContent = dato.valor
+      valor.style.cssText = `
+        font-size: 14px;
+        font-weight: bold;
+        color: ${colores.hudTextColor};
+        font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+      `
+      celda.appendChild(valor)
+    })
+
+    const mensajesContainer = document.createElement('div')
+    mensajesContainer.style.cssText = `
+      width: 90%;
+      max-width: 800px;
+      max-height: 220px;
+      overflow-y: auto;
+      background: rgba(18, 14, 13, 0.72);
+      border: 2px solid ${colores.hudBorderColor};
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+    `
+    panel.appendChild(mensajesContainer)
+
+    resumen.mensajes.forEach((mensaje) => {
+      const bloque = document.createElement('div')
+      bloque.style.cssText = `
+        margin-bottom: 12px;
+        padding-left: 20px;
+        position: relative;
+      `
+      mensajesContainer.appendChild(bloque)
+
+      const icono = document.createElement('span')
+      icono.textContent = '▸'
+      icono.style.cssText = `
+        position: absolute;
+        left: 0;
+        color: ${colores.primary};
+        font-size: 14px;
+      `
+      bloque.appendChild(icono)
+
+      const texto = document.createElement('p')
+      texto.textContent = mensaje
+      texto.style.cssText = `
+        font-size: 14px;
+        color: ${colores.textBody};
+        font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+        margin: 0;
+        line-height: 1.4;
+      `
+      bloque.appendChild(texto)
+    })
+
+    const botonesContainer = document.createElement('div')
+    botonesContainer.style.cssText = `
+      display: flex;
+      gap: 16px;
+      margin-top: auto;
+      padding-top: 16px;
+    `
+    panel.appendChild(botonesContainer)
+
+    const btnVerLog = document.createElement('button')
+    btnVerLog.textContent = 'Ver registro completo'
+    btnVerLog.style.cssText = `
+      width: 220px;
+      height: 44px;
+      border: 2px solid ${colores.hudBorderColor};
+      border-radius: 12px;
+      background: ${colores.hudBotonVolverBg};
+      color: ${colores.hudBotonTextColor};
+      font-size: 14px;
+      font-weight: bold;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+      cursor: pointer;
+    `
+    btnVerLog.onclick = () => {
+      this.mostrarLogCompletoPrueba(logJSON, overlay)
+    }
+    botonesContainer.appendChild(btnVerLog)
+
+    const btnCerrar = document.createElement('button')
+    btnCerrar.textContent = 'Volver al inicio'
+    btnCerrar.style.cssText = `
+      width: 200px;
+      height: 44px;
+      border: none;
+      border-radius: 12px;
+      background: ${colores.primary};
+      color: ${colores.primaryText};
+      font-size: 14px;
+      font-weight: bold;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+      cursor: pointer;
+    `
+    btnCerrar.onclick = () => {
+      document.body.removeChild(overlay)
+      if (this.callbackVolver) {
+        this.callbackVolver()
+      }
+    }
+    botonesContainer.appendChild(btnCerrar)
+  }
+
+  mostrarLogCompletoPrueba(logJSON, overlayPadre) {
+    const colores = this._coloresDefecto()
+    const jsonString = typeof logJSON === 'string' ? logJSON : JSON.stringify(logJSON, null, 2)
+
+    const overlay = document.createElement('div')
+    overlay.id = 'log-completo-prueba-overlay'
+    overlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 10100;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+    `
+    document.body.appendChild(overlay)
+
+    const panel = document.createElement('div')
+    panel.style.cssText = `
+      background: rgba(28, 20, 16, 0.97);
+      border: 3px solid ${colores.hudBorderColor};
+      border-radius: 20px;
+      width: 90%;
+      max-width: 1100px;
+      height: 85vh;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      color: ${colores.hudTextColor};
+    `
+    overlay.appendChild(panel)
+
+    const titulo = document.createElement('h2')
+    titulo.textContent = 'Registro Completo de la Partida (Prueba)'
+    titulo.style.cssText = `
+      font-size: 26px;
+      margin: 0 0 16px 0;
+      text-align: center;
+      color: ${colores.primary};
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+    `
+    panel.appendChild(titulo)
+
+    const pre = document.createElement('pre')
+    pre.textContent = jsonString
+    pre.style.cssText = `
+      background: rgba(18, 14, 13, 0.85);
+      color: ${colores.textBody};
+      padding: 16px;
+      border-radius: 12px;
+      width: 100%;
+      flex-grow: 1;
+      overflow: auto;
+      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+      font-size: 12px;
+      border: 2px solid ${colores.hudBorderColor};
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    `
+    panel.appendChild(pre)
+
+    const botonesContainer = document.createElement('div')
+    botonesContainer.style.cssText = `
+      display: flex;
+      gap: 16px;
+      margin-top: 16px;
+    `
+    panel.appendChild(botonesContainer)
+
+    const btnCopiar = document.createElement('button')
+    btnCopiar.textContent = 'Copiar al portapapeles'
+    btnCopiar.style.cssText = `
+      width: 220px;
+      height: 40px;
+      border: 2px solid ${colores.hudBorderColor};
+      border-radius: 10px;
+      background: ${colores.hudBotonVolverBg};
+      color: ${colores.hudBotonTextColor};
+      font-size: 13px;
+      font-weight: bold;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+      cursor: pointer;
+    `
+    btnCopiar.onclick = () => {
+      navigator.clipboard.writeText(jsonString).then(() => {
+        btnCopiar.textContent = 'Copiado!'
+        btnCopiar.style.color = colores.badgeWork
+        setTimeout(() => {
+          btnCopiar.textContent = 'Copiar al portapapeles'
+          btnCopiar.style.color = colores.hudBotonTextColor
+        }, 2000)
+      }).catch(() => {})
+    }
+    botonesContainer.appendChild(btnCopiar)
+
+    const btnVolver = document.createElement('button')
+    btnVolver.textContent = 'Volver al resumen'
+    btnVolver.style.cssText = `
+      width: 180px;
+      height: 40px;
+      border: none;
+      border-radius: 10px;
+      background: ${colores.primary};
+      color: ${colores.primaryText};
+      font-size: 13px;
+      font-weight: bold;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+      cursor: pointer;
+    `
+    btnVolver.onclick = () => {
+      document.body.removeChild(overlay)
+    }
+    botonesContainer.appendChild(btnVolver)
   }
 }
