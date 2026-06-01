@@ -1,0 +1,173 @@
+[
+  {
+    "_id": "6a1b3b48ce932395e7903038",
+    "username": "anonimo",
+    "lobbyCode": "N/A",
+    "respuestas": {
+      "entendimiento_accidentes": 8,
+      "diversion": 6,
+      "tutorial_util": 9,
+      "visuales": 8,
+      "reglas_claras": 7,
+      "mecanicas": 6,
+      "muestra_agrada": 8,
+      "muestra_ayuda": 9,
+      "volver_a_jugar": 6
+    },
+    "promedioGeneral": 7.44,
+    "timestamp": "2026-05-30T19:32:24.240Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a1ca1d7a763876bd0332ba3",
+    "username": "jdthanak",
+    "lobbyCode": "N/A",
+    "respuestas": {
+      "entendimiento_accidentes": 10,
+      "diversion": 10,
+      "tutorial_util": 6,
+      "visuales": 10,
+      "reglas_claras": 5,
+      "mecanicas": 10,
+      "muestra_agrada": 10,
+      "muestra_ayuda": 5,
+      "volver_a_jugar": 5
+    },
+    "promedioGeneral": 7.89,
+    "timestamp": "2026-05-31T21:02:15.273Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a1ca3f5a763876bd0332ba9",
+    "username": "jdthanak",
+    "lobbyCode": "N/A",
+    "respuestas": {
+      "entendimiento_accidentes": 10,
+      "diversion": 10,
+      "tutorial_util": 6,
+      "visuales": 10,
+      "reglas_claras": 5,
+      "mecanicas": 10,
+      "muestra_agrada": 10,
+      "muestra_ayuda": 5,
+      "volver_a_jugar": 8
+    },
+    "promedioGeneral": 8.22,
+    "timestamp": "2026-05-31T21:11:17.289Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a1ca467a763876bd0332bab",
+    "username": "anonimo",
+    "lobbyCode": "N/A",
+    "respuestas": {
+      "entendimiento_accidentes": 6,
+      "diversion": 3,
+      "tutorial_util": 7,
+      "visuales": 6,
+      "reglas_claras": 6,
+      "mecanicas": 10,
+      "muestra_agrada": 8,
+      "muestra_ayuda": 9,
+      "volver_a_jugar": 7
+    },
+    "promedioGeneral": 6.89,
+    "timestamp": "2026-05-31T21:13:11.588Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a1ca520a763876bd0332bac",
+    "username": "anonimo",
+    "lobbyCode": "N/A",
+    "respuestas": {
+      "entendimiento_accidentes": 9,
+      "diversion": 7,
+      "tutorial_util": 9,
+      "visuales": 7,
+      "reglas_claras": 9,
+      "mecanicas": 10,
+      "muestra_agrada": 9,
+      "muestra_ayuda": 9,
+      "volver_a_jugar": 8
+    },
+    "promedioGeneral": 8.56,
+    "timestamp": "2026-05-31T21:16:16.097Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a1caa04a763876bd0332bad",
+    "username": "anonimo",
+    "lobbyCode": "N/A",
+    "respuestas": {
+      "entendimiento_accidentes": 8,
+      "diversion": 5,
+      "tutorial_util": 7,
+      "visuales": 9,
+      "reglas_claras": 7,
+      "mecanicas": 6,
+      "muestra_agrada": 7,
+      "muestra_ayuda": 8,
+      "volver_a_jugar": 5
+    },
+    "promedioGeneral": 6.89,
+    "timestamp": "2026-05-31T21:37:08.210Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a1dd7e7416b04e5e591eb80",
+    "username": "anonimo",
+    "lobbyCode": "N/A",
+    "respuestas": {
+      "entendimiento_accidentes": 8,
+      "diversion": 9,
+      "tutorial_util": 8,
+      "visuales": 10,
+      "reglas_claras": 7,
+      "mecanicas": 9,
+      "muestra_agrada": 7,
+      "muestra_ayuda": 8,
+      "volver_a_jugar": 7
+    },
+    "promedioGeneral": 8.11,
+    "timestamp": "2026-06-01T19:05:11.624Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a1dee782a7bc0c89af86e95",
+    "username": "anonimo",
+    "lobbyCode": "N/A",
+    "respuestas": {
+      "entendimiento_accidentes": 10,
+      "diversion": 7,
+      "tutorial_util": 9,
+      "visuales": 10,
+      "reglas_claras": 4,
+      "mecanicas": 7,
+      "muestra_agrada": 7,
+      "muestra_ayuda": 8,
+      "volver_a_jugar": 7
+    },
+    "promedioGeneral": 7.67,
+    "timestamp": "2026-06-01T20:41:28.449Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a1df44651e18500e5b000b6",
+    "username": "anonimo",
+    "lobbyCode": "N/A",
+    "respuestas": {
+      "entendimiento_accidentes": 10,
+      "diversion": 8,
+      "tutorial_util": 9,
+      "visuales": 7,
+      "reglas_claras": 6,
+      "mecanicas": 9,
+      "muestra_agrada": 7,
+      "muestra_ayuda": 9,
+      "volver_a_jugar": 7
+    },
+    "promedioGeneral": 8,
+    "timestamp": "2026-06-01T21:06:14.299Z",
+    "__v": 0
+  }
+]

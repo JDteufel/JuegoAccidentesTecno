@@ -1,0 +1,36 @@
+[
+  {
+    "_id": "69f155c37b58346314fd864c",
+    "username": "jugador1",
+    "password": "pass1234",
+    "createdAt": "2026-04-29T00:50:11.262Z"
+  },
+  {
+    "_id": "69f155c37b58346314fd864d",
+    "username": "jugador2",
+    "password": "pass5678",
+    "createdAt": "2026-04-29T00:50:11.262Z"
+  },
+  {
+    "_id": "69f1682572196e52989b8723",
+    "username": "jdthanak",
+    "password": "Jtecno009",
+    "createdAt": "2026-04-29T02:08:37.463Z",
+    "__v": 0,
+    "tema": "clasico"
+  },
+  {
+    "_id": "69fb722038753899ef50d32e",
+    "username": "prueba",
+    "password": "$2b$10$CAWR54tcfuUuH6liF13QQOWtxOyutNxCeyCzweVsKRuv4DvEDgKDm",
+    "createdAt": "2026-05-06T16:53:52.323Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a065cfd3f9fa3af00b0cb68",
+    "username": "semanatic",
+    "password": "SEMANATIC",
+    "createdAt": "2026-05-14T23:38:37.739Z",
+    "__v": 0
+  }
+]

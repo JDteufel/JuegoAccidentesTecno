@@ -1,0 +1,1028 @@
+[
+  {
+    "_id": "6a0d2eb84108433f857a21d3",
+    "timestamp": "2026-05-20T03:47:04.772Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Obsidian",
+      "horas": 1,
+      "categorias": [
+        "Estudio",
+        "Trabajo"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a10ba30adb649dba9eda7f9",
+    "timestamp": "2026-05-22T20:18:56.743Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Leer",
+      "horas": 3,
+      "categorias": [
+        "Estudio",
+        "Entretenimiento"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a10ba31adb649dba9eda7fa",
+    "timestamp": "2026-05-22T20:18:57.199Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "GitHub",
+      "horas": 2,
+      "categorias": [
+        "Trabajo",
+        "Estudio"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a10ba32adb649dba9eda7fb",
+    "timestamp": "2026-05-22T20:18:58.379Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Siesta",
+      "horas": 1,
+      "categorias": [
+        "Bienestar"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a10ba33adb649dba9eda7fc",
+    "timestamp": "2026-05-22T20:18:59.418Z",
+    "type": "METRICAS",
+    "action": "accidente_activado",
+    "details": {
+      "accidente": "Sesgo de IA",
+      "nivel": 3,
+      "manual": true,
+      "cartasAfectadas": [],
+      "cartasBeneficiadas": []
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a10be19adb649dba9eda7ff",
+    "timestamp": "2026-05-22T20:35:37.011Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Pinterest",
+      "horas": 2,
+      "categorias": [
+        "Entretenimiento",
+        "Estudio"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a10be19adb649dba9eda800",
+    "timestamp": "2026-05-22T20:35:37.440Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "GitHub",
+      "horas": 2,
+      "categorias": [
+        "Trabajo",
+        "Estudio"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a10be19adb649dba9eda801",
+    "timestamp": "2026-05-22T20:35:37.897Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Trello",
+      "horas": 2,
+      "categorias": [
+        "Trabajo"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a10be1aadb649dba9eda802",
+    "timestamp": "2026-05-22T20:35:38.585Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Duolingo",
+      "horas": 2,
+      "categorias": [
+        "Estudio"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a10be1badb649dba9eda803",
+    "timestamp": "2026-05-22T20:35:39.611Z",
+    "type": "METRICAS",
+    "action": "accidente_activado",
+    "details": {
+      "accidente": "Corrupcion de Datos",
+      "nivel": 2,
+      "manual": true,
+      "cartasAfectadas": [],
+      "cartasBeneficiadas": []
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a10c175adb649dba9eda806",
+    "timestamp": "2026-05-22T20:49:57.955Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Obsidian",
+      "horas": 2,
+      "categorias": [
+        "Estudio",
+        "Trabajo"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a10c177adb649dba9eda807",
+    "timestamp": "2026-05-22T20:49:59.258Z",
+    "type": "METRICAS",
+    "action": "accidente_activado",
+    "details": {
+      "accidente": "Corte de Energia",
+      "nivel": 2,
+      "manual": true,
+      "cartasAfectadas": [
+        "Figma",
+        "Kubernetes",
+        "Notion",
+        null,
+        "Trello",
+        "Coursera",
+        "VS Code"
+      ],
+      "cartasBeneficiadas": [
+        null
+      ]
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a10c178adb649dba9eda808",
+    "timestamp": "2026-05-22T20:50:00.203Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "horas": 1,
+      "categorias": [
+        "Trabajo",
+        "Entretenimiento",
+        "Estudio",
+        "Bienestar"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1b0ada249f8206861030e5",
+    "timestamp": "2026-05-30T16:05:46.960Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Twitch",
+      "horas": 1,
+      "categorias": [
+        "Entretenimiento"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1b0adc249f8206861030e6",
+    "timestamp": "2026-05-30T16:05:48.014Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Caminar",
+      "horas": 2,
+      "categorias": [
+        "Bienestar"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1b0add249f8206861030e7",
+    "timestamp": "2026-05-30T16:05:49.229Z",
+    "type": "METRICAS",
+    "action": "accidente_activado",
+    "details": {
+      "accidente": "Interferencia Electromagnetica",
+      "nivel": 1,
+      "manual": true,
+      "cartasAfectadas": [],
+      "cartasBeneficiadas": []
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1b0ade249f8206861030e8",
+    "timestamp": "2026-05-30T16:05:50.205Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Spotify",
+      "horas": 1,
+      "categorias": [
+        "Entretenimiento",
+        "Bienestar"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1b0ade249f8206861030e9",
+    "timestamp": "2026-05-30T16:05:50.838Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "horas": 1,
+      "categorias": [
+        "Trabajo",
+        "Entretenimiento",
+        "Estudio",
+        "Bienestar"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1b0adf249f8206861030ea",
+    "timestamp": "2026-05-30T16:05:51.931Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "TikTok",
+      "horas": 1,
+      "categorias": [
+        "Entretenimiento"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1b0d4a249f8206861030ed",
+    "timestamp": "2026-05-30T16:16:10.630Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "YouTube",
+      "horas": 2,
+      "categorias": [
+        "Entretenimiento",
+        "Estudio"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1b0d4b249f8206861030ee",
+    "timestamp": "2026-05-30T16:16:11.335Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Figma",
+      "horas": 2,
+      "categorias": [
+        "Trabajo"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1b0d4c249f8206861030ef",
+    "timestamp": "2026-05-30T16:16:12.160Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Zoom",
+      "horas": 1,
+      "categorias": [
+        "Trabajo"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1b0d4e249f8206861030f0",
+    "timestamp": "2026-05-30T16:16:14.136Z",
+    "type": "METRICAS",
+    "action": "accidente_activado",
+    "details": {
+      "accidente": "Interferencia Electromagnetica",
+      "nivel": 1,
+      "manual": true,
+      "cartasAfectadas": [],
+      "cartasBeneficiadas": []
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1b0d4f249f8206861030f1",
+    "timestamp": "2026-05-30T16:16:15.264Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Coursera",
+      "horas": 3,
+      "categorias": [
+        "Estudio"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1b0d50249f8206861030f2",
+    "timestamp": "2026-05-30T16:16:16.043Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Docker",
+      "horas": 1,
+      "categorias": [
+        "Trabajo"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1b0d50249f8206861030f3",
+    "timestamp": "2026-05-30T16:16:16.044Z",
+    "type": "METRICAS",
+    "action": "carta_uso",
+    "details": {
+      "carta": "Docker",
+      "cantidad": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1b0d50249f8206861030f4",
+    "timestamp": "2026-05-30T16:16:16.045Z",
+    "type": "METRICAS",
+    "action": "estadisticas_finales",
+    "details": {
+      "totalLogs": 14,
+      "porCategoria": {
+        "USUARIO": 0,
+        "METRICAS": 12,
+        "LOGS": 2
+      },
+      "timestamp": "2026-05-30T16:16:16.033Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1b0d50249f8206861030f7",
+    "timestamp": "2026-05-30T16:16:16.053Z",
+    "type": "METRICAS",
+    "action": "carta_uso",
+    "details": {
+      "carta": "Figma",
+      "cantidad": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1b0d50249f8206861030f8",
+    "timestamp": "2026-05-30T16:16:16.055Z",
+    "type": "METRICAS",
+    "action": "carta_uso",
+    "details": {
+      "carta": "Zoom",
+      "cantidad": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1b0d50249f8206861030f9",
+    "timestamp": "2026-05-30T16:16:16.056Z",
+    "type": "METRICAS",
+    "action": "carta_uso",
+    "details": {
+      "carta": "Coursera",
+      "cantidad": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1b0d50249f8206861030f5",
+    "timestamp": "2026-05-30T16:16:16.047Z",
+    "type": "METRICAS",
+    "action": "partida_duracion",
+    "details": {
+      "duracionSegundos": 8,
+      "perfil": "Especialista en Seguridad"
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1b0d50249f8206861030f6",
+    "timestamp": "2026-05-30T16:16:16.047Z",
+    "type": "METRICAS",
+    "action": "carta_uso",
+    "details": {
+      "carta": "YouTube",
+      "cantidad": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1ca043a763876bd0332b9f",
+    "timestamp": "2026-05-31T20:55:31.564Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Docker",
+      "horas": 1,
+      "categorias": [
+        "Trabajo"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1ca047a763876bd0332ba0",
+    "timestamp": "2026-05-31T20:55:35.881Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "AWS",
+      "horas": 4,
+      "categorias": [
+        "Trabajo"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1ca051a763876bd0332ba1",
+    "timestamp": "2026-05-31T20:55:45.395Z",
+    "type": "METRICAS",
+    "action": "accidente_activado",
+    "details": {
+      "accidente": "Ataque de Seguridad",
+      "nivel": 2,
+      "manual": true,
+      "cartasAfectadas": [],
+      "cartasBeneficiadas": []
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1ca353a763876bd0332ba4",
+    "timestamp": "2026-05-31T21:08:35.310Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "LinkedIn",
+      "horas": 2,
+      "categorias": [
+        "Trabajo"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1ca357a763876bd0332ba5",
+    "timestamp": "2026-05-31T21:08:39.771Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Leer",
+      "horas": 1,
+      "categorias": [
+        "Estudio",
+        "Entretenimiento"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1ca375a763876bd0332ba6",
+    "timestamp": "2026-05-31T21:09:09.311Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Pinterest",
+      "horas": 1,
+      "categorias": [
+        "Entretenimiento",
+        "Estudio"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1ca378a763876bd0332ba7",
+    "timestamp": "2026-05-31T21:09:12.784Z",
+    "type": "METRICAS",
+    "action": "accidente_activado",
+    "details": {
+      "accidente": "Exfiltracion de Datos",
+      "nivel": 3,
+      "manual": true,
+      "cartasAfectadas": [],
+      "cartasBeneficiadas": []
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1cdabaa763876bd0332bb1",
+    "timestamp": "2026-06-01T01:04:58.450Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Jira",
+      "horas": 2,
+      "categorias": [
+        "Trabajo"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1cdd5ca763876bd0332bb3",
+    "timestamp": "2026-06-01T01:16:12.511Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Pinterest",
+      "horas": 2,
+      "categorias": [
+        "Entretenimiento",
+        "Estudio"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1cdd5ea763876bd0332bb4",
+    "timestamp": "2026-06-01T01:16:14.067Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Figma",
+      "horas": 1,
+      "categorias": [
+        "Trabajo"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1cde59a763876bd0332bb6",
+    "timestamp": "2026-06-01T01:20:25.600Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Strava",
+      "horas": 1,
+      "categorias": [
+        "Bienestar"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1cde5aa763876bd0332bb7",
+    "timestamp": "2026-06-01T01:20:26.563Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Spotify",
+      "horas": 3,
+      "categorias": [
+        "Entretenimiento",
+        "Bienestar"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1cde5da763876bd0332bb8",
+    "timestamp": "2026-06-01T01:20:29.421Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "VS Code",
+      "horas": 1,
+      "categorias": [
+        "Trabajo",
+        "Estudio"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1cde5ea763876bd0332bb9",
+    "timestamp": "2026-06-01T01:20:30.594Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Duolingo",
+      "horas": 2,
+      "categorias": [
+        "Estudio"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1ce1b5a763876bd0332bbb",
+    "timestamp": "2026-06-01T01:34:45.555Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "TikTok",
+      "horas": 4,
+      "categorias": [
+        "Entretenimiento"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1ce1baa763876bd0332bbc",
+    "timestamp": "2026-06-01T01:34:50.858Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Leer",
+      "horas": 1,
+      "categorias": [
+        "Estudio",
+        "Entretenimiento"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1ce443a763876bd0332bbe",
+    "timestamp": "2026-06-01T01:45:39.126Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Teams",
+      "horas": 2,
+      "categorias": [
+        "Trabajo"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1ce825a763876bd0332bc1",
+    "timestamp": "2026-06-01T02:02:13.703Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Trello",
+      "horas": 1,
+      "categorias": [
+        "Trabajo"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1ce834a763876bd0332bc2",
+    "timestamp": "2026-06-01T02:02:28.456Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Discord",
+      "horas": 2,
+      "categorias": [
+        "Trabajo",
+        "Entretenimiento"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1ce835a763876bd0332bc3",
+    "timestamp": "2026-06-01T02:02:29.419Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Teams",
+      "horas": 1,
+      "categorias": [
+        "Trabajo"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1ced6aa763876bd0332bc7",
+    "timestamp": "2026-06-01T02:24:42.170Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Pinterest",
+      "horas": 1,
+      "categorias": [
+        "Entretenimiento",
+        "Estudio"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1ced6ca763876bd0332bc8",
+    "timestamp": "2026-06-01T02:24:44.627Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "horas": 1,
+      "categorias": [
+        "Trabajo",
+        "Entretenimiento",
+        "Estudio",
+        "Bienestar"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1cee0fa763876bd0332bca",
+    "timestamp": "2026-06-01T02:27:27.572Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Teams",
+      "horas": 2,
+      "categorias": [
+        "Trabajo"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1cee10a763876bd0332bcb",
+    "timestamp": "2026-06-01T02:27:28.892Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "VS Code",
+      "horas": 1,
+      "categorias": [
+        "Trabajo",
+        "Estudio"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1cee9fa763876bd0332bcc",
+    "timestamp": "2026-06-01T02:29:51.243Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Docker",
+      "horas": 3,
+      "categorias": [
+        "Trabajo"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1ceea3a763876bd0332bcd",
+    "timestamp": "2026-06-01T02:29:55.662Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "YouTube",
+      "horas": 1,
+      "categorias": [
+        "Entretenimiento",
+        "Estudio"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1ceeb2a763876bd0332bce",
+    "timestamp": "2026-06-01T02:30:10.707Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Discord",
+      "horas": 2,
+      "categorias": [
+        "Trabajo",
+        "Entretenimiento"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1cf075a763876bd0332bd1",
+    "timestamp": "2026-06-01T02:37:41.939Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Notion",
+      "horas": 2,
+      "categorias": [
+        "Trabajo",
+        "Estudio"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1cf51ba763876bd0332bd4",
+    "timestamp": "2026-06-01T02:57:31.733Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Jira",
+      "horas": 1,
+      "categorias": [
+        "Trabajo"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1cf68ba763876bd0332bd6",
+    "timestamp": "2026-06-01T03:03:39.972Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Jira",
+      "horas": 2,
+      "categorias": [
+        "Trabajo"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1cf68da763876bd0332bd7",
+    "timestamp": "2026-06-01T03:03:41.173Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Teams",
+      "horas": 2,
+      "categorias": [
+        "Trabajo"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1cf68ea763876bd0332bd8",
+    "timestamp": "2026-06-01T03:03:42.206Z",
+    "type": "METRICAS",
+    "action": "carta_jugada",
+    "details": {
+      "carta": "Duolingo",
+      "horas": 2,
+      "categorias": [
+        "Estudio"
+      ],
+      "turno": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1cf68ea763876bd0332bd9",
+    "timestamp": "2026-06-01T03:03:42.211Z",
+    "type": "METRICAS",
+    "action": "partida_duracion",
+    "details": {
+      "duracionSegundos": 9,
+      "perfil": "Analista de Sistemas"
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1cf68ea763876bd0332bda",
+    "timestamp": "2026-06-01T03:03:42.213Z",
+    "type": "METRICAS",
+    "action": "carta_uso",
+    "details": {
+      "carta": "Jira",
+      "cantidad": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1cf68ea763876bd0332bdb",
+    "timestamp": "2026-06-01T03:03:42.219Z",
+    "type": "METRICAS",
+    "action": "carta_uso",
+    "details": {
+      "carta": "Duolingo",
+      "cantidad": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1cf68ea763876bd0332bdc",
+    "timestamp": "2026-06-01T03:03:42.221Z",
+    "type": "METRICAS",
+    "action": "carta_uso",
+    "details": {
+      "carta": "Teams",
+      "cantidad": 1
+    },
+    "__v": 0
+  },
+  {
+    "_id": "6a1cf68ea763876bd0332bdd",
+    "timestamp": "2026-06-01T03:03:42.222Z",
+    "type": "METRICAS",
+    "action": "estadisticas_finales",
+    "details": {
+      "totalLogs": 9,
+      "porCategoria": {
+        "USUARIO": 0,
+        "METRICAS": 7,
+        "LOGS": 2
+      },
+      "timestamp": "2026-06-01T03:03:42.205Z"
+    },
+    "__v": 0
+  }
+]

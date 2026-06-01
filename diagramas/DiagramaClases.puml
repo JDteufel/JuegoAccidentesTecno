@@ -405,8 +405,12 @@ package "src/controller/" #LightGreen {
         - vistaEncuesta: VistaEncuesta
         - controladorEstadoApp: ControladorEstadoApp
         - username: String
+        - lobbyCode: String
+        + init()
         + configurarUsuario(username, lobbyCode)
         + enviarEncuesta(respuestas)
+        + _calcularPromedio(respuestas): float
+        + mostrar()
     }
 
     class ControladorVistaGestion {
