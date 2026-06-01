@@ -44,7 +44,6 @@ export function logEvent(type, action, details = {}) {
     }
   }
 
-  // Si es un evento de métricas, lo enviamos individualmente de inmediato para análisis
   if (type === 'METRICAS') {
     syncToMongoDB(type, action, details)
   }
@@ -60,13 +59,10 @@ export async function syncAllToMongoDB() {
   try {
     console.log(`[LogsService] Preparando envío de ${allLogs.length} eventos...`)
 
-    // Creamos una copia limpia de los logs para evitar cualquier problema de serialización
     const logsCopia = JSON.parse(JSON.stringify(allLogs))
 
     console.log('[LogsService] Contenido del historial a enviar:', logsCopia)
 
-    // Enviamos todo el historial acumulado como un único documento
-    // Usamos la acción 'sesion_completa' y ponemos el array de logs en el campo 'historial' de los detalles
     await mongoDBService.logEvent('SISTEMA', 'sesion_completa', {
       totalEventos: logsCopia.length,
       historial: logsCopia,
@@ -76,7 +72,6 @@ export async function syncAllToMongoDB() {
 
     console.log('[LogsService] Lote de logs sincronizado con éxito en un único registro')
 
-    // Limpiamos los logs locales para que el siguiente envío sea un nuevo lote
     limpiarLogs()
 
     return true

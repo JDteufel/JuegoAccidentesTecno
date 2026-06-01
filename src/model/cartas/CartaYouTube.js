@@ -26,4 +26,3 @@ export class CartaYouTube extends Carta {
     return super.aplicarHoras(perfil)
   }
 }
-

@@ -26,4 +26,3 @@ export class CartaJira extends Carta {
     return super.aplicarHoras(perfil)
   }
 }
-

@@ -26,4 +26,3 @@ export class CartaTwitch extends Carta {
     return super.aplicarHoras(perfil)
   }
 }
-

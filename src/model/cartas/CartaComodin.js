@@ -29,4 +29,3 @@ export class CartaComodin extends Carta {
     return true
   }
 }
-

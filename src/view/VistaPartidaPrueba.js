@@ -38,7 +38,8 @@ export class VistaPartidaPrueba {
       indice: null,
       panelOrigen: null,
       offsetX: 0,
-      offsetY: 0
+      offsetY: 0,
+      ghost: null
     }
 
     this.zonaDropIntercambio = null
@@ -1149,6 +1150,18 @@ export class VistaPartidaPrueba {
       const cartaVacia = this.crearCartaManoVaciaPrueba(i)
       gridMano.addControl(cartaVacia, 0, i)
     }
+
+    const zonaDropTablero = new GUI.Rectangle('zonaDropTableroPrueba')
+    zonaDropTablero.width = '100%'
+    zonaDropTablero.height = '50%'
+    zonaDropTablero.top = '0px'
+    zonaDropTablero.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
+    zonaDropTablero.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP
+    zonaDropTablero.background = 'transparent'
+    zonaDropTablero.thickness = 0
+    zonaDropTablero.isPointerBlocker = false
+    this.overlay.addControl(zonaDropTablero)
+    this.zonaDropTablero = zonaDropTablero
   }
 
   crearCartaManoVaciaPrueba(indice) {
@@ -1272,18 +1285,60 @@ export class VistaPartidaPrueba {
     cartaPanel.onPointerDownObservable.add((coords) => {
       if (carta.estaDeshabilitada()) return
       if (this.dragState.activo) return
+
+      const ghost = new GUI.Image(`ghostPrueba_${carta.codigo}`, imagenSrc)
+      ghost.name = `ghostPrueba_${carta.codigo}`
+      ghost.width = '140px'
+      ghost.height = '190px'
+      ghost.stretch = GUI.Image.STRETCH_UNIFORM
+      ghost.alpha = 0.65
+      ghost.isHitTestVisible = false
+      ghost.zIndex = 9999
+      ghost.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
+      ghost.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP
+      ghost.left = `${coords.x}px`
+      ghost.top = `${coords.y}px`
+      this.overlay.addControl(ghost)
+
       this.dragState.activo = true
       this.dragState.carta = carta
       this.dragState.indice = indice
       this.dragState.inicioY = coords.y
       this.dragState.inicioX = coords.x
       this.dragState.moviendo = false
+      this.dragState.ghost = ghost
+
+      cartaPanel.alpha = 0.3
     })
 
     cartaPanel.onPointerUpObservable.add((coords) => {
       if (!this.dragState.activo || this.dragState.indice !== indice) return
+
+      const deltaX = coords.x - this.dragState.inicioX
       const deltaY = this.dragState.inicioY - coords.y
-      if (this.dragState.moviendo && deltaY > 60) {
+
+      if (this.dragState.ghost) {
+        this.dragState.ghost.dispose()
+        this.dragState.ghost = null
+      }
+
+      const enZonaIntercambio = this._puntoEnZona(coords.x, coords.y, this.zonaDropIntercambio)
+      const enZonaTablero = this._puntoEnZona(coords.x, coords.y, this.zonaDropTablero)
+
+      if (this.dragState.moviendo && enZonaIntercambio) {
+        cartaPanel.top = '0px'
+        cartaPanel.alpha = carta.estaDeshabilitada() ? 0.5 : 1
+        if (this.callbackIntercambioCarta) {
+          const cartasIguales = this.cartas.filter(c =>
+            c.horas === carta.horas && c !== carta && !c.estaDeshabilitada()
+          )
+          if (cartasIguales.length > 0) {
+            this.seleccionarCartaParaIntercambio(carta)
+          } else {
+            this.mostrarMensajeFlotante(`No hay cartas con ${carta.horas}h para intercambiar`)
+          }
+        }
+      } else if (this.dragState.moviendo && enZonaTablero) {
         cartaPanel.top = '0px'
         cartaPanel.alpha = carta.estaDeshabilitada() ? 0.5 : 1
         if (this.callbackJugarCarta) {
@@ -1293,6 +1348,7 @@ export class VistaPartidaPrueba {
         cartaPanel.top = '0px'
         cartaPanel.alpha = carta.estaDeshabilitada() ? 0.5 : 1
       }
+
       this.dragState.activo = false
       this.dragState.carta = null
       this.dragState.indice = null
@@ -1305,17 +1361,44 @@ export class VistaPartidaPrueba {
       if (deltaY > 10 || deltaX > 10) {
         this.dragState.moviendo = true
       }
-      if (this.dragState.moviendo && deltaY > 0) {
-        cartaPanel.top = `${-Math.min(deltaY, 80)}px`
-        cartaPanel.alpha = Math.max(0.5, 1 - deltaY / 200)
+      if (this.dragState.moviendo) {
+        if (this.dragState.ghost) {
+          this.dragState.ghost.left = `${coords.x}px`
+          this.dragState.ghost.top = `${coords.y}px`
+        }
+        if (deltaY > 0) {
+          cartaPanel.top = `${-Math.min(deltaY, 80)}px`
+          cartaPanel.alpha = Math.max(0.3, 0.5 - deltaY / 300)
+        }
       }
     })
 
     return cartaPanel
   }
 
+  _puntoEnZona(pointerX, pointerY, zona) {
+    if (!zona) return false
+
+    const guiSize = this.guiTexture.getSize()
+    const centerX = guiSize.width / 2
+
+    if (zona === this.zonaDropIntercambio) {
+      const panelLeft = centerX - (guiSize.width * 0.95) / 2 + 130
+      const zonaLeft = panelLeft + 8
+      const zonaRight = zonaLeft + 160
+
+      return pointerX >= zonaLeft && pointerX <= zonaRight
+    }
+
+    if (zona === this.zonaDropTablero) {
+      return pointerY <= guiSize.height * 0.5
+    }
+
+    return false
+  }
+
   configurarDragDrop() {
-    // El drag-drop se maneja a nivel de cada carta en crearCartaManoGUI
+    
   }
 
   eliminarCartaDeMano(carta) {
@@ -1442,6 +1525,124 @@ export class VistaPartidaPrueba {
       overlay.dispose()
     })
     panel.addControl(btnCerrar)
+  }
+
+  seleccionarCartaParaIntercambio(cartaSeleccionada, overlay = null) {
+    if (overlay) {
+      overlay.dispose()
+    }
+
+    const colores = this._coloresDefecto()
+
+    const horasIguales = this.cartas.filter(c =>
+      c.horas === cartaSeleccionada.horas &&
+      c !== cartaSeleccionada &&
+      !c.estaDeshabilitada() &&
+      !cartaSeleccionada.estaDeshabilitada()
+    )
+
+    if (horasIguales.length === 0) {
+      this.mostrarMensajeFlotante(`No hay cartas con ${cartaSeleccionada.horas}h para intercambiar`)
+      return
+    }
+
+    const overlay2 = new GUI.Rectangle('overlayIntercambio2Prueba')
+    overlay2.width = 1
+    overlay2.height = 1
+    overlay2.thickness = 0
+    overlay2.background = 'rgba(0,0,0,0.6)'
+    overlay2.zIndex = 500
+    this.overlay.addControl(overlay2)
+
+    const panel = new GUI.Rectangle('panelIntercambio2Prueba')
+    panel.width = '450px'
+    panel.height = '300px'
+    panel.thickness = 3
+    panel.cornerRadius = 20
+    panel.color = colores.hudBorderColor
+    panel.background = colores.panelAccidentesBg
+    panel.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
+    panel.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER
+    overlay2.addControl(panel)
+
+    const titulo = new GUI.TextBlock('tituloIntercambio2Prueba', `Intercambiar ${cartaSeleccionada.titulo}`)
+    titulo.top = '-110px'
+    titulo.height = '40px'
+    titulo.color = colores.hudTextColor
+    titulo.fontSize = 22
+    titulo.fontFamily = 'Comic Sans MS'
+    titulo.fontWeight = 'bold'
+    panel.addControl(titulo)
+
+    const subtitulo = new GUI.TextBlock('subtituloIntercambio2Prueba', `Selecciona carta de ${cartaSeleccionada.horas}h para intercambiar`)
+    subtitulo.top = '-75px'
+    subtitulo.height = '24px'
+    subtitulo.color = colores.hudZonaIntercambioIcono
+    subtitulo.fontSize = 13
+    subtitulo.fontFamily = 'Comic Sans MS'
+    panel.addControl(subtitulo)
+
+    const grid = new GUI.Grid('gridIntercambio2Prueba')
+    grid.width = '400px'
+    grid.height = '150px'
+    grid.top = '-20px'
+    grid.addRowDefinition(70)
+    grid.addRowDefinition(70)
+    for (let i = 0; i < 3; i++) {
+      grid.addColumnDefinition(1 / 3)
+    }
+    panel.addControl(grid)
+
+    horasIguales.forEach((carta, indice) => {
+      if (indice >= 6) return
+      const fila = Math.floor(indice / 3)
+      const col = indice % 3
+
+      const btnCarta = GUI.Button.CreateSimpleButton(`btnIntercambio2Prueba_${indice}`, `${carta.titulo} (${carta.horas}h)`)
+      btnCarta.width = '120px'
+      btnCarta.height = '55px'
+      btnCarta.background = colores.hudBotonReiniciarBg
+      btnCarta.color = colores.hudTextColor
+      btnCarta.cornerRadius = 10
+      btnCarta.fontSize = 12
+      btnCarta.fontFamily = 'Comic Sans MS'
+      btnCarta.onPointerUpObservable.add(() => {
+        this.ejecutarIntercambio(cartaSeleccionada, carta)
+        overlay2.dispose()
+      })
+      grid.addControl(btnCarta, fila, col)
+    })
+
+    const btnCerrar = GUI.Button.CreateSimpleButton('btnCerrarIntercambio2Prueba', 'Cancelar')
+    btnCerrar.width = '120px'
+    btnCerrar.height = '36px'
+    btnCerrar.top = '110px'
+    btnCerrar.background = colores.hudBotonVolverBg
+    btnCerrar.color = colores.hudBotonTextColor
+    btnCerrar.cornerRadius = 10
+    btnCerrar.fontSize = 14
+    btnCerrar.fontFamily = 'Comic Sans MS'
+    btnCerrar.onPointerUpObservable.add(() => {
+      overlay2.dispose()
+    })
+    panel.addControl(btnCerrar)
+  }
+
+  ejecutarIntercambio(carta1, carta2) {
+    const indice1 = this.cartas.indexOf(carta1)
+    const indice2 = this.cartas.indexOf(carta2)
+
+    if (indice1 === -1 || indice2 === -1) return
+
+    this.cartas[indice1] = carta2
+    this.cartas[indice2] = carta1
+
+    this.actualizarPanelCartas()
+    this.mostrarMensajeFlotante(`Intercambiaste ${carta1.titulo} por ${carta2.titulo}`)
+
+    if (this.callbackIntercambioCarta) {
+      this.callbackIntercambioCarta(carta1, carta2)
+    }
   }
 
   crearPanelModal(nombre, tituloTexto) {

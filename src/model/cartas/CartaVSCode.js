@@ -26,4 +26,3 @@ export class CartaVSCode extends Carta {
     return super.aplicarHoras(perfil)
   }
 }
-

@@ -26,4 +26,3 @@ export class CartaAWS extends Carta {
     return super.aplicarHoras(perfil)
   }
 }
-

@@ -26,4 +26,3 @@ export class CartaNotion extends Carta {
     return super.aplicarHoras(perfil)
   }
 }
-

@@ -97,6 +97,7 @@ export class ControladorVistaPartida {
   jugarCarta(carta) {
     if (!this.turnoActivo || this.accidenteActivo) return
     if (carta.estaDeshabilitada()) return
+    if (!this.perfilAsignado.cartaEsValida(carta.categorias)) return
 
     if (!this.metricasUsoCartas[carta.titulo]) {
       this.metricasUsoCartas[carta.titulo] = 0
@@ -194,19 +195,13 @@ export class ControladorVistaPartida {
     return { accidente }
   }
 
-  verificarVictoria() {
-    if (this.perfilAsignado.completado) {
-      this.turnoActivo = false
-      this.vistaPartida.mostrarMensajeFinal('Perfil completado! Has terminado tu trabajo.')
-    }
-  }
-
   obtenerPerfilesUsados() {
     return this.controladorEstadoApp.obtenerPerfilesAsignados()
   }
 
   intercambiarCartas(carta1, carta2) {
     if (!this.turnoActivo || this.accidenteActivo) return
+    if (!carta2) return
     if (carta1.horas !== carta2.horas) {
       this.vistaPartida.mostrarMensaje('Las cartas deben tener la misma cantidad de horas para intercambiar')
       return
@@ -242,7 +237,11 @@ export class ControladorVistaPartida {
       }
     })
 
-    this.perfilAsignado.agregarHoras(actividad.horasBeneficio, actividad.categoriasBeneficiadas[0])
+    if (actividad.categoriasBeneficiadas && actividad.categoriasBeneficiadas.length > 0) {
+      actividad.categoriasBeneficiadas.forEach(cat => {
+        this.perfilAsignado.agregarHoras(actividad.horasBeneficio, cat)
+      })
+    }
 
     this.desactivarAccidenteMasAntiguo()
 

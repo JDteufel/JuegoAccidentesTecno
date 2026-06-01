@@ -247,7 +247,7 @@
   color: var(--primary-text);
 }
 
-/* Responsive Mobile */
+
 @media (max-width: 768px) {
   .encuesta-tarjeta {
     width: 92%;

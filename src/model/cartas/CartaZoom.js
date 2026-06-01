@@ -26,4 +26,3 @@ export class CartaZoom extends Carta {
     return super.aplicarHoras(perfil)
   }
 }
-

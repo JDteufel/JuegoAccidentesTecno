@@ -1207,6 +1207,18 @@ export class VistaPartida {
       const cartaVacia = this.crearCartaManoVacia(i)
       gridMano.addControl(cartaVacia, 0, i)
     }
+
+    const zonaDropTablero = new GUI.Rectangle('zonaDropTablero')
+    zonaDropTablero.width = '100%'
+    zonaDropTablero.height = '50%'
+    zonaDropTablero.top = '0px'
+    zonaDropTablero.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
+    zonaDropTablero.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP
+    zonaDropTablero.background = 'transparent'
+    zonaDropTablero.thickness = 0
+    zonaDropTablero.isPointerBlocker = false
+    this.overlay.addControl(zonaDropTablero)
+    this.zonaDropTablero = zonaDropTablero
   }
 
   crearCartaManoVacia(indice) {
@@ -1260,19 +1272,61 @@ export class VistaPartida {
     cartaPanel.onPointerDownObservable.add((coords) => {
       if (carta.estaDeshabilitada()) return
       if (this.dragState) return
+
+      const ghost = new GUI.Image(`ghost_${carta.codigo}`, imagenSrc)
+      ghost.name = `ghost_${carta.codigo}`
+      ghost.width = '140px'
+      ghost.height = '190px'
+      ghost.stretch = GUI.Image.STRETCH_UNIFORM
+      ghost.alpha = 0.65
+      ghost.isHitTestVisible = false
+      ghost.zIndex = 9999
+      ghost.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
+      ghost.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP
+      ghost.left = `${coords.x}px`
+      ghost.top = `${coords.y}px`
+      this.overlay.addControl(ghost)
+
       this.dragState = {
         indice,
         carta,
         inicioY: coords.y,
         inicioX: coords.x,
-        moviendo: false
+        moviendo: false,
+        ghost
       }
+
+      cartaPanel.alpha = 0.3
     })
 
     cartaPanel.onPointerUpObservable.add((coords) => {
       if (!this.dragState || this.dragState.indice !== indice) return
+
+      const deltaX = coords.x - this.dragState.inicioX
       const deltaY = this.dragState.inicioY - coords.y
-      if (this.dragState.moviendo && deltaY > 60) {
+
+      if (this.dragState.ghost) {
+        this.dragState.ghost.dispose()
+        this.dragState.ghost = null
+      }
+
+      const enZonaIntercambio = this._puntoEnZona(coords.x, coords.y, this.zonaDropIntercambio)
+      const enZonaTablero = this._puntoEnZona(coords.x, coords.y, this.zonaDropTablero)
+
+      if (this.dragState.moviendo && enZonaIntercambio) {
+        cartaPanel.top = '0px'
+        cartaPanel.alpha = carta.estaDeshabilitada() ? 0.5 : 1
+        if (this.callbackIntercambioCarta) {
+          const cartasIguales = this.cartas.filter(c =>
+            c.horas === carta.horas && c !== carta && !c.estaDeshabilitada()
+          )
+          if (cartasIguales.length > 0) {
+            this.seleccionarCartaParaIntercambio(carta)
+          } else {
+            this.mostrarMensajeFlotante(`No hay cartas con ${carta.horas}h para intercambiar`)
+          }
+        }
+      } else if (this.dragState.moviendo && enZonaTablero) {
         cartaPanel.top = '0px'
         cartaPanel.alpha = carta.estaDeshabilitada() ? 0.5 : 1
         if (this.callbackJugarCarta) {
@@ -1282,6 +1336,7 @@ export class VistaPartida {
         cartaPanel.top = '0px'
         cartaPanel.alpha = carta.estaDeshabilitada() ? 0.5 : 1
       }
+
       this.dragState = null
     })
 
@@ -1292,13 +1347,40 @@ export class VistaPartida {
       if (deltaY > 10 || deltaX > 10) {
         this.dragState.moviendo = true
       }
-      if (this.dragState.moviendo && deltaY > 0) {
-        cartaPanel.top = `${-Math.min(deltaY, 80)}px`
-        cartaPanel.alpha = Math.max(0.5, 1 - deltaY / 200)
+      if (this.dragState.moviendo) {
+        if (this.dragState.ghost) {
+          this.dragState.ghost.left = `${coords.x}px`
+          this.dragState.ghost.top = `${coords.y}px`
+        }
+        if (deltaY > 0) {
+          cartaPanel.top = `${-Math.min(deltaY, 80)}px`
+          cartaPanel.alpha = Math.max(0.3, 0.5 - deltaY / 300)
+        }
       }
     })
 
     return cartaPanel
+  }
+
+  _puntoEnZona(pointerX, pointerY, zona) {
+    if (!zona) return false
+
+    const guiSize = this.guiTexture.getSize()
+    const centerX = guiSize.width / 2
+
+    if (zona === this.zonaDropIntercambio) {
+      const panelLeft = centerX - (guiSize.width * 0.95) / 2 + 130
+      const zonaLeft = panelLeft + 8
+      const zonaRight = zonaLeft + 160
+
+      return pointerX >= zonaLeft && pointerX <= zonaRight
+    }
+
+    if (zona === this.zonaDropTablero) {
+      return pointerY <= guiSize.height * 0.5
+    }
+
+    return false
   }
 
   onVolver(callback) {

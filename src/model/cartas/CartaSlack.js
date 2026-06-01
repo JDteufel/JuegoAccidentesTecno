@@ -26,4 +26,3 @@ export class CartaSlack extends Carta {
     return super.aplicarHoras(perfil)
   }
 }
-

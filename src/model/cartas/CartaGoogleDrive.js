@@ -26,4 +26,3 @@ export class CartaGoogleDrive extends Carta {
     return super.aplicarHoras(perfil)
   }
 }
-

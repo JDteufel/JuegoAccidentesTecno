@@ -330,7 +330,6 @@
   margin-top: 30px;
 }
 
-/* ========== TABLET (769px - 1024px) ========== */
 @media (max-width: 1024px) {
   #gestionContainer .tarjeta-gestion {
     width: 95vw;
@@ -369,7 +368,6 @@
   }
 }
 
-/* ========== MOVIL (<= 768px) ========== */
 @media (max-width: 768px) {
   #gestionContainer {
     padding: 8px;
@@ -504,7 +502,6 @@
   }
 }
 
-/* ========== MOVIL PEQUENO (<= 400px) ========== */
 @media (max-width: 400px) {
   #gestionContainer .tarjeta-gestion {
     padding: 16px 8px 12px;

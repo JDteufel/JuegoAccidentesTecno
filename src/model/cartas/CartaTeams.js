@@ -26,4 +26,3 @@ export class CartaTeams extends Carta {
     return super.aplicarHoras(perfil)
   }
 }
-

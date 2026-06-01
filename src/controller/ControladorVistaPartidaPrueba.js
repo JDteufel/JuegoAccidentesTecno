@@ -371,6 +371,7 @@ export class ControladorVistaPartidaPrueba {
 
   intercambiarCartas(carta1, carta2) {
     if (!this.turnoActivo || this.accidenteActivo) return
+    if (!carta2) return
     if (carta1.horas !== carta2.horas) {
       this.vistaPartidaPrueba.mostrarMensaje('Las cartas deben tener la misma cantidad de horas para intercambiar')
       return
@@ -406,7 +407,11 @@ export class ControladorVistaPartidaPrueba {
       }
     })
 
-    this.perfilAsignado.agregarHoras(actividad.horasBeneficio, actividad.categoriasBeneficiadas[0])
+    if (actividad.categoriasBeneficiadas && actividad.categoriasBeneficiadas.length > 0) {
+      actividad.categoriasBeneficiadas.forEach(cat => {
+        this.perfilAsignado.agregarHoras(actividad.horasBeneficio, cat)
+      })
+    }
 
     this.desactivarAccidenteMasAntiguo()
 

@@ -26,4 +26,3 @@ export class CartaDocker extends Carta {
     return super.aplicarHoras(perfil)
   }
 }
-

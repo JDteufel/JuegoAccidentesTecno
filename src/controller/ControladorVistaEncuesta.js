@@ -42,6 +42,7 @@ export class ControladorVistaEncuesta {
       if (resultado && resultado.ok === true) {
         this.vistaEncuesta._mostrarFeedback('Encuesta enviada correctamente', 'success')
         setTimeout(() => {
+          this.vistaEncuesta.resetear()
           this.vistaEncuesta.ocultar()
           this.controladorEstadoApp.irAPantalla(PANTALLAS.INICIAL_PUBLICA)
         }, 1500)

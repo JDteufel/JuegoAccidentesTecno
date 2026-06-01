@@ -26,4 +26,3 @@ export class CartaTrello extends Carta {
     return super.aplicarHoras(perfil)
   }
 }
-
